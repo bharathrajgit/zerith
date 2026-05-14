@@ -1,0 +1,96 @@
+{
+  "model": "Ensemble (RF+GB+LR)",
+  "voting": "soft",
+  "weights": [
+    3,
+    2,
+    1
+  ],
+  "n_samples": 2000,
+  "n_features": 13,
+  "class_distribution": {
+    "Placement-Ready": 400,
+    "Beginner": 800,
+    "Intermediate": 800
+  },
+  "cv_mean_accuracy": 0.998,
+  "cv_std": 0.0018708286933869665,
+  "cv_scores": [
+    0.9975,
+    1.0,
+    0.995,
+    0.9975,
+    1.0
+  ],
+  "test_accuracy": 0.995,
+  "classes": [
+    "Beginner",
+    "Intermediate",
+    "Placement-Ready"
+  ],
+  "confusion_matrix": [
+    [
+      160,
+      0,
+      0
+    ],
+    [
+      0,
+      160,
+      0
+    ],
+    [
+      0,
+      2,
+      78
+    ]
+  ],
+  "classification_report": {
+    "Beginner": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 160.0
+    },
+    "Intermediate": {
+      "precision": 0.9876543209876543,
+      "recall": 1.0,
+      "f1-score": 0.9937888198757764,
+      "support": 160.0
+    },
+    "Placement-Ready": {
+      "precision": 1.0,
+      "recall": 0.975,
+      "f1-score": 0.9873417721518988,
+      "support": 80.0
+    },
+    "accuracy": 0.995,
+    "macro avg": {
+      "precision": 0.9958847736625515,
+      "recall": 0.9916666666666667,
+      "f1-score": 0.9937101973425584,
+      "support": 400.0
+    },
+    "weighted avg": {
+      "precision": 0.9950617283950618,
+      "recall": 0.995,
+      "f1-score": 0.9949838823806902,
+      "support": 400.0
+    }
+  },
+  "feature_importance": {
+    "topics_studied_count": 0.16472787203452188,
+    "conceptual_error_rate": 0.14936003082734395,
+    "round2_accuracy": 0.13709575941100813,
+    "attempt_count": 0.11880815337516627,
+    "avg_response_time": 0.09323742886063179,
+    "reasoning_error_rate": 0.0895261472811925,
+    "round3_accuracy": 0.07557305898933633,
+    "hint_usage_rate": 0.06420908953903412,
+    "coding_accuracy": 0.052231471061252,
+    "round1_accuracy": 0.018228293788106746,
+    "skip_attempts": 0.017057089672451637,
+    "application_error_rate": 0.01642629467367438,
+    "streak_day": 0.0035193104862802794
+  }
+}

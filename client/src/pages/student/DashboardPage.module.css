@@ -1,0 +1,139 @@
+/* client/src/pages/student/DashboardPage.module.css */
+.page {
+  display: flex; flex-direction: column; gap: 2rem;
+  padding: 0; /* main padding from layout */
+  color: #f1f5f9;
+}
+.header {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end;
+}
+.greeting {
+  font-size: 1.5rem; font-weight: 700; color: white;
+}
+.planInfo {
+  color: #94a3b8; font-size: 0.875rem; margin-top: 0.25rem;
+}
+.date {
+  font-size: 0.875rem; color: #64748b;
+}
+
+/* Stats */
+.statsRow {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;
+}
+.statCard {
+  background: #111120; border: 1px solid #1e1e35; border-radius: 1rem; padding: 1.25rem;
+  position: relative; overflow: hidden;
+}
+.statCardAmber { border-color: rgba(245,158,11,0.2); }
+.statCardGreen { border-color: rgba(34,197,94,0.2); }
+.statCardBlue { border-color: rgba(99,102,241,0.2); }
+.statIcon { margin-bottom: 0.75rem; width: 28px; height: 28px; }
+.statValue { font-size: 1.875rem; font-weight: 700; color: white; }
+.statLabel { font-size: 0.875rem; color: #94a3b8; margin-top: 0.25rem; }
+.statSub { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; }
+.progressBar { height: 4px; background: #1e1e35; border-radius: 2px; margin-top: 0.75rem; overflow: hidden; }
+.progressBarFill { height: 100%; background: linear-gradient(90deg, #22c55e, #4ade80); border-radius: 2px; transition: width 0.5s; }
+
+/* Today ring */
+.todayRing { position: relative; width: 80px; height: 80px; margin-bottom: 0.75rem; }
+.ringSvg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ringProgress { transition: stroke-dashoffset 1s; }
+.ringValue { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 1rem; font-weight: 700; color: white; }
+
+/* Section */
+.section { margin-bottom: 0; }
+.sectionTitle { display: flex; align-items: center; gap: 0.75rem; font-size: 1.125rem; font-weight: 700; color: white; margin-bottom: 1rem; }
+.dayBadge { font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; background: rgba(99,102,241,0.15); color: #a5b4fc; }
+
+/* Tasks list */
+.tasksList { display: flex; flex-direction: column; gap: 0.75rem; }
+.taskRow { display: flex; align-items: center; gap: 1rem; background: #111120; border: 1px solid #1e1e35; border-radius: 0.75rem; padding: 1rem; }
+.taskIcon { color: #94a3b8; }
+.taskInfo { flex: 1; min-width: 0; }
+.taskName { font-weight: 500; color: white; truncate: true; }
+.taskType { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; }
+.taskStatusDone { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: rgba(34,197,94,0.15); color: #4ade80; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; }
+.taskBtn { display: flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.75rem; background: #6366f1; color: white; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; border: none; cursor: pointer; }
+.taskStatusLocked { padding: 0.25rem 0.75rem; background: rgba(100,116,139,0.15); color: #64748b; border-radius: 0.5rem; font-size: 0.75rem; }
+
+/* Two column */
+.twoCol { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+@media (max-width: 768px) { .twoCol { grid-template-columns: 1fr; } }
+
+.weakList { display: flex; flex-direction: column; gap: 0.75rem; }
+.weakCard { display: flex; align-items: flex-start; gap: 0.75rem; background: #111120; border: 1px solid #1e1e35; border-radius: 0.75rem; padding: 1rem; }
+.severityDot { width: 8px; height: 8px; border-radius: 50%; margin-top: 0.5rem; }
+.severityHigh { background: #ef4444; }
+.severityMedium { background: #f59e0b; }
+.severityLow { background: #22c55e; }
+.weakInfo { flex: 1; min-width: 0; }
+.weakTopic { font-weight: 500; color: white; }
+.weakRecommendation { font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }
+.practiceBtn { padding: 0.25rem 0.75rem; background: #6366f1; color: white; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 500; border: none; cursor: pointer; white-space: nowrap; }
+
+.chartCard { background: #111120; border: 1px solid #1e1e35; border-radius: 0.75rem; padding: 1rem; height: 220px; }
+.emptyState { display: flex; align-items: center; justify-content: center; height: 100%; color: #64748b; }
+
+/* Module grid */
+.moduleGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 1rem; }
+.moduleCard { background: #1a1a2e; border: 1px solid #1e1e35; border-radius: 0.75rem; padding: 1rem; cursor: pointer; transition: border-color 0.2s, transform 0.2s; }
+.moduleCard:hover { border-color: rgba(99,102,241,0.5); transform: translateY(-2px); }
+.moduleCardGreen { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.3); }
+.moduleCardAmber { background: rgba(245,158,11,0.05); border-color: rgba(245,158,11,0.3); }
+.moduleCardOrange { background: rgba(249,115,22,0.05); border-color: rgba(249,115,22,0.3); }
+.moduleCardRed { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.3); }
+.moduleEmoji { font-size: 1.5rem; }
+.moduleName { font-weight: 500; font-size: 0.875rem; margin-top: 0.5rem; color: white; }
+.modulePercent { font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem; }
+.moduleBar { height: 3px; background: rgba(255,255,255,0.1); border-radius: 1.5px; margin-top: 0.5rem; overflow:hidden; }
+.moduleBarFill { height: 100%; background: #6366f1; border-radius: 1.5px; transition: width 0.5s; }
+
+/* Chat float */
+.chatFloatBtn {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 30;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  box-shadow: 0 10px 30px rgba(99,102,241,0.4);
+  display: flex; align-items: center; justify-content: center;
+  color: white; border: none; cursor: pointer;
+  transition: transform 0.2s;
+}
+.chatFloatBtn:hover { transform: scale(1.1); }
+
+/* Chat panel */
+.chatPanel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 100%; max-width: 380px;
+  background: #111120; border-left: 1px solid #1e1e35; z-index: 40;
+  display: flex; flex-direction: column;
+}
+.chatHeader {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem; border-bottom: 1px solid #1e1e35;
+}
+.chatTitle { font-weight: 700; color: white; }
+.chatSubtitle { font-size: 0.75rem; color: #64748b; }
+.chatClose { background: none; border: none; color: #94a3b8; cursor: pointer; }
+.chatMessages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.chatSystemMsg { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); border-radius: 0.75rem; padding: 0.75rem 1rem; font-size: 0.875rem; color: #e2e8f0; }
+.chatBubbleUser { align-self: flex-end; background: #6366f1; color: white; padding: 0.5rem 1rem; border-radius: 1rem 1rem 0 1rem; max-width: 80%; font-size: 0.875rem; }
+.chatBubbleAi { align-self: flex-start; background: rgba(255,255,255,0.05); color: #e2e8f0; padding: 0.5rem 1rem; border-radius: 1rem 1rem 1rem 0; max-width: 80%; font-size: 0.875rem; }
+.chatTyping { align-self: flex-start; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 0.75rem 1rem; display: flex; gap: 0.3rem; }
+.typingDot { width: 6px; height: 6px; background: #64748b; border-radius: 50%; animation: typingBounce 0.6s infinite alternate; }
+@keyframes typingBounce { to { transform: translateY(-4px); opacity: 0.5; } }
+.chatInputArea { display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid #1e1e35; }
+.chatInput { flex: 1; background: #0a0a0f; border: 1px solid #1e1e35; border-radius: 0.5rem; padding: 0.75rem; color: white; font-size: 0.875rem; outline: none; }
+.chatInput:focus { border-color: #6366f1; }
+.chatSendBtn { padding: 0.75rem; background: #6366f1; border: none; border-radius: 0.5rem; color: white; cursor: pointer; display: flex; align-items: center; }
+.chatSendBtn:disabled { background: #4b5563; cursor: default; }
+
+/* Skeleton */
+.skeleton { background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 0.75rem; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.taskSkeleton { display: flex; align-items: center; gap: 1rem; background: #111120; border-radius: 0.75rem; padding: 1rem; }
+.skeletonAvatar { width: 40px; height: 40px; border-radius: 50%; background: #1e1e35; }
+.skeletonLines { flex: 1; }
+.skeletonLine { height: 10px; background: #1e1e35; border-radius: 5px; }
+.chartSkeleton { height: 220px; display: flex; align-items: flex-end; padding: 1rem; }
+.skeletonChartBar { width: 100%; height: 60%; background: #1e1e35; border-radius: 4px; }
+.skeletonList { display: flex; flex-direction: column; gap: 0.75rem; }

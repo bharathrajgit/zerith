@@ -1,0 +1,123 @@
+=== DSA PLATFORM FRONTEND CONTEXT ===
+
+BACKEND: Fully complete on port 5000
+ML SERVICE: Complete on port 8000
+TASK: Build React frontend ONLY
+
+TECH STACK:
+React 18 + Vite | Tailwind CSS
+Recharts (charts) | Lucide React (icons)
+React Router v6 | Axios | React Hot Toast
+
+DESIGN SYSTEM:
+Background:    #0a0a0f (darkest)
+Card bg:       #111120
+Border:        #1e1e35
+Primary:       #6366f1 (indigo)
+Success:       #22c55e (green)
+Warning:       #f59e0b (amber)
+Danger:        #ef4444 (red)
+Text primary:  #f1f5f9
+Text muted:    #64748b
+Font:          Inter
+
+AI CHATBOT: Gemini API (free tier)
+Key: process.env.VITE_GEMINI_API_KEY
+
+COMPLETE API REFERENCE:
+Student Auth:
+  POST /api/auth/register
+  POST /api/auth/login
+  GET  /api/auth/me
+  PUT  /api/auth/reset-first-password
+
+Institution Auth:
+  POST /api/institution/auth/register
+  POST /api/institution/auth/login
+  GET  /api/institution/auth/profile
+
+Diagnostic (Real-time AI, never stored):
+  POST /api/diagnostic/start → {token}
+  POST /api/diagnostic/question → {question}
+  POST /api/diagnostic/answer → {isCorrect}
+  POST /api/diagnostic/complete → {level,roadmap}
+
+Modules:
+  GET /api/modules
+  GET /api/modules/:id
+  GET /api/modules/:id/topics
+
+MCQ:
+  GET /api/mcq/topic/:topicId/:level
+  GET /api/mcq/:mcqId
+  GET /api/mcq/diagnostic
+
+Assessment:
+  POST /api/assessment/submit
+  GET  /api/assessment/history
+
+Progress:
+  GET /api/progress
+  GET /api/progress/:topicId
+
+Roadmap:
+  POST /api/roadmap/generate
+  GET /api/roadmap
+  PUT /api/roadmap/complete-task
+
+Streak:
+  POST /api/streak/log
+  GET /api/streak
+
+ML (via Node proxy):
+  POST /api/ml/classify-level
+  POST /api/ml/detect-weak-areas
+  POST /api/ml/readiness-score
+  GET /api/ml/feature-importance
+  GET /api/ml/training-report
+
+Institution Students:
+  POST /api/institution/students/add
+  POST /api/institution/students/bulk
+  GET /api/institution/students
+  DELETE /api/institution/students/:id
+  PUT /api/institution/students/:id/reset-password
+
+Institution Analytics:
+  GET /api/institution/analytics/overview
+  GET /api/institution/analytics/departments
+  GET /api/institution/analytics/at-risk
+  GET /api/institution/analytics/malpractice
+  GET /api/institution/analytics/placement-prediction
+  GET /api/institution/analytics/student/:id
+
+CRITICAL INTEGRATION RULES:
+1. All POST requests: Content-Type: application/json
+2. Protected routes: Authorization: Bearer <token>
+3. Token stored: localStorage key "dsa_token"
+4. User type stored: localStorage key "dsa_user_type"
+5. Weak area scores: send as 0-1 NOT 0-100
+6. On 401: clear localStorage + redirect /login
+7. Diagnostic: never store questions, only results
+8. mustResetPassword: redirect to /reset-password
+
+RULES FOR CODE:
+- Complete files only, zero "..." placeholders
+- Every API call has loading + error + empty state
+- No white blank screens ever
+- Mobile responsive always
+- Dark theme always consistent
+
+UI CHANGE REQUEST:
+Change only the frontend styling layer:
+- Convert Tailwind CSS usage into component-style CSS
+- Use CSS Modules or separate component-scoped CSS files
+- Keep all logic, routes, API calls, and features unchanged
+- Make the UI light, unique, modern, and more interactive
+- Improve user experience with better spacing, hover states, animations, card depth, and polished visual hierarchy
+- Preserve responsiveness and all loading/error/empty states
+- Do not introduce blank screens
+- Generate complete production-ready files only
+- No placeholders, no TODOs, no ellipses
+
+=== END CONTEXT ===

@@ -1,0 +1,9 @@
+{
+  "labels": [
+    "normal",
+    "gaze_away",
+    "head_pose_away",
+    "multiple_faces",
+    "face_missing"
+  ]
+}

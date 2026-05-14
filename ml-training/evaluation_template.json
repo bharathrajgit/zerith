@@ -1,0 +1,19 @@
+{
+  "model_name": "proctor_monitor",
+  "dataset_slug": "",
+  "class_labels": [
+    "normal",
+    "gaze_away",
+    "head_pose_away",
+    "multiple_faces",
+    "face_missing"
+  ],
+  "validation_accuracy": 0,
+  "macro_f1": 0,
+  "per_class_precision": {},
+  "per_class_recall": {},
+  "per_class_f1": {},
+  "confusion_matrix_path": "",
+  "onnx_export_path": "ml-service/trained_models/proctor_monitor.onnx",
+  "notes": ""
+}

@@ -1,0 +1,353 @@
+/* client/src/pages/institution/AnalyticsPage.module.css */
+
+/* ================================================================
+   Base & Animations
+   ================================================================ */
+.page {
+  padding-bottom: 2rem;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease both;
+}
+
+.section {
+  margin-bottom: 2.5rem;
+  animation: fadeInUp 0.6s ease both;
+}
+.section:nth-child(2) { animation-delay: 0.1s; }
+.section:nth-child(3) { animation-delay: 0.2s; }
+.section:nth-child(4) { animation-delay: 0.3s; }
+
+.sectionTitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ================================================================
+   Chart Card
+   ================================================================ */
+.chartCard {
+  background: linear-gradient(135deg, #0f0f23 0%, #111120 100%);
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.chartCard:hover {
+  border-color: #2d2d50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Two‑column layout */
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 768px) {
+  .twoCol { grid-template-columns: 1fr; }
+}
+
+/* ================================================================
+   Top Performers & Weak Students
+   ================================================================ */
+.performerCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.performerCard:hover {
+  border-color: #2d2d50;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.performerTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+}
+.performerList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.performerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+.performerRow:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.performerRank {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.75rem;
+  background: #1e1e35;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.performerRow:nth-child(1) .performerRank {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #111;
+}
+.performerRow:nth-child(2) .performerRank {
+  background: linear-gradient(135deg, #94a3b8, #64748b);
+  color: #111;
+}
+.performerRow:nth-child(3) .performerRank {
+  background: linear-gradient(135deg, #b45309, #92400e);
+  color: #fff;
+}
+.performerName {
+  flex: 1;
+  font-weight: 500;
+}
+.performerDept {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  background: rgba(255,255,255,0.05);
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+}
+.performerScore {
+  font-weight: 700;
+  color: white;
+  min-width: 3rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.emptyText {
+  color: #64748b;
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255,255,255,0.02);
+  border-radius: 0.5rem;
+}
+
+/* ================================================================
+   Readiness Heatmap Table
+   ================================================================ */
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  border: 1px solid #1e1e35;
+}
+.heatmapTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #111120;
+}
+.heatmapTable th {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  border-bottom: 2px solid #1e1e35;
+  background: #0a0a0f;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+.topicCell {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  font-weight: 500;
+  border-bottom: 1px solid #1e1e35;
+  background: rgba(255,255,255,0.01);
+}
+.heatCell {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: white;
+  text-align: center;
+  border-bottom: 1px solid #1e1e35;
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+.heatCell:hover {
+  background: rgba(99, 102, 241, 0.1);
+  transform: scale(1.02);
+}
+.heatmapTable tbody tr:hover .topicCell {
+  background: rgba(255,255,255,0.03);
+}
+.heatmapTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ================================================================
+   Department Comparison Cards (Used in second twoCol)
+   ================================================================ */
+.deptCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  transition: border-color 0.3s, transform 0.2s;
+}
+.deptCard:hover {
+  border-color: #6366f1;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.1);
+}
+.deptHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.deptName {
+  font-weight: 600;
+  color: white;
+  font-size: 1rem;
+}
+.deptCode {
+  font-size: 0.7rem;
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.15);
+  padding: 0.15rem 0.5rem;
+  border-radius: 2rem;
+}
+.deptStat {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+}
+.deptStat strong {
+  color: white;
+}
+.deptProgress {
+  height: 8px;
+  background: #1e1e35;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+.deptProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 4px;
+  transition: width 0.8s ease;
+}
+
+/* ================================================================
+   Placement Prediction Timeline (stacked bar)
+   ================================================================ */
+.predictionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+.predictionCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.predictionCard:hover {
+  border-color: #6366f1;
+}
+.predictionLabel {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+}
+.predictionValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+}
+.predictionDesc {
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* ================================================================
+   Loading Skeletons
+   ================================================================ */
+.skeletonBlock {
+  height: 160px;
+  background: linear-gradient(
+    90deg,
+    #1e1e35 25%,
+    #2a2a40 50%,
+    #1e1e35 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+}
+.skeletonRow {
+  display: flex;
+  gap: 1rem;
+}
+.skeletonCard {
+  flex: 1;
+  height: 120px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 1rem;
+}
+
+/* ================================================================
+   Responsive tweaks
+   ================================================================ */
+@media (max-width: 480px) {
+  .predictionGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

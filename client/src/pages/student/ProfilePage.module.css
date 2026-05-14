@@ -1,0 +1,373 @@
+/* client/src/pages/student/ProfilePage.module.css */
+
+/* Base Page */
+.page {
+  padding-bottom: 2rem;
+  animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+  letter-spacing: -0.3px;
+}
+
+/* Grid Layout */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Cards */
+.card {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #1e1e35;
+}
+
+/* Form Fields */
+.field {
+  margin-bottom: 1.25rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus,
+.select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.helper {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Buttons */
+.saveBtn {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: linear-gradient(135deg, #6366f1, #5b21b6);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.saveBtn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.saveBtn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.saveBtn:disabled {
+  background: #4b5563;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* Loading spinner inside button */
+.btnLoading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Password Strength Meter */
+.strengthMeter {
+  margin-top: 0.5rem;
+}
+
+.strengthBar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.25rem;
+}
+
+.strengthSegment {
+  height: 4px;
+  flex: 1;
+  background: #1e1e35;
+  border-radius: 2px;
+  transition: background 0.3s ease;
+}
+
+.strengthSegment.active {
+  background: #6366f1;
+}
+
+.strengthText {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.errorMsg {
+  font-size: 0.75rem;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+/* Toggle Switches */
+.toggleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #1e1e35;
+  transition: background 0.2s;
+}
+
+.toggleRow:last-child {
+  border-bottom: none;
+}
+
+.toggleRow:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  margin: 0 -0.5rem;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 0;
+}
+
+.toggleOn {
+  background: #6366f1;
+}
+
+.toggleOff {
+  background: #475569;
+}
+
+.toggleThumb {
+  position: absolute;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.toggleOn .toggleThumb {
+  left: 22px;
+}
+
+.toggleOff .toggleThumb {
+  left: 2px;
+}
+
+/* Info Rows */
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #1e1e35;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.infoRow:last-child {
+  border-bottom: none;
+}
+
+.levelBadge {
+  padding: 0.2rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.levelBadge:hover {
+  transform: scale(1.05);
+}
+
+.levelGreen {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.levelAmber {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.levelRed {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  margin-right: 0.25rem;
+}
+
+/* Loading Skeleton */
+.loadingSkeleton {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.skeletonTitle {
+  height: 2rem;
+  width: 200px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a45 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.skeletonGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .skeletonGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.skeletonCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.skeletonLine {
+  height: 1rem;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a45 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.skeletonBtn {
+  height: 2.5rem;
+  width: 120px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a45 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

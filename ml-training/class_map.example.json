@@ -1,0 +1,23 @@
+{
+  "normal": [
+    "normal",
+    "focused",
+    "single_face"
+  ],
+  "gaze_away": [
+    "looking_away",
+    "gaze_away"
+  ],
+  "head_pose_away": [
+    "head_pose_away",
+    "turned_head"
+  ],
+  "multiple_faces": [
+    "multiple_faces",
+    "two_people"
+  ],
+  "face_missing": [
+    "face_missing",
+    "no_face"
+  ]
+}

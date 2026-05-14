@@ -1,0 +1,173 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header,
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  color: #fff;
+  font-size: 1.75rem;
+}
+
+.subtitle,
+.sectionCopy,
+.summaryLabel {
+  color: #94a3b8;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.summaryCard,
+.section,
+.emptyState {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+}
+
+.summaryCard {
+  padding: 1rem;
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.summaryIcon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 0.85rem;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+}
+
+.summaryValue {
+  margin: 0.2rem 0 0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.section {
+  padding: 1.2rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.85rem 0.9rem;
+  border-bottom: 1px solid #1e1e35;
+}
+
+.table th {
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.table td {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.primaryBtn,
+.outlineBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryBtn {
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.outlineBtn {
+  border: 1px solid #2d2d50;
+  color: #cbd5e1;
+  background: transparent;
+}
+
+.emptyState {
+  padding: 1.2rem;
+  text-align: center;
+  color: #94a3b8;
+  margin-top: 1rem;
+}
+
+.skeletonHero,
+.skeletonSection {
+  border-radius: 1rem;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeletonHero {
+  height: 180px;
+}
+
+.skeletonSection {
+  height: 240px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 960px) {
+  .summaryGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header,
+  .sectionHeader {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

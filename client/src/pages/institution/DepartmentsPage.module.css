@@ -1,0 +1,300 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  color: #fff;
+  margin: 0;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin: 0.35rem 0 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.listColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.departmentCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1rem;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+.departmentCard:hover,
+.departmentCardActive {
+  border-color: #6366f1;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.28);
+}
+
+.departmentHead,
+.metricRow,
+.detailHeader,
+.studentRow,
+.modalActions,
+.actionRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.departmentName,
+.detailTitle,
+.studentName {
+  color: #fff;
+  margin: 0;
+  font-weight: 700;
+}
+
+.departmentCode,
+.detailMeta,
+.studentMeta,
+.studentSource,
+.notesLabel,
+.statLabel,
+.fieldLabel {
+  color: #94a3b8;
+}
+
+.departmentCount {
+  color: #a5b4fc;
+  font-size: 0.82rem;
+}
+
+.progressBar {
+  height: 8px;
+  background: #1e1e35;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 999px;
+}
+
+.detailColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.detailCard,
+.studentPanel,
+.emptyState,
+.modalBox,
+.statCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+}
+
+.detailCard,
+.studentPanel,
+.modalBox {
+  padding: 1.2rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.statCard {
+  padding: 0.9rem;
+}
+
+.statValue {
+  color: #fff;
+  font-size: 1.3rem;
+}
+
+.notesPanel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.notesPanel p {
+  color: #e2e8f0;
+  margin: 0.3rem 0 0;
+  line-height: 1.5;
+}
+
+.studentPanelHeader {
+  margin-bottom: 1rem;
+}
+
+.studentPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  margin: 0;
+}
+
+.studentTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.studentRow {
+  border: 1px solid #1e1e35;
+  border-radius: 0.85rem;
+  padding: 0.9rem 1rem;
+}
+
+.studentSource {
+  margin: 0.25rem 0 0;
+  font-size: 0.82rem;
+}
+
+.primaryBtn,
+.outlineBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border: none;
+}
+
+.outlineBtn {
+  background: transparent;
+  border: 1px solid #2d2d50;
+  color: #cbd5e1;
+}
+
+.primaryBtn:hover,
+.outlineBtn:hover {
+  transform: translateY(-1px);
+}
+
+.outlineBtn:hover {
+  border-color: #6366f1;
+}
+
+.emptyState,
+.emptyStateInline {
+  color: #94a3b8;
+  text-align: center;
+  padding: 2rem;
+}
+
+.loadingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.skeletonCard {
+  height: 180px;
+  border-radius: 1rem;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 7, 18, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+}
+
+.modalBox {
+  width: min(520px, 92vw);
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  margin-top: 0.45rem;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 0.75rem;
+  color: #fff;
+  padding: 0.8rem 0.9rem;
+}
+
+.textarea {
+  resize: vertical;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid,
+  .notesPanel,
+  .loadingGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header,
+  .detailHeader,
+  .studentRow,
+  .modalActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .statsGrid,
+  .notesPanel,
+  .loadingGrid {
+    grid-template-columns: 1fr;
+  }
+}

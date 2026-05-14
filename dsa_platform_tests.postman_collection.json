@@ -1,0 +1,196 @@
+const BASE = process.env.BASE_URL || 'http://localhost:5000';
+let token = '';
+let moduleId = '';
+let topicId = '';
+let mcqId = '';
+
+const headers = (tok) => ({
+  'Content-Type': 'application/json',
+  ...(tok && { Authorization: `Bearer ${tok}` }),
+});
+
+const test = async (name, fn) => {
+  try {
+    await fn();
+    console.log(`✅ PASS: ${name}`);
+  } catch (err) {
+    console.error(`❌ FAIL: ${name} — ${err.message}`);
+  }
+};
+
+(async () => {
+  // 1. Register
+  await test('Register new user', async () => {
+    const res = await fetch(`${BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        username: 'testrunner',
+        email: 'runner@example.com',
+        password: 'password123',
+      }),
+    });
+    const json = await res.json();
+    if (res.status !== 201) throw new Error(json.message);
+    token = json.token;
+  });
+
+  // 2. Login (to get a fresh token anyway)
+  await test('Login', async () => {
+    const res = await fetch(`${BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        email: 'runner@example.com',
+        password: 'password123',
+      }),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    token = json.token;
+  });
+
+  // 3. Get all modules
+  await test('Get all modules', async () => {
+    const res = await fetch(`${BASE}/api/modules`);
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!Array.isArray(json.data)) throw new Error('No modules array');
+    moduleId = json.data[0]._id; // Arrays module
+  });
+
+  // 4. Get diagnostic MCQs
+  await test('Get diagnostic MCQs', async () => {
+    const res = await fetch(`${BASE}/api/mcq/diagnostic`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (json.data.questions.length !== 20) throw new Error('Expected 20 questions');
+    mcqId = json.data.questions[0]._id;
+  });
+
+  // 5. Submit diagnostic assessment (using only first MCQ to keep it simple)
+  await test('Submit diagnostic assessment', async () => {
+    const res = await fetch(`${BASE}/api/assessment/diagnostic`, {
+      method: 'POST',
+      headers: headers(token),
+      body: JSON.stringify({
+        submissions: [{ mcqId, selectedAnswer: 0, timeTaken: 25 }],
+      }),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.level) throw new Error('No level returned');
+  });
+
+  // 6. Check roadmap generated (call GET /api/roadmap)
+  await test('Roadmap generated', async () => {
+    const res = await fetch(`${BASE}/api/roadmap`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.roadmap) throw new Error('No roadmap');
+    topicId = json.data.roadmap.weeks[0].moduleId; // topicId is actually moduleId in the first week? We'll fix. Actually we need a topicId later. We'll extract from topics later.
+    // Instead, get first topic of that module.
+    // We'll use GET /api/modules/:moduleId/topics
+  });
+
+  // 7. Get today's tasks (same GET /api/roadmap)
+  await test('Get today tasks from roadmap', async () => {
+    const res = await fetch(`${BASE}/api/roadmap`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.todayTasks) throw new Error('No todayTasks');
+  });
+
+  // 8. Get first topic of the module (need a valid topicId)
+  await test('Get Topics by Module (to get topicId)', async () => {
+    const res = await fetch(`${BASE}/api/modules/${moduleId}/topics`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data[0]) throw new Error('No topics');
+    topicId = json.data[0]._id;
+  });
+
+  // 9. Get MCQs for that topic (Basic level)
+  await test('Get MCQs for first topic Basic level', async () => {
+    const res = await fetch(`${BASE}/api/mcq/topic/${topicId}/Basic`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.questions || json.data.questions.length === 0) throw new Error('No questions');
+    mcqId = json.data.questions[0]._id; // reuse for assessment
+  });
+
+  // 10. Submit assessment for that topic (Basic round) with one question
+  await test('Submit assessment for first topic', async () => {
+    const res = await fetch(`${BASE}/api/assessment/submit`, {
+      method: 'POST',
+      headers: headers(token),
+      body: JSON.stringify({
+        topicId,
+        moduleId,
+        round: 'Basic',
+        submissions: [{ mcqId, selectedAnswer: 1, timeTaken: 30, hintsUsed: 0 }],
+      }),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.passed !== undefined) throw new Error('No pass result');
+  });
+
+  // 11. Check progress updated
+  await test('Check progress updated', async () => {
+    const res = await fetch(`${BASE}/api/progress`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (typeof json.data.overallProgress !== 'number') throw new Error('No overallProgress');
+  });
+
+  // 12. Log streak
+  await test('Log streak', async () => {
+    const res = await fetch(`${BASE}/api/streak/log`, {
+      method: 'POST',
+      headers: headers(token),
+      body: JSON.stringify({
+        tasksCompleted: 2,
+        minutesSpent: 15,
+        topicsStudied: ['Arrays'],
+      }),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (typeof json.data.currentStreak !== 'number') throw new Error('No streak');
+  });
+
+  // 13. Get streak data
+  await test('Get streak data', async () => {
+    const res = await fetch(`${BASE}/api/streak`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (!json.data.weeklyActivity) throw new Error('No weeklyActivity');
+  });
+
+  // 14. Get user progress overview (again, but fine)
+  await test('Get user progress overview', async () => {
+    const res = await fetch(`${BASE}/api/progress`, {
+      headers: headers(token),
+    });
+    const json = await res.json();
+    if (res.status !== 200) throw new Error(json.message);
+    if (typeof json.data.overallProgress !== 'number') throw new Error('No overallProgress');
+  });
+
+  console.log('\n🎯 Test suite completed.');
+})();

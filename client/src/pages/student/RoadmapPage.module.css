@@ -1,0 +1,468 @@
+/* client/src/pages/student/RoadmapPage.module.css */
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+  animation: fadeIn 0.5s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(99, 102, 241, 0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.fadeInUp {
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* Loading Skeletons */
+.skeletonHeader {
+  height: 48px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.skeletonProgress {
+  height: 16px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+  margin-bottom: 2rem;
+}
+.skeletonTimeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.skeletonWeek {
+  height: 96px;
+  background: #1e1e35;
+  border-radius: 0.75rem;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Error & Empty */
+.errorState, .emptyState {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: #94a3b8;
+}
+.errorState h2, .emptyState h2 {
+  color: white;
+  margin: 1rem 0 0.5rem;
+}
+.errorIcon {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ef4444;
+  display: block;
+}
+.emptyIcon {
+  margin-bottom: 1rem;
+  color: #64748b;
+}
+.retryBtn {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  padding: 0.65rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+.retryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+/* Header */
+.header {
+  margin-bottom: 2rem;
+}
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 1.25rem;
+}
+.progressOverview {
+  margin-bottom: 1rem;
+}
+.progressBarLarge {
+  height: 10px;
+  background: #1e1e35;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 5px;
+  width: 0%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.progressBarFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+.progressDetails {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.progressText {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+.statusBadge {
+  padding: 0.2rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.onTrack {
+  background: rgba(34, 197, 94, 0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.behind {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.metaStrip {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+.metaSeparator {
+  color: #2e2e4a;
+}
+
+/* Week Cards */
+.weekList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.weekCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease, border-color 0.3s;
+  animation: fadeInUp 0.4s ease both;
+}
+.weekCard:hover {
+  border-color: #2d2d50;
+}
+.currentWeek {
+  border-color: #6366f1;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+.pastWeek {
+  opacity: 0.85;
+}
+.futureWeek {
+  opacity: 0.65;
+}
+
+.weekHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem;
+  background: none;
+  border: none;
+  width: 100%;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s;
+}
+.weekHeader:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.weekInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+.weekNumber {
+  font-weight: 700;
+  color: white;
+  font-size: 1rem;
+}
+.weekTopic {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+.weekTopicIcon {
+  color: #6366f1;
+  flex-shrink: 0;
+}
+.weekProgressMini {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+.weekProgressBar {
+  height: 4px;
+  background: #1e1e35;
+  border-radius: 2px;
+  flex: 1;
+  max-width: 100px;
+  overflow: hidden;
+}
+.weekProgressFill {
+  height: 100%;
+  background: #6366f1;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+.weekDaysCompleted {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.weekRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.weekStatus {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+.chevron {
+  display: flex;
+  transition: transform 0.3s ease;
+  color: #64748b;
+}
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+/* Expandable days container */
+.daysContainer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  background: #0a0a0f;
+}
+.daysOpen {
+  max-height: 2000px; /* arbitrary large value */
+  padding: 0 1rem 1rem;
+}
+.daysGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+/* Day Cards */
+.dayCard {
+  background: #0f0f1a;
+  border: 1px solid #1e1e35;
+  border-radius: 0.75rem;
+  padding: 0.85rem;
+  transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+}
+.dayCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.todayCard {
+  border-color: #6366f1;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.25);
+  animation: pulseGlow 2s infinite;
+}
+.completedCard {
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.05);
+}
+.lockedCard {
+  opacity: 0.5;
+  filter: grayscale(0.6);
+}
+.missedCard {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.05);
+}
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+.dayNumberBadge {
+  display: flex;
+  flex-direction: column;
+}
+.dayNumber {
+  font-weight: 700;
+  color: white;
+  font-size: 0.85rem;
+}
+.dayWeekday {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+.dayStatusIcon {
+  display: flex;
+  gap: 0.25rem;
+}
+.dayCheck { color: #22c55e; }
+.dayLock { color: #64748b; }
+.dayMiss { color: #f59e0b; }
+.dayToday { color: #6366f1; }
+.divider {
+  height: 1px;
+  background: #1e1e35;
+  margin-bottom: 0.5rem;
+}
+.taskList {
+  list-style: none;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.taskItem {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.taskItemClickable {
+  cursor: pointer;
+  border-radius: 0.35rem;
+  padding: 0.15rem 0.25rem;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.taskItemClickable:hover {
+  background: rgba(99, 102, 241, 0.12);
+  color: #c7d2fe;
+}
+.taskEmoji {
+  font-size: 0.85rem;
+}
+.taskName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.moreTasks {
+  color: #64748b;
+  font-size: 0.7rem;
+  padding-left: 1.5rem;
+}
+.startDayBtn {
+  margin-top: 0.75rem;
+  width: 100%;
+  padding: 0.4rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+}
+.startDayBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+.startDayBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.dotCompleted {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+.dotToday {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6366f1;
+}
+.dotMissed {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+.dotLocked {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #64748b;
+}
+
+@media (max-width: 600px) {
+  .daysGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,173 @@
+You are an expert JavaScript developer. You are building the DSA learning platform described below. Read the full description and then generate the COMPLETE `server/seed/index.js` file.
+
+## PROJECT CONTEXT
+
+We have a full‑stack DSA learning platform with:
+- React frontend (Vite + Tailwind + CSS Modules)
+- Node/Express backend
+- MongoDB Atlas
+- Python Flask ML service (already built, do NOT change)
+
+The platform already has:
+- Student authentication (JWT)
+- Diagnostic test (AI‑generated questions, ML level prediction)
+- Roadmap generator (90/60/30‑day plans)
+- Assessment system with anti‑malpractice
+- Progress tracking
+- Streak system
+- Institution management
+- All frontend pages (Dashboard, Modules, Topic Learning, Assessment, Roadmap, Progress, Institution Dashboard, etc.)
+
+## SEED DATA REQUIREMENTS
+
+We need to replace the old seed data with new content based on the **Kunal Kushwaha DSA playlist**:
+
+https://www.youtube.com/playlist?list=PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ
+
+This playlist has 69 videos covering Java basics → core DSA → advanced topics.
+
+### Modules (14)
+1. Fundamentals (Beginner) – Java basics, flowcharts, functions, OOP, time complexity
+2. Patterns (Beginner) – Star, number, nested loop patterns
+3. Arrays (Beginner) – 1D/2D arrays, ArrayList, algorithms
+4. Strings (Beginner) – Immutability, StringBuilder, pattern matching
+5. Searching (Beginner) – Linear, binary, advanced searches
+6. Sorting (Intermediate) – Basic sorts, merge/quick, special sorts
+7. Recursion (Intermediate) – Basics, recursive problems, backtracking
+8. Linked Lists (Intermediate) – Singly, doubly, circular
+9. Stack and Queue (Intermediate) – Stack, queue, deque, PriorityQueue
+10. Trees (Advanced) – Binary trees, BST, traversals, segment trees
+11. Heaps and Hashing (Advanced) – Heaps, HashMap internals, advanced hashing
+12. Graphs (Advanced) – Representation, BFS/DFS, shortest paths
+13. Dynamic Programming (Advanced) – Fundamentals, knapsack, LCS
+14. Advanced DSA (Advanced) – Tries, greedy, segment trees, Mo's algorithm
+
+### Topics (47 total, 3‑4 per module)
+Each topic must have:
+- `title`, `description`
+- `moduleOrder` (1‑14), `order` (position inside module)
+- `videoUrl` – YouTube video ID ONLY (e.g., "n60Dn0UsbEk")
+- `videoTitle` – descriptive title
+- `videoDuration` – minutes
+- `difficultyLevel` – "Basic", "Medium", or "Hard"
+- `courseLevel` – "Beginner", "Intermediate", or "Advanced"
+- `javaConceptTags` – array of strings
+
+**EXACT Video IDs to use (from Kunal's playlist or verified supplements):**
+
+| Module | Topic | Video ID |
+|--------|-------|----------|
+| Fundamentals | Flowcharts & Pseudocode | l7mBZy5eD04 |
+| Fundamentals | Java Architecture & Setup | 4XTsAAHW7Mw |
+| Fundamentals | First Java Program & Datatypes | Hq4bJ7dYxOo |
+| Fundamentals | Conditionals & Loops | vJv3KP7hE74 |
+| Fundamentals | Functions / Methods | B0NtAFf4bvU |
+| Fundamentals | OOP | Z9bYcJp_1a0 |
+| Fundamentals | Time & Space Complexity | 8hly31xKli0 |
+| Patterns | Star Patterns | lsOOs5JEnRw |
+| Patterns | Number & Character Patterns | vtU5k8rRnOg |
+| Patterns | Advanced Pattern Problems | FZmbW0X6wQY |
+| Arrays | 1D Arrays & ArrayList | n60Dn0UsbEk |
+| Arrays | 2D Arrays & Matrix | enI_KyGLYPo |
+| Arrays | Array Algorithms (Kadane, two-pointer) | sTdiMLom00U |
+| Strings | String Basics & Immutability | zL1DPZ0Ovlo |
+| Strings | StringBuilder & StringBuffer | YFZai3fPUQI |
+| Strings | String Pattern Matching | gdifkIwCJyg |
+| Searching | Linear Search | _HRA37X8N_Q |
+| Searching | Binary Search | f6UU7V3szVw |
+| Searching | Ternary & Advanced Searches | W9QJ8HaRvJQ |
+| Sorting | Basic Sorting (Bubble, Selection, Insertion) | F5MZyqRp_IM |
+| Sorting | Advanced Sorting (Merge, Quick) | iKGAgWdgoRk |
+| Sorting | Specialised Sorting (Counting, Radix, Bucket) | Z8svOqamag8 |
+| Recursion | Recursion Fundamentals | M2uO2nMT0Bk |
+| Recursion | Recursive Problem Solving (Tower of Hanoi, subsets) | JxILxTwHukM |
+| Recursion | Backtracking (N-Queens, Sudoku) | nC1rbW2YSz0 |
+| Linked Lists | Singly Linked List | 58YbpRDc4yw |
+| Linked Lists | Doubly Linked List | 70tx7KcMROc |
+| Linked Lists | Circular Linked List & Cycle Detection | zg5v2rlV1tM |
+| Stack & Queue | Stack Implementation | rHQI4mrJ3cg |
+| Stack & Queue | Queue & Circular Queue | S9LUYztYLu4 |
+| Stack & Queue | Deque & PriorityQueue Intro | Qf-TDPr0nYw |
+| Trees | Binary Tree Fundamentals | 4s1Tcvm00pA |
+| Trees | BST | 9D-vP-jcc-Y |
+| Trees | Tree Traversals & Views | Qdr3ohMSxBo |
+| Heaps & Hashing | Heap Data Structure | Qf-TDPr0nYw |
+| Heaps & Hashing | HashMap & HashSet Internals | XLbvmMz8Fr8 |
+| Heaps & Hashing | Advanced Hashing (Karp-Rabin) | swciWFPq3NE |
+| Graphs | Graph Representation | gDGw0cvFXPQ |
+| Graphs | BFS & DFS | zg5v2rlV1tM |
+| Graphs | Shortest Path (Dijkstra) | 2odLxQWYDi0 |
+| DP | DP Fundamentals | mV3wrLBbuuE |
+| DP | Knapsack & Subset | gdifkIwCJyg |
+| DP | DP on Strings & Grid | guzgnCSafg4 |
+| Advanced DSA | Tries (Prefix Trees) | AXjmTQ8LEoI |
+| Advanced DSA | Greedy Algorithms | ARvQcqJ_-NY |
+| Advanced DSA | Segment Trees | c5g4z36T7hI |
+| Advanced DSA | Mo's Algorithm | Mp5Dk95G8Ik |
+
+### MCQs (10 per topic = 470 total)
+For each topic, generate 10 multiple‑choice questions directly based on the video content. Distribute: 4 Basic, 4 Medium, 2 Hard (or adjust for advanced topics). Each MCQ must have:
+- `moduleOrder`, `topicOrder`
+- `difficulty` – "Basic"/"Medium"/"Hard"
+- `question`, `options` (array of 4), `correctAnswer` (index 0‑3)
+- `explanation` (reference the video)
+- `questionType` – "conceptual"/"application"/"reasoning"
+- `tags` – array of strings
+
+### Coding Problems (1 per topic = 47)
+For each topic, if the video includes a hands‑on coding exercise, create a coding problem with:
+- Java starter code (skeleton with TODO comments)
+- 2‑3 test cases with input/output
+- Hints
+If the video is purely conceptual (flowcharts, OOP theory, time complexity), set `hasCoding: false` and provide a placeholder.
+
+### ROADMAP INTEGRATION (IMPORTANT!)
+The existing roadmap generator already creates 90/60/30‑day plans. The seeded modules/topics must be compatible with it. Ensure:
+- Modules are ordered correctly (1‑14)
+- Topics within each module are ordered sequentially
+- The roadmap generator can map weeks to these new modules
+- Module progression logic is preserved:
+  - Beginner students: start at Module 1, sequential unlock
+  - Intermediate students: Modules 1‑3 fully unlocked, Module 4+ sequential
+  - Advanced students: Modules 1‑7 fully unlocked, Module 8+ sequential
+
+### PROGRESS SYSTEM INTEGRATION
+The existing Progress model tracks:
+- `round1Score`, `round2Score`, `round3Score` (MCQ rounds)
+- `codingScore`
+- `status` (Locked/Unlocked/InProgress/Completed/Mastered)
+- `masteryScore`
+
+Ensure the seed function doesn't interfere with these fields. New topics should have no progress records until students actually complete them.
+
+## TECHNICAL REQUIREMENTS
+
+### File Structure
+Generate `server/seed/index.js` with:
+- Imports: mongoose, dotenv, Module, Topic, MCQ, CodingProblem
+- Helper functions: `log(msg)`, `section(title)`
+- Arrays: `modules`, `topics`, `mcqs`, `codingProblems`
+- Async function `seed()`:
+  - Connect to MongoDB (process.env.MONGO_URI)
+  - If `--fresh` flag: drop all Module, Topic, MCQ, CodingProblem documents
+  - Insert modules
+  - Insert topics (mapping moduleOrder → moduleId)
+  - Update module.totalTopics + module.topics references
+  - Insert MCQs (mapping moduleOrder + topicOrder → topicId)
+  - Insert CodingProblems (mapping moduleOrder + topicOrder → topicId)
+  - Log final counts
+  - Disconnect from MongoDB
+
+### Critical Rules
+- Use `require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') })`
+- Model paths: `require('../models/Module')` etc.
+- Video URLs are YouTube IDs ONLY (e.g., "n60Dn0UsbEk")
+- MCQs must be video‑specific, not generic
+- Coding problems must have javaStarterCode with TODO comments
+- The seed function must work with `--fresh` flag
+- All arrays must be complete – no placeholders, no "..."
+
+Generate the complete file now. Do not skip any array. Include all 470 MCQs and all 47 coding problems.
+
+
+some for the vidoe id not working this playlist is correct https://www.youtube.com/playlist?list=PL9gnSGHSqcnr_DxHsP7AW9ftq0AtAyYqJ as mention missing part topic in this videos will be other tutorial but not other languages only in english and java language only got it if you have any question ask me first and generate all got it

@@ -1,0 +1,353 @@
+/* client/src/pages/institution/MalpracticePage.module.css */
+
+/* ================================================================
+   Base & Animations
+   ================================================================ */
+.page {
+  padding-bottom: 2rem;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* ================================================================
+   Stats Cards
+   ================================================================ */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.statCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.3s;
+  animation: fadeInUp 0.6s ease both;
+}
+.statCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+.statRed { border-color: rgba(239,68,68,0.3); }
+.statAmber { border-color: rgba(245,158,11,0.3); }
+.statGreen { border-color: rgba(34,197,94,0.3); }
+.statValue {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+.statLabel {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ================================================================
+   Filter Buttons
+   ================================================================ */
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.6s ease both;
+  animation-delay: 0.1s;
+}
+.filterBtn {
+  padding: 0.35rem 1.1rem;
+  border-radius: 2rem;
+  border: 1px solid #1e1e35;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.filterBtn:hover {
+  border-color: #6366f1;
+  color: white;
+  background: rgba(99,102,241,0.05);
+}
+.activeFilter {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+
+/* ================================================================
+   Alert List
+   ================================================================ */
+.alertList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.alertCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
+  animation: slideUp 0.5s ease both;
+}
+.alertCard:hover {
+  border-color: #2d2d50;
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.alertHigh { border-left: 4px solid #ef4444; }
+.alertMedium { border-left: 4px solid #f59e0b; }
+.alertLow { border-left: 4px solid #94a3b8; }
+.alertBody {
+  flex: 1;
+  cursor: pointer;
+  min-width: 0;
+}
+.alertHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.alertStudent {
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.riskBadge {
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.riskHigh { background: rgba(239,68,68,0.15); color: #f87171; }
+.riskMedium { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.riskLow { background: rgba(148,163,184,0.15); color: #94a3b8; }
+.alertFlags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+.flagTag {
+  padding: 0.15rem 0.5rem;
+  background: rgba(100,116,139,0.2);
+  color: #cbd5e1;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+}
+.alertMeta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.similarityScore {
+  color: #f59e0b;
+  font-weight: 500;
+}
+.alertActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-left: 1rem;
+}
+.reviewBtn,
+.dismissBtn {
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.5rem;
+  border: none;
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s;
+}
+.reviewBtn {
+  background: rgba(34,197,94,0.15);
+  color: #4ade80;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+.reviewBtn:hover {
+  background: rgba(34,197,94,0.25);
+  transform: translateY(-1px);
+}
+.dismissBtn {
+  background: rgba(239,68,68,0.1);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.2);
+}
+.dismissBtn:hover {
+  background: rgba(239,68,68,0.2);
+  transform: translateY(-1px);
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  background: #111120;
+  border-radius: 1rem;
+  border: 1px solid #1e1e35;
+  animation: fadeIn 0.4s ease;
+}
+
+/* ================================================================
+   Modal / Detail Overlay
+   ================================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modalBox {
+  background: #111120;
+  border: 1px solid #2d2d50;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  width: 90%;
+  max-width: 520px;
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  animation: slideUp 0.3s ease;
+}
+.closeBtn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.closeBtn:hover {
+  color: white;
+}
+.modalBox h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+.detailGrid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.85rem;
+  margin: 1.5rem 0;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+.detailGrid span:nth-child(odd) {
+  color: #64748b;
+  font-weight: 500;
+}
+.riskScoreBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.riskScoreBar > div:first-child {
+  flex: 1;
+  height: 8px;
+  background: #1e1e35;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.riskScoreFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+.reasonsText {
+  font-size: 0.8rem;
+  color: #f87171;
+  word-break: break-word;
+}
+.recommendation {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  background: rgba(245,158,11,0.1);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  color: #fbbf24;
+  line-height: 1.5;
+}
+
+/* ================================================================
+   Skeleton Loading
+   ================================================================ */
+.skeletonCard {
+  height: 100px;
+  background: linear-gradient(
+    90deg,
+    #1e1e35 25%,
+    #2a2a40 50%,
+    #1e1e35 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 600px) {
+  .alertCard {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .alertActions {
+    margin-left: 0;
+    margin-top: 0.75rem;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

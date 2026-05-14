@@ -1,0 +1,582 @@
+/* client/src/pages/institution/StudentsPage.module.css */
+
+/* ================================================================
+   Base & Layout
+   ================================================================ */
+.page {
+  padding-bottom: 2rem;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ================================================================
+   Header
+   ================================================================ */
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+}
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Buttons */
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.2rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: white;
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.primaryBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+}
+.primaryBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.outlineBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.2rem;
+  background: transparent;
+  color: #cbd5e1;
+  border: 1px solid #2d2d50;
+  border-radius: 0.6rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.outlineBtn:hover {
+  border-color: #6366f1;
+  color: white;
+  background: rgba(99,102,241,0.05);
+}
+.dangerBtn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+/* ================================================================
+   Filter Bar
+   ================================================================ */
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  padding: 0 0.75rem;
+  color: #94a3b8;
+  flex: 1 1 200px;
+}
+.searchInput {
+  background: transparent;
+  border: none;
+  padding: 0.6rem 0;
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  width: 100%;
+  outline: none;
+}
+.select {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+}
+.select:focus {
+  border-color: #6366f1;
+}
+
+/* ================================================================
+   Table & Skeleton
+   ================================================================ */
+.tableWrapper {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table thead th {
+  text-align: left;
+  padding: 0.8rem 1rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid #1e1e35;
+  background: #0a0a0f;
+}
+.table thead th:hover {
+  color: #e2e8f0;
+}
+.table tbody td {
+  padding: 0.85rem 1rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  border-bottom: 1px solid #1e1e35;
+}
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+.row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Student cell */
+.studentCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.studentName {
+  display: block;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.15rem;
+}
+.studentEmail {
+  display: block;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.levelGreen { background: rgba(34,197,94,0.15); color: #4ade80; }
+.levelAmber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.levelRed { background: rgba(239,68,68,0.15); color: #f87171; }
+.typeInstitutionCreated { background: rgba(59,130,246,0.15); color: #93c5fd; }
+.typeSelfRegistered { background: rgba(16,185,129,0.15); color: #6ee7b7; }
+
+.statusActive { color: #4ade80; font-weight: 500; }
+.statusInactive { color: #94a3b8; }
+.statusPending { color: #f59e0b; }
+
+/* Readiness bar */
+.readiness {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.miniBar {
+  flex: 1;
+  height: 6px;
+  background: #1e1e35;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.miniBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+
+/* Actions */
+.actionsGroup {
+  display: flex;
+  gap: 0.4rem;
+}
+.actionsGroup button {
+  background: none;
+  border: 1px solid #1e1e35;
+  color: #94a3b8;
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+.actionsGroup button:hover {
+  border-color: #6366f1;
+  color: white;
+  background: rgba(99,102,241,0.1);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #0a0a0f;
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+.pageBtns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.pageBtns button {
+  background: none;
+  border: 1px solid #1e1e35;
+  color: #94a3b8;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  display: flex;
+}
+.pageBtns button:hover:not(:disabled) {
+  border-color: #6366f1;
+  color: white;
+}
+.pageBtns button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Skeleton */
+.tableSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+.skeletonRow {
+  height: 50px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 0.5rem;
+}
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  background: #111120;
+  border-radius: 1rem;
+  border: 1px solid #1e1e35;
+}
+
+/* ================================================================
+   Modals & Overlay
+   ================================================================ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+.modalBox {
+  background: #111120;
+  border: 1px solid #2d2d50;
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  position: relative;
+  animation: slideInUp 0.3s ease;
+}
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.closeBtn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+.closeBtn:hover { color: white; }
+.modalBox h3 {
+  font-size: 1.25rem;
+  color: white;
+  margin-bottom: 1.5rem;
+}
+.input {
+  width: 100%;
+  padding: 0.7rem;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  color: white;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  outline: none;
+}
+.input:focus { border-color: #6366f1; }
+.errorText {
+  color: #f87171;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+.successIcon {
+  color: #22c55e;
+  margin-bottom: 1rem;
+}
+.credentialBox {
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+.credentialBox code {
+  background: #0a0a0f;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  color: #fbbf24;
+}
+.warnText {
+  color: #f59e0b;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+.modalBtns {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  justify-content: flex-end;
+}
+
+/* Bulk upload tabs */
+.tabBtns {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.tabBtns button {
+  background: transparent;
+  border: 1px solid #1e1e35;
+  color: #94a3b8;
+  padding: 0.4rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+.tabBtns button.activeTab {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}
+.textarea {
+  width: 100%;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  color: white;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-top: 0.5rem;
+}
+.fileInput {
+  color: #94a3b8;
+  margin: 1rem 0;
+}
+.csvNote {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+.csvTab {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.previewTable {
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+}
+.previewRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0.5rem;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+}
+.previewRow strong {
+  color: #94a3b8;
+}
+.resultBox {
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+}
+.failEmails {
+  color: #f87171;
+  margin-top: 0.25rem;
+}
+
+/* ================================================================
+   Slideover (Profile Panel)
+   ================================================================ */
+.slideover {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 400px;
+  max-width: 90vw;
+  background: #0a0a0f;
+  border-left: 1px solid #1e1e35;
+  padding: 2rem 1.5rem;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  overflow-y: auto;
+  animation: slideInRight 0.3s ease;
+  z-index: 101;
+}
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.profileHeader {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.profileAvatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.profileReadiness {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.progressBar {
+  height: 6px;
+  background: #1e1e35;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progressBar div {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+.topicRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+}
+.assessmentRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+.streakRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #e2e8f0;
+}
+.weakList {
+  list-style: disc;
+  padding-left: 1.5rem;
+  color: #f87171;
+  font-size: 0.8rem;
+}

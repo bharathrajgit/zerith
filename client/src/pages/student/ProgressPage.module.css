@@ -1,0 +1,425 @@
+/* client/src/pages/student/ProgressPage.module.css */
+.page {
+  max-width: 950px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.fadeInUp {
+  animation: fadeInUp 0.6s ease both;
+}
+.pageTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+/* Gauge Section */
+.gaugeSection {
+  background: linear-gradient(135deg, #0f0f23 0%, #111120 100%);
+  border: 1px solid #1e1e35;
+  border-radius: 1.25rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.gaugeContainer {
+  position: relative;
+  width: 200px;
+  height: 130px;
+  margin: 0 auto;
+}
+.gaugeSvg {
+  width: 100%;
+  height: 100%;
+}
+.gaugeFill {
+  transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gaugeText {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.gaugeScore {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: white;
+  display: block;
+}
+.gaugeLabel {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  display: block;
+  margin-top: 0.25rem;
+}
+.supportingStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  flex: 1;
+}
+.supportStat {
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.02);
+}
+.supportValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.2rem;
+}
+.supportStat span:last-child {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Chart Section */
+.chartSection {
+  margin-bottom: 2rem;
+}
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.chartContainer {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.25rem 0.5rem;
+}
+.emptyChart {
+  padding: 3rem;
+  text-align: center;
+  color: #64748b;
+  background: #111120;
+  border-radius: 1rem;
+  border: 1px solid #1e1e35;
+}
+
+/* Table Section */
+.tableSection {
+  margin-bottom: 2rem;
+}
+.filterRow {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.filterBtn {
+  padding: 0.3rem 1.2rem;
+  border-radius: 2rem;
+  border: 1px solid #1e1e35;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.filterBtn:hover {
+  border-color: #6366f1;
+  color: white;
+}
+.activeFilter {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: white;
+}
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #111120;
+}
+.th {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  font-size: 0.8rem;
+  color: #64748b;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid #1e1e35;
+  transition: color 0.2s;
+  position: sticky;
+  top: 0;
+  background: #111120;
+  z-index: 10;
+}
+.th:hover {
+  color: #e2e8f0;
+}
+.thContent {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.sortIcon {
+  font-size: 0.7rem;
+  opacity: 0.6;
+}
+.td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #1e1e35;
+  font-size: 0.85rem;
+  color: #e2e8f0;
+  transition: background 0.2s;
+}
+.tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+.tr:last-child td {
+  border-bottom: none;
+}
+.topicCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.topicEmoji {
+  font-size: 1.1rem;
+}
+.topicName {
+  font-weight: 500;
+}
+.cellPill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  text-align: center;
+  font-weight: 600;
+  min-width: 2.5rem;
+}
+.cellGreen { background: rgba(34,197,94,0.15); color: #4ade80; }
+.cellAmber { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.cellOrange { background: rgba(249,115,22,0.15); color: #fb923c; }
+.cellRed { background: rgba(239,68,68,0.15); color: #f87171; }
+.cellEmpty { color: #475569; }
+
+.masteryCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.miniBar {
+  flex: 1;
+  height: 6px;
+  background: #1e1e35;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.miniBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+.miniBarText {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.statusMastered { background: rgba(34,197,94,0.15); color: #4ade80; }
+.statusProficient { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.statusDeveloping { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.statusWeak { background: rgba(239,68,68,0.15); color: #f87171; }
+
+/* Streak Calendar */
+.streakSection {
+  margin-bottom: 2rem;
+}
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 1.5rem;
+  background: #111120;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #1e1e35;
+}
+@media (min-width: 600px) {
+  .calendarGrid {
+    grid-template-columns: repeat(15, 1fr);
+  }
+}
+@media (min-width: 800px) {
+  .calendarGrid {
+    grid-template-columns: repeat(30, 1fr);
+  }
+}
+.calendarCell {
+  aspect-ratio: 1;
+  border-radius: 0.35rem;
+  background: #1e1e35;
+  transition: all 0.3s ease;
+  transform: scale(0.9);
+}
+.calActive {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.4);
+  transform: scale(1);
+}
+.calToday {
+  border: 2px solid #6366f1;
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+}
+.calendarCell:not(.calActive):hover {
+  background: #2d2d4a;
+}
+.streakStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.streakStat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+/* Achievements */
+.achievementsSection {
+  margin-bottom: 2rem;
+}
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1rem;
+}
+.achievementCard {
+  background: #111120;
+  border: 1px solid #1e1e35;
+  border-radius: 1rem;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+.achievementCard:hover {
+  transform: translateY(-3px);
+  border-color: #2d2d50;
+}
+.earned {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+}
+.locked {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+}
+.achievementIcon {
+  font-size: 2.2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.achievementName {
+  font-weight: 600;
+  color: white;
+  font-size: 0.9rem;
+}
+.achievementDesc {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+/* Misc */
+.emptyMessage {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  background: #111120;
+  border-radius: 1rem;
+  border: 1px solid #1e1e35;
+}
+.errorState {
+  text-align: center;
+  padding: 3rem;
+  color: #ef4444;
+}
+.errorIcon {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin-bottom: 1rem;
+}
+.retryBtn {
+  margin-top: 1rem;
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.retryBtn:hover {
+  background: #5b21b6;
+}
+
+/* Skeletons */
+.skeletonGauge {
+  height: 160px;
+  background: linear-gradient(90deg, #1e1e35 25%, #2a2a40 50%, #1e1e35 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+}
+.skeletonChart {
+  height: 280px;
+  background: #1e1e35;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  animation: shimmer 1.5s infinite;
+}
+.skeletonTable {
+  height: 300px;
+  background: #1e1e35;
+  border-radius: 1rem;
+  animation: shimmer 1.5s infinite;
+}

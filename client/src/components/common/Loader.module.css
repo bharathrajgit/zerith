@@ -1,0 +1,186 @@
+.fullPageOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top, rgba(99, 102, 241, 0.18), transparent 35%),
+    radial-gradient(circle at bottom, rgba(139, 92, 246, 0.12), transparent 30%),
+    rgba(4, 6, 16, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.loaderCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  min-width: 180px;
+  padding: 1.75rem 2rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 1.5rem;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: fadeInUp 220ms ease-out;
+}
+
+.spinnerWrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+}
+
+.spinnerRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 180deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(99, 102, 241, 1),
+    rgba(168, 85, 247, 0.9),
+    rgba(99, 102, 241, 0.15)
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 8px), #000 0);
+  animation: spin 0.9s linear infinite;
+}
+
+.spinnerDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 8px rgba(255, 255, 255, 0.05),
+    0 0 28px rgba(99, 102, 241, 0.7);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.text {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #e2e8f0;
+  text-align: center;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.92) 0%,
+    rgba(51, 65, 85, 0.96) 50%,
+    rgba(30, 41, 59, 0.92) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.25s ease-in-out infinite;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 25%, rgba(255, 255, 255, 0.06) 50%, transparent 75%);
+  transform: translateX(-100%);
+  animation: sweep 1.25s ease-in-out infinite;
+}
+
+.rounded {
+  border-radius: 0.9rem;
+}
+
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.tableRow {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.tableCell {
+  height: 16px;
+  flex: 1;
+  border-radius: 999px;
+}
+
+.buttonSpinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.22);
+  border-top-color: #ffffff;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinnerRing,
+  .spinnerDot,
+  .skeleton,
+  .skeleton::after,
+  .buttonSpinner,
+  .loaderCard {
+    animation: none !important;
+  }
+}
