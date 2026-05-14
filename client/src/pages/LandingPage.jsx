@@ -777,54 +777,6 @@ export default function LandingPage() {
     },
   ];
 
-  const instPlans = [
-    {
-      name: "Basic",
-      price: "₹5,000",
-      period: "/month",
-      students: "Up to 100 students",
-      features: [
-        "All 11 DSA modules",
-        "Basic analytics dashboard",
-        "Bulk student upload",
-        "Email support",
-        "Monthly report export",
-      ],
-      cta: "Get Started",
-      highlight: false,
-    },
-    {
-      name: "Pro",
-      price: "₹15,000",
-      period: "/month",
-      students: "Up to 500 students",
-      features: [
-        "Everything in Basic",
-        "ML placement predictions",
-        "At-risk early warnings",
-        "Malpractice reports",
-        "Priority support + API",
-      ],
-      cta: "Get Pro",
-      highlight: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "pricing",
-      students: "Unlimited students",
-      features: [
-        "Everything in Pro",
-        "Dedicated account manager",
-        "Custom integrations",
-        "SLA guarantee",
-        "On-site training sessions",
-      ],
-      cta: "Contact Us",
-      highlight: false,
-    },
-  ];
-
   const faqs = [
     { 
       q: "Is the diagnostic test really unique each time?", 
@@ -901,7 +853,7 @@ export default function LandingPage() {
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
           <Zap size={24} style={{ color: "#6366f1", flexShrink: 0 }} />
-          DSA Master
+          Zerith
         </button>
 
         {/* Desktop Navigation */}
@@ -1500,14 +1452,13 @@ export default function LandingPage() {
               ].map((t) => <CheckRow key={t} text={t} />)}
             </div>
 
-            {/* Pricing Cards */}
+            {/* Free Plan Card (payment options removed) */}
             <div style={{
               display: "flex",
               flexDirection: "column",
               gap: "1.5rem",
               animation: "fadeInRight 0.6s 0.3s ease both",
             }}>
-              {/* Free Plan */}
               <div className="lp-pricing" style={{
                 ...cardBase,
                 padding: "2.5rem",
@@ -1587,116 +1538,6 @@ export default function LandingPage() {
                   Start Free
                 </button>
               </div>
-
-              {/* Pro Plan */}
-              <div className="lp-pricing lp-pricing-highlight" style={{
-                ...cardBase,
-                padding: "2.5rem",
-                border: "2px solid rgba(99, 102, 241, 0.5)",
-                boxShadow: "0 0 60px rgba(99, 102, 241, 0.15)",
-                transform: "scale(1.05)",
-                position: "relative",
-                animation: "borderGlow 3s ease infinite",
-              }}>
-                <div style={{
-                  position: "absolute",
-                  top: "-16px",
-                  left: "50%",
-                  transform: "translateX(-50%)",
-                  background: "linear-gradient(135deg, #6366f1, #7c3aed)",
-                  color: "#fff",
-                  fontSize: "0.7rem",
-                  fontWeight: 700,
-                  padding: "0.35rem 1.2rem",
-                  borderRadius: "100px",
-                  whiteSpace: "nowrap",
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  boxShadow: "0 4px 15px rgba(99, 102, 241, 0.4)",
-                }}>
-                  ⭐ MOST POPULAR
-                </div>
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "0.6rem",
-                }}>
-                  <span style={{
-                    fontFamily: "'Space Grotesk', sans-serif",
-                    fontSize: "1.1rem",
-                    fontWeight: 700,
-                    color: "#f1f5f9",
-                  }}>
-                    Pro Plan
-                  </span>
-                  <span style={{
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    color: "#6366f1",
-                    background: "rgba(99, 102, 241, 0.15)",
-                    border: "1px solid rgba(99, 102, 241, 0.3)",
-                    borderRadius: "100px",
-                    padding: "0.3rem 0.8rem",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase",
-                  }}>
-                    ⭐ POPULAR
-                  </span>
-                </div>
-                <div className="gradient-text" style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "3rem",
-                  fontWeight: 900,
-                  letterSpacing: "-0.05em",
-                  marginBottom: "0.2rem",
-                  background: "linear-gradient(135deg, #6366f1, #a78bfa)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}>
-                  ₹499
-                </div>
-                <div style={{
-                  fontSize: "0.85rem",
-                  color: "#64748b",
-                  marginBottom: "1.5rem",
-                }}>
-                  per month
-                </div>
-                <div style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.8rem",
-                  marginBottom: "1.8rem",
-                }}>
-                  {[
-                    "Everything in Free",
-                    "Unlimited coding problems",
-                    "Unlimited AI hints",
-                    "Priority support",
-                    "Performance export PDF",
-                  ].map((t) => (
-                    <div key={t} style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.6rem",
-                      fontSize: "0.9rem",
-                      color: "#94a3b8",
-                    }}>
-                      <Check size={14} color="#6366f1" strokeWidth={2.5} />
-                      {t}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  className="lp-btn-p"
-                  style={{ ...buttonPrimary, width: "100%", borderRadius: "14px" }}
-                >
-                  Get Pro
-                  <ArrowRight size={16} />
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -1724,7 +1565,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Enhanced Institution Feature Cards */}
+          {/* Institution Feature Cards */}
           <div className="lp-grid-3" style={{
             display: "grid",
             gridTemplateColumns: "repeat(3, 1fr)",
@@ -1776,131 +1617,7 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Enhanced Pricing Table */}
-          <div className="lp-grid-3" style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "1.5rem",
-            marginBottom: "4rem",
-            alignItems: "start",
-          }}>
-            {instPlans.map((plan, i) => (
-              <div
-                key={plan.name}
-                className={`lp-pricing${plan.highlight ? " lp-pricing-highlight" : ""}`}
-                style={{
-                  ...cardBase,
-                  display: "flex",
-                  flexDirection: "column",
-                  position: "relative",
-                  padding: plan.highlight ? "2.8rem 2rem" : "2.5rem 2rem",
-                  ...(plan.highlight ? {
-                    border: "2px solid rgba(99, 102, 241, 0.5)",
-                    boxShadow: "0 0 60px rgba(99, 102, 241, 0.2)",
-                    transform: "scale(1.05)",
-                    animation: "borderGlow 3s ease infinite",
-                    zIndex: 2,
-                  } : {}),
-                }}
-              >
-                {plan.highlight && (
-                  <div style={{
-                    position: "absolute",
-                    top: "-16px",
-                    left: "50%",
-                    transform: "translateX(-50%)",
-                    background: "linear-gradient(135deg, #6366f1, #7c3aed)",
-                    color: "#fff",
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    padding: "0.35rem 1.2rem",
-                    borderRadius: "100px",
-                    whiteSpace: "nowrap",
-                    letterSpacing: "0.1em",
-                    textTransform: "uppercase",
-                    boxShadow: "0 4px 15px rgba(99, 102, 241, 0.4)",
-                  }}>
-                    MOST POPULAR
-                  </div>
-                )}
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "1.1rem",
-                  fontWeight: 700,
-                  color: plan.highlight ? "#a78bfa" : "#f1f5f9",
-                  marginBottom: "0.4rem",
-                }}>
-                  {plan.name}
-                </div>
-                <div style={{
-                  fontFamily: "'Space Grotesk', sans-serif",
-                  fontSize: "2.5rem",
-                  fontWeight: 900,
-                  letterSpacing: "-0.05em",
-                  marginBottom: "0.3rem",
-                  ...(plan.highlight ? {
-                    background: "linear-gradient(135deg, #6366f1, #a78bfa)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  } : { color: "#f1f5f9" }),
-                }}>
-                  {plan.price}
-                </div>
-                <div style={{
-                  fontSize: "0.85rem",
-                  color: "#64748b",
-                  marginBottom: "0.3rem",
-                }}>
-                  {plan.period}
-                </div>
-                <div style={{
-                  fontSize: "0.85rem",
-                  color: "#6366f1",
-                  fontWeight: 600,
-                  marginBottom: "1.5rem",
-                }}>
-                  {plan.students}
-                </div>
-                <div style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.7rem",
-                  marginBottom: "2rem",
-                  flex: 1,
-                }}>
-                  {plan.features.map((ft) => (
-                    <div key={ft} style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.6rem",
-                      fontSize: "0.88rem",
-                      color: "#94a3b8",
-                    }}>
-                      <Check
-                        size={14}
-                        color={plan.highlight ? "#6366f1" : "#22c55e"}
-                        strokeWidth={2.5}
-                      />
-                      {ft}
-                    </div>
-                  ))}
-                </div>
-                <button
-                  className={plan.highlight ? "lp-btn-p" : "lp-btn-o"}
-                  style={plan.highlight ? 
-                    { ...buttonPrimary, width: "100%", borderRadius: "14px" } : 
-                    { ...buttonOutline, width: "100%", borderRadius: "14px" }
-                  }
-                  onClick={() => navigate("/institution/register")}
-                >
-                  {plan.cta}
-                  {plan.highlight && <ArrowRight size={16} />}
-                </button>
-              </div>
-            ))}
-          </div>
-
+          {/* Institution CTA (pricing removed) */}
           <div style={{ textAlign: "center", animation: "fadeInUp 0.6s 0.6s ease both" }}>
             <button
               className="lp-btn-p"
@@ -2014,7 +1731,7 @@ export default function LandingPage() {
                 backgroundClip: "text",
               }}>
                 <Zap size={22} style={{ color: "#6366f1" }} />
-                DSA Master
+                Zerith
               </div>
               <p style={{ fontSize: "0.9rem", color: "#64748b" }}>
                 Master DSA. Get Placed.
@@ -2076,7 +1793,7 @@ export default function LandingPage() {
               ))}
             </div>
             <span style={{ fontSize: "0.85rem", color: "#334155" }}>
-              © 2024 DSA Master. All rights reserved.
+              © 2024 Zerith. All rights reserved.
             </span>
           </div>
         </div>
