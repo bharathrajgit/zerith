@@ -1,6 +1,6 @@
 // client/src/pages/student/ProgressPage.jsx
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import StudentLayout from '../../components/layout/StudentLayout';
+import StudentLayout from '../../components/Layout/StudentLayout';
 import api from '../../services/api';
 import { Flame, Trophy, Activity } from 'lucide-react';
 import {

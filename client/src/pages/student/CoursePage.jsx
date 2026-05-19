@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { CheckCircle2, Lock, PlayCircle } from 'lucide-react';
-import StudentLayout from '../../components/layout/StudentLayout';
+import StudentLayout from '../../components/Layout/StudentLayout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import styles from './CoursePage.module.css';

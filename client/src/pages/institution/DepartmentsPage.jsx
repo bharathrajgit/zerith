@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import InstitutionLayout from '../../components/layout/InstitutionLayout';
+import InstitutionLayout from '../../components/Layout/InstitutionLayout';
 import api from '../../services/api';
 import { Plus, Pencil, Trash2, ArrowRightLeft, Users } from 'lucide-react';
 import toast from 'react-hot-toast';

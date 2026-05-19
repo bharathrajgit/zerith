@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import StudentLayout from '../../components/layout/StudentLayout';
+import StudentLayout from '../../components/Layout/StudentLayout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import styles from './ModuleListPage.module.css';
