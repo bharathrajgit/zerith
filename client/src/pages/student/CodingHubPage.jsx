@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 import api from '../../services/api';
 
 const FILTERS = ['All', 'Unlocked', 'Solved', 'Locked'];

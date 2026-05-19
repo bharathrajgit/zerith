@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { ChevronDown, Lock, Check, Clock, Target, Zap } from 'lucide-react';

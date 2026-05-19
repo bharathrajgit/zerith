@@ -1,7 +1,7 @@
 // client/src/pages/student/AssessmentPage.jsx
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 import api from '../../services/api';
 import { getHint } from '../../services/geminiService';
 import { useAuth } from '../../context/AuthContext';

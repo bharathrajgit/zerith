@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InstitutionLayout from '../../components/Layout/InstitutionLayout';
+import InstitutionLayout from '../../components/layout/InstitutionLayout';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import {

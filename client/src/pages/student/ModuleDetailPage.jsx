@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 
 import { useParams, useNavigate } from 'react-router-dom';
 
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 
 import api from '../../services/api';
 

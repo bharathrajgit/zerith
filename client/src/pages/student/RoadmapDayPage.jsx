@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { ArrowLeft, Check, Play, BookOpen, Code, Lock } from 'lucide-react';

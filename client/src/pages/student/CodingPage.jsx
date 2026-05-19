@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import StudentLayout from '../../components/Layout/StudentLayout';
+import StudentLayout from '../../components/layout/StudentLayout';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import usePracticeMonitoring from '../../hooks/usePracticeMonitoring';

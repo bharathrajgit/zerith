@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import InstitutionLayout from '../../components/Layout/InstitutionLayout';
+import InstitutionLayout from '../../components/layout/InstitutionLayout';
 import api from '../../services/api';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,

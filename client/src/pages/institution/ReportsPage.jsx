@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import InstitutionLayout from '../../components/Layout/InstitutionLayout';
+import InstitutionLayout from '../../components/layout/InstitutionLayout';
 import api from '../../services/api';
 import { Download, FileText, Shield, Users } from 'lucide-react';
 import toast from 'react-hot-toast';

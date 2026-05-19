@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import InstitutionLayout from '../../components/Layout/InstitutionLayout';
+import InstitutionLayout from '../../components/layout/InstitutionLayout';
 import api from '../../services/api';
 import {
   Search, Plus, Upload, Download, AlertCircle, X, Check, Eye, Key,
