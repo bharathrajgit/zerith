@@ -272,12 +272,18 @@ const analyzeProctorFrame = async (payload) => {
         headPoseAway: false,
         gazeAway: false,
         faceMissing: false,
+        phoneVisible: false,
+        extraScreenVisible: false,
         faceCount: 1,
       },
       warningSuggested: false,
       confidence: 0,
       signals: [],
       fallback: true,
+      metadata: {
+        modelLoaded: false,
+        modelSource: 'heuristic',
+      },
     };
   }
 };

@@ -345,6 +345,142 @@
   font-size: 0.85rem;
 }
 
+.monitoringPanel {
+  margin-bottom: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.14), transparent 40%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.9));
+}
+
+.monitoringSafe {
+  border-color: rgba(34, 197, 94, 0.22);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.18);
+}
+
+.monitoringWarn {
+  border-color: rgba(245, 158, 11, 0.28);
+  box-shadow: 0 12px 32px rgba(245, 158, 11, 0.12);
+}
+
+.monitoringDanger {
+  border-color: rgba(239, 68, 68, 0.3);
+  box-shadow: 0 12px 32px rgba(239, 68, 68, 0.12);
+}
+
+.monitoringPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.monitoringEyebrow {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.monitoringTitle {
+  margin: 0.3rem 0 0;
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.monitoringRiskPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.monitoringStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.95rem;
+}
+
+.monitoringStat {
+  padding: 0.8rem 0.9rem;
+  border-radius: 0.85rem;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.monitoringStatLabel {
+  display: block;
+  color: #94a3b8;
+  font-size: 0.74rem;
+  margin-bottom: 0.3rem;
+}
+
+.monitoringStatValue {
+  color: #f8fafc;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.monitoringSignalRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.monitoringSignalChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 140, 248, 0.24);
+  background: rgba(79, 70, 229, 0.14);
+  color: #c7d2fe;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.monitoringHint {
+  margin: 0.85rem 0 0;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.monitoringAlert {
+  margin-bottom: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.monitoringAlertHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: #f8fafc;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.monitoringAlertMeta {
+  margin: 0.45rem 0 0;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+}
+
 /* Timer */
 .timerWrapper {
   display: flex;
@@ -1090,6 +1226,21 @@
 @media (max-width: 640px) {
   .page {
     padding: 0 1rem 2rem;
+  }
+
+  .topBar {
+    align-items: flex-start;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .monitoringPanelHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .monitoringStats {
+    grid-template-columns: 1fr;
   }
 
   .introCard {

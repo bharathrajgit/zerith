@@ -8,8 +8,10 @@ const {
   getDepartmentAnalytics,
   getStudentDetailReport,
   getAtRiskStudents,
+  getMalpracticeEvidence,
   getMalpracticeReport,
   getPlacementPredictionReport,
+  streamMalpracticeEvidenceImage,
   updateMalpracticeStatus,
 } = require('../controllers/institution.analytics.controller');
 
@@ -20,6 +22,8 @@ router.get('/departments', getDepartmentAnalytics);
 router.get('/student/:studentId', getStudentDetailReport);
 router.get('/at-risk', getAtRiskStudents);
 router.get('/malpractice', getMalpracticeReport);
+router.get('/malpractice/:logId/evidence', getMalpracticeEvidence);
+router.get('/malpractice/evidence/:evidenceId/image', streamMalpracticeEvidenceImage);
 router.patch('/malpractice/:logId/status', updateMalpracticeStatus);
 router.get('/placement-prediction', getPlacementPredictionReport);
 router.get('/dropout-risk/:studentId', protectInstitution, async (req, res, next) => {

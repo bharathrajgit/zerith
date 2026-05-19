@@ -43,6 +43,8 @@ export default function InstitutionLogin() {
         return;
       }
       navigate('/institution/dashboard');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -68,7 +70,7 @@ export default function InstitutionLogin() {
           <span className={`${styles.logoIcon} ${styles.logoIconInstitution}`}>
             <Zap size={18} />
           </span>
-          DSA Master
+          Zerith
         </Link>
 
         {/* Institution badge with Institution theme */}

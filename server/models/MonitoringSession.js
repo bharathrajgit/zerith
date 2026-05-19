@@ -159,12 +159,19 @@ const monitoringSessionSchema = new mongoose.Schema(
       headPoseAway: { type: Boolean, default: false },
       gazeAway: { type: Boolean, default: false },
       faceMissing: { type: Boolean, default: false },
+      phoneVisible: { type: Boolean, default: false },
+      extraScreenVisible: { type: Boolean, default: false },
       faceCount: { type: Number, default: 1 },
       confidence: { type: Number, default: 0 },
       latestDetections: {
         type: mongoose.Schema.Types.Mixed,
         default: {},
       },
+    },
+    evidenceCaptureState: {
+      type: Map,
+      of: Date,
+      default: {},
     },
     events: {
       type: [monitoringEventSchema],

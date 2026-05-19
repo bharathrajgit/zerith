@@ -11,6 +11,8 @@ Train a lightweight proctoring classifier that can export to ONNX and support th
 - `head_pose_away`
 - `multiple_faces`
 - `face_missing`
+- `phone_visible`
+- `extra_screen_visible`
 
 The runtime endpoint is `ml-service -> POST /ml/proctor/analyze-frame`.
 
@@ -25,6 +27,8 @@ Recommended class layout after download/prep:
 - `head_pose_away/`
 - `multiple_faces/`
 - `face_missing/`
+- `phone_visible/`
+- `extra_screen_visible/`
 
 The existing repo reference to `Mercor Cheating Detection` is still useful for session-level calibration, but the proctoring image model should be trained from a webcam-appropriate dataset with frame/image labels.
 
@@ -62,6 +66,7 @@ python ml-training\export_onnx.py
 - `ml-training\artifacts\training_metrics.json`
 - `ml-service\trained_models\proctor_monitor.onnx`
 - `ml-service\trained_models\proctor_labels.json`
+- `ml-service\trained_models\proctor_training_report.json`
 
 ## Threshold Defaults
 
@@ -71,9 +76,13 @@ These are the default runtime thresholds expected by the app:
 - `head_pose_away` -> medium risk
 - `gaze_away` -> medium risk
 - `face_missing` -> medium risk
+- `phone_visible` -> high risk, immediate warning candidate
+- `extra_screen_visible` -> high risk, immediate warning candidate
 - warning suggestion threshold -> `riskScore >= 0.45`
 
 ## Notes
 
+- The runtime contract is fixed to the seven labels above, in that exact order.
 - The current runtime endpoint supports fallback behavior when the ONNX file is not present yet.
+- Heuristic fallback stays face-only; gadget classes are emitted only by an ONNX model.
 - Raw video should not be persisted by default; only derived alerts and aggregated metadata are stored in app data.

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   User, Mail, Lock, Eye, EyeOff,
@@ -6,31 +6,41 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 import styles from './Auth.module.css';
 
 const GOALS = [
   { value: 'Interview Prep', label: 'Interview Prep' },
-  { value: 'Academics',      label: 'Academics'      },
-  { value: 'Both',           label: 'Both'           },
+  { value: 'Academics', label: 'Academics' },
+  { value: 'Both', label: 'Both' },
 ];
 
+const initialLookupState = {
+  status: 'idle',
+  institutionName: '',
+  institutionCode: '',
+  departments: [],
+  message: '',
+};
+
 export default function StudentRegister() {
-  const navigate               = useNavigate();
+  const navigate = useNavigate();
   const { registerStudent, isAuthenticated } = useAuth();
-  const [loading, setLoading]  = useState(false);
-  const [errors,  setErrors]   = useState({});
-  const [showP,   setShowP]    = useState(false);
-  const [showCP,  setShowCP]   = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [showP, setShowP] = useState(false);
+  const [showCP, setShowCP] = useState(false);
+  const [lookupState, setLookupState] = useState(initialLookupState);
   const justRegistered = useRef(false);
 
   const [form, setForm] = useState({
-    name:            '',
-    email:           '',
-    password:        '',
+    name: '',
+    email: '',
+    password: '',
     confirmPassword: '',
-    college:         '',
-    targetGoal:      '',
+    targetGoal: '',
     institutionCode: '',
+    departmentCode: '',
   });
 
   useEffect(() => {
@@ -39,62 +49,163 @@ export default function StudentRegister() {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    const normalizedCode = form.institutionCode.trim().toUpperCase();
 
-  const set = (k) => (e) => {
-    setForm(p => ({ ...p, [k]: e.target.value }));
-    if (errors[k]) setErrors(p => ({ ...p, [k]: '' }));
+    if (!normalizedCode) {
+      setLookupState(initialLookupState);
+      setForm((prev) => (
+        prev.departmentCode
+          ? { ...prev, departmentCode: '' }
+          : prev
+      ));
+      return undefined;
+    }
+
+    let cancelled = false;
+    const timeoutId = window.setTimeout(async () => {
+      setLookupState((prev) => ({
+        ...prev,
+        status: 'loading',
+        message: 'Checking institution code...',
+      }));
+
+      try {
+        const { data } = await api.get(`/auth/institution-lookup/${encodeURIComponent(normalizedCode)}`);
+        if (cancelled) return;
+
+        const departments = data?.data?.departments || [];
+        setLookupState({
+          status: 'success',
+          institutionName: data?.data?.institutionName || '',
+          institutionCode: data?.data?.institutionCode || normalizedCode,
+          departments,
+          message: departments.length
+            ? 'Select the department you want to join.'
+            : 'No departments are available for this institution yet.',
+        });
+
+        setForm((prev) => {
+          const hasExistingSelection = departments.some(
+            (department) => department.code === prev.departmentCode
+          );
+
+          return {
+            ...prev,
+            departmentCode: hasExistingSelection
+              ? prev.departmentCode
+              : departments.length === 1
+              ? departments[0].code
+              : '',
+          };
+        });
+      } catch (error) {
+        if (cancelled) return;
+
+        setLookupState({
+          status: 'error',
+          institutionName: '',
+          institutionCode: normalizedCode,
+          departments: [],
+          message: error?.response?.data?.message || 'Institution code not found',
+        });
+        setForm((prev) => ({ ...prev, departmentCode: '' }));
+      }
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [form.institutionCode]);
+
+  const set = (key) => (event) => {
+    const value = event.target.value;
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+      ...(key === 'institutionCode' ? { departmentCode: '' } : {}),
+    }));
+    if (errors[key]) {
+      setErrors((prev) => ({ ...prev, [key]: '' }));
+    }
+    if (key === 'institutionCode' && errors.departmentCode) {
+      setErrors((prev) => ({ ...prev, departmentCode: '' }));
+    }
   };
 
-  /* ── Validation ───────────────────────────────── */
   const validate = () => {
-    const e = {};
-    if (!form.name.trim())
-      e.name = 'Full name is required';
-    if (!form.email.trim())
-      e.email = 'Email is required';
-    else if (!/^\S+@\S+\.\S+$/.test(form.email))
-      e.email = 'Enter a valid email';
-    if (!form.password)
-      e.password = 'Password is required';
-    else if (form.password.length < 8)
-      e.password = 'Minimum 8 characters';
-    if (form.password !== form.confirmPassword)
-      e.confirmPassword = 'Passwords do not match';
-    if (!form.college.trim())
-      e.college = 'College name is required';
-    if (!form.targetGoal)
-      e.targetGoal = 'Select a goal';
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    const nextErrors = {};
+
+    if (!form.name.trim()) nextErrors.name = 'Full name is required';
+    if (!form.email.trim()) nextErrors.email = 'Email is required';
+    else if (!/^\S+@\S+\.\S+$/.test(form.email)) nextErrors.email = 'Enter a valid email';
+
+    if (!form.password) nextErrors.password = 'Password is required';
+    else if (form.password.length < 8) nextErrors.password = 'Minimum 8 characters';
+
+    if (form.password !== form.confirmPassword) {
+      nextErrors.confirmPassword = 'Passwords do not match';
+    }
+
+    if (!form.targetGoal) nextErrors.targetGoal = 'Select a goal';
+
+    const normalizedCode = form.institutionCode.trim();
+    if (normalizedCode) {
+      if (lookupState.status === 'loading') {
+        nextErrors.institutionCode = 'Please wait while we verify the institution code';
+      } else if (lookupState.status === 'error') {
+        nextErrors.institutionCode = lookupState.message || 'Enter a valid institution code';
+      } else if (lookupState.status !== 'success') {
+        nextErrors.institutionCode = 'Unable to verify institution code';
+      } else if (lookupState.departments.length === 0) {
+        nextErrors.institutionCode = 'This institution does not have departments open for self-registration yet';
+      } else if (!form.departmentCode) {
+        nextErrors.departmentCode = 'Select a department';
+      }
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
-  /* ── Submit ───────────────────────────────────── */
-  const handleSubmit = async (ev) => {
-    ev.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     if (!validate()) return;
+
     setLoading(true);
     try {
-      const res = await registerStudent({
-        username:        form.email,
-        name:            form.name,
-        email:           form.email,
-        password:        form.password,
-        college:         form.college,
-        targetGoal:      form.targetGoal,
-        institutionCode: form.institutionCode || undefined,
-      });
-      if (!res.success) {
-        toast.error(res.message || 'Registration failed');
+      const payload = {
+        username: form.email,
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+        targetGoal: form.targetGoal,
+      };
+
+      if (form.institutionCode.trim()) {
+        payload.institutionCode = form.institutionCode.trim().toUpperCase();
+        payload.departmentCode = form.departmentCode;
+      }
+
+      const response = await registerStudent(payload);
+      if (!response.success) {
+        toast.error(response.message || 'Registration failed');
         return;
       }
+
       justRegistered.current = true;
       navigate('/diagnostic');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
   };
 
-  /* ── Render ───────────────────────────────────── */
+  const showDepartmentField =
+    lookupState.status === 'success' && lookupState.departments.length > 0;
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.blob1} />
@@ -105,48 +216,29 @@ export default function StudentRegister() {
           <span className={styles.logoIcon}>
             <Zap size={18} />
           </span>
-          DSA Master
+          Zerith
         </Link>
 
-        <h1 className={styles.title}>
-          Create your account
-        </h1>
+        <h1 className={styles.title}>Create your account</h1>
         <p className={styles.subtitle}>
-          Start your 90-day DSA journey today
+          Join with an institution code if you have one, or continue as an independent student.
         </p>
 
-        <form onSubmit={handleSubmit}
-              className={styles.form}
-              noValidate>
-
-          {/* Full Name */}
-          <Field
-            label="Full Name"
-            icon={<User size={16} />}
-            error={errors.name}
-          >
+        <form onSubmit={handleSubmit} className={styles.form} noValidate>
+          <Field label="Full Name" icon={<User size={16} />} error={errors.name}>
             <input
               type="text"
-              className={`${styles.input} ${
-                errors.name ? styles.inputError : ''
-              }`}
+              className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
               placeholder="John Doe"
               value={form.name}
               onChange={set('name')}
             />
           </Field>
 
-          {/* Email */}
-          <Field
-            label="Email Address"
-            icon={<Mail size={16} />}
-            error={errors.email}
-          >
+          <Field label="Email Address" icon={<Mail size={16} />} error={errors.email}>
             <input
               type="email"
-              className={`${styles.input} ${
-                errors.email ? styles.inputError : ''
-              }`}
+              className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
               placeholder="you@example.com"
               value={form.email}
               onChange={set('email')}
@@ -154,143 +246,135 @@ export default function StudentRegister() {
             />
           </Field>
 
-          {/* Password */}
           <Field
             label="Password"
             icon={<Lock size={16} />}
             error={errors.password}
-            extra={
+            extra={(
               <button
                 type="button"
                 className={styles.eyeBtn}
-                onClick={() => setShowP(p => !p)}
+                onClick={() => setShowP((prev) => !prev)}
                 tabIndex={-1}
               >
-                {showP
-                  ? <EyeOff size={16} />
-                  : <Eye size={16} />}
+                {showP ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
-            }
+            )}
           >
             <input
               type={showP ? 'text' : 'password'}
-              className={`${styles.input} ${
-                errors.password ? styles.inputError : ''
-              }`}
+              className={`${styles.input} ${errors.password ? styles.inputError : ''}`}
               placeholder="Min 8 characters"
               value={form.password}
               onChange={set('password')}
             />
           </Field>
 
-          {/* Confirm Password */}
           <Field
             label="Confirm Password"
             icon={<Lock size={16} />}
             error={errors.confirmPassword}
-            extra={
+            extra={(
               <button
                 type="button"
                 className={styles.eyeBtn}
-                onClick={() => setShowCP(p => !p)}
+                onClick={() => setShowCP((prev) => !prev)}
                 tabIndex={-1}
               >
-                {showCP
-                  ? <EyeOff size={16} />
-                  : <Eye size={16} />}
+                {showCP ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
-            }
+            )}
           >
             <input
               type={showCP ? 'text' : 'password'}
-              className={`${styles.input} ${
-                errors.confirmPassword
-                  ? styles.inputError : ''
-              }`}
+              className={`${styles.input} ${errors.confirmPassword ? styles.inputError : ''}`}
               placeholder="Re-enter password"
               value={form.confirmPassword}
               onChange={set('confirmPassword')}
             />
           </Field>
 
-          {/* College */}
-          <Field
-            label="College / Institute Name"
-            icon={<Building2 size={16} />}
-            error={errors.college}
-          >
-            <input
-              type="text"
-              className={`${styles.input} ${
-                errors.college ? styles.inputError : ''
-              }`}
-              placeholder="e.g. BITS Pilani"
-              value={form.college}
-              onChange={set('college')}
-            />
-          </Field>
-
-          {/* Target Goal */}
-          <Field
-            label="Target Goal"
-            icon={<Target size={16} />}
-            error={errors.targetGoal}
-          >
+          <Field label="Target Goal" icon={<Target size={16} />} error={errors.targetGoal}>
             <select
-              className={`${styles.input} ${
-                styles.select
-              } ${
-                errors.targetGoal ? styles.inputError : ''
-              }`}
+              className={`${styles.input} ${styles.select} ${errors.targetGoal ? styles.inputError : ''}`}
               value={form.targetGoal}
               onChange={set('targetGoal')}
             >
               <option value="">Select your goal</option>
-              {GOALS.map(g => (
-                <option key={g.value} value={g.value}>
-                  {g.label}
+              {GOALS.map((goal) => (
+                <option key={goal.value} value={goal.value}>
+                  {goal.label}
                 </option>
               ))}
             </select>
           </Field>
 
-          {/* Institution Code (optional) */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
-              Institution Code{' '}
-              <span className={styles.optional}>
-                (Optional)
-              </span>
-            </label>
-            <div className={styles.inputWrap}>
-              <span className={styles.inputIcon}>
-                <Hash size={16} />
-              </span>
-              <input
-                type="text"
-                className={styles.input}
-                placeholder="e.g. BITS2847"
-                value={form.institutionCode}
-                onChange={set('institutionCode')}
-              />
+          <Field
+            label="Institution Code"
+            icon={<Hash size={16} />}
+            error={errors.institutionCode}
+          >
+            <input
+              type="text"
+              className={`${styles.input} ${errors.institutionCode ? styles.inputError : ''}`}
+              placeholder="Optional, e.g. BITS2847"
+              value={form.institutionCode}
+              onChange={set('institutionCode')}
+            />
+          </Field>
+
+          <div className={styles.lookupCard}>
+            <div className={styles.lookupHeader}>
+              <Building2 size={16} />
+              <span>Institution access</span>
             </div>
-            <p className={styles.helperText}>
-              Get this code from your institution admin
+            <p className={styles.lookupText}>
+              {!form.institutionCode.trim()
+                ? 'Leave the code blank if you are joining as an independent student.'
+                : lookupState.message}
             </p>
+            {lookupState.status === 'success' ? (
+              <div className={`${styles.lookupStatus} ${styles.lookupStatusSuccess}`}>
+                <strong>{lookupState.institutionName}</strong>
+                <span>{lookupState.departments.length} department{lookupState.departments.length === 1 ? '' : 's'} available</span>
+              </div>
+            ) : null}
+            {lookupState.status === 'loading' ? (
+              <div className={`${styles.lookupStatus} ${styles.lookupStatusLoading}`}>
+                <strong>Verifying institution code</strong>
+                <span>Fetching department list...</span>
+              </div>
+            ) : null}
+            {lookupState.status === 'error' ? (
+              <div className={`${styles.lookupStatus} ${styles.lookupStatusError}`}>
+                <strong>Code not available</strong>
+                <span>{lookupState.message}</span>
+              </div>
+            ) : null}
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className={styles.submitBtn}
-          >
-            {loading
-              ? <span className={styles.spinner} />
-              : 'Create Account'}
+          {showDepartmentField ? (
+            <Field label="Department" icon={<Building2 size={16} />} error={errors.departmentCode}>
+              <select
+                className={`${styles.input} ${styles.select} ${errors.departmentCode ? styles.inputError : ''}`}
+                value={form.departmentCode}
+                onChange={set('departmentCode')}
+              >
+                <option value="">Select your department</option>
+                {lookupState.departments.map((department) => (
+                  <option key={department.code} value={department.code}>
+                    {department.name} ({department.code})
+                  </option>
+                ))}
+              </select>
+            </Field>
+          ) : null}
+
+          <button type="submit" disabled={loading} className={styles.submitBtn}>
+            {loading ? <span className={`${styles.spinner} ${styles.spinnerStudent}`} /> : 'Create Account'}
           </button>
         </form>
 
-        {/* Back to Home link */}
         <div className={styles.backToHome}>
           <Link to="/" className={styles.backLink}>
             <ArrowLeft size={16} />
@@ -301,7 +385,7 @@ export default function StudentRegister() {
         <div className={styles.links}>
           <p>
             Already have an account?{' '}
-            <Link to="/login" className={styles.link}>
+            <Link to="/login" className={styles.linkStudent}>
               Login
             </Link>
           </p>
@@ -311,7 +395,6 @@ export default function StudentRegister() {
   );
 }
 
-/* ── Reusable field wrapper ─────────────────────── */
 function Field({ label, icon, error, extra, children }) {
   return (
     <div className={styles.fieldGroup}>
@@ -321,9 +404,7 @@ function Field({ label, icon, error, extra, children }) {
         {children}
         {extra}
       </div>
-      {error && (
-        <p className={styles.errorMsg}>{error}</p>
-      )}
+      {error ? <p className={styles.errorMsg}>{error}</p> : null}
     </div>
   );
 }

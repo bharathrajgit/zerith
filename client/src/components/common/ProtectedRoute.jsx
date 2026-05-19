@@ -28,12 +28,14 @@
     </div>
   );
 
-  const ProtectedRoute = ({ children, requiredType }) => {
-    const { isLoading, isAuthenticated, userType, user } = useAuth();
-    const location = useLocation();
+const ProtectedRoute = ({ children, requiredType }) => {
+  const { isLoading, isAuthenticated, userType, user } = useAuth();
+  const location = useLocation();
+  const storedDiagnosticCompleted =
+    requiredType === "student" && localStorage.getItem("dsa_diag_completed") === "true";
 
-    // 1. Still loading auth state
-    if (isLoading) return <FullPageLoader />;
+  // 1. Still loading auth state
+  if (isLoading) return <FullPageLoader />;
 
     // 2. Not authenticated at all
     if (!isAuthenticated) {
@@ -56,6 +58,7 @@
   if (
     requiredType === "student" &&
     user?.diagnosticCompleted === false &&
+    !storedDiagnosticCompleted &&
     location.pathname !== "/diagnostic"
   ) {
     return <Navigate to="/diagnostic" replace />;

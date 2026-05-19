@@ -19,5 +19,15 @@
   "face_missing": [
     "face_missing",
     "no_face"
+  ],
+  "phone_visible": [
+    "phone_visible",
+    "phone_detected",
+    "mobile_phone"
+  ],
+  "extra_screen_visible": [
+    "extra_screen_visible",
+    "second_monitor",
+    "multiple_screens"
   ]
 }

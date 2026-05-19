@@ -1,0 +1,247 @@
+.cameraContainer {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  cursor: move;
+  user-select: none;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid #6366f1;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  background: #111120;
+}
+
+.cameraContainer.warning {
+  border-color: #ef4444;
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+  animation: warningPulse 0.5s ease 3;
+}
+
+.video {
+  width: 160px;
+  height: 120px;
+  display: block;
+  object-fit: cover;
+}
+
+.cameraPlaceholder {
+  width: 160px;
+  height: 120px;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, rgba(99, 102, 241, 0.22), transparent 55%),
+    linear-gradient(180deg, #111120 0%, #0a0a0f 100%);
+  color: #f1f5f9;
+  font-size: 11px;
+  line-height: 1.45;
+  font-family: Inter, sans-serif;
+}
+
+.statusBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  animation: pulse 2s infinite;
+  flex-shrink: 0;
+}
+
+.statusDot.warning {
+  background: #ef4444;
+}
+
+.statusDot.loading {
+  background: #64748b;
+}
+
+.statusLabel {
+  font-size: 10px;
+  color: #f1f5f9;
+  font-family: Inter, sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.warningBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: slideDown 0.3s ease;
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+}
+
+.warningBanner.warning1 {
+  background: #f59e0b;
+}
+
+.warningBanner.warning2 {
+  background: #ef4444;
+}
+
+.warningBanner.warning3 {
+  background: #7c3aed;
+}
+
+.warningIcon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.warningBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.warningText {
+  font-weight: 600;
+  font-size: 14px;
+  color: #ffffff;
+  font-family: Inter, sans-serif;
+}
+
+.warningSubtext {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.warningProgress {
+  height: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.warningProgressFill {
+  height: 100%;
+  background: #ffffff;
+  animation: shrink 4s linear forwards;
+}
+
+.lockOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px;
+  text-align: center;
+}
+
+.lockIcon {
+  font-size: 72px;
+  animation: lockBounce 0.5s ease;
+}
+
+.lockTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-family: Inter, sans-serif;
+}
+
+.lockSubtitle {
+  font-size: 16px;
+  color: #64748b;
+  text-align: center;
+  max-width: 460px;
+  line-height: 1.6;
+  font-family: Inter, sans-serif;
+}
+
+.countdown {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ef4444;
+  font-family: "Courier New", monospace;
+  background: #1a0a0a;
+  padding: 16px 32px;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.lockNotice {
+  font-size: 13px;
+  color: #475569;
+  font-family: Inter, sans-serif;
+}
+
+@keyframes warningPulse {
+  0%,
+  100% {
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 40px rgba(239, 68, 68, 0.9);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes lockBounce {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

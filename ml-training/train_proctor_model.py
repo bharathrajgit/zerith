@@ -1,10 +1,13 @@
 import json
+import os
+from collections import Counter
 from pathlib import Path
 
 try:
     import torch
+    from sklearn.metrics import accuracy_score, classification_report
     from torch import nn, optim
-    from torch.utils.data import DataLoader, random_split
+    from torch.utils.data import DataLoader, Subset, WeightedRandomSampler
     from torchvision import datasets, models, transforms
 except Exception as exc:  # pragma: no cover
     raise SystemExit(
@@ -18,7 +21,153 @@ CLASS_LABELS = [
     'head_pose_away',
     'multiple_faces',
     'face_missing',
+    'phone_visible',
+    'extra_screen_visible',
 ]
+RANDOM_SEED = 42
+
+
+class OrderedImageFolder(datasets.ImageFolder):
+    def find_classes(self, directory):
+        available = {
+            entry.name: entry.path
+            for entry in os.scandir(directory)
+            if entry.is_dir()
+        }
+        missing = [label for label in CLASS_LABELS if label not in available]
+        if missing:
+            raise FileNotFoundError(
+                f'Missing prepared class folders: {", ".join(missing)}'
+            )
+
+        return list(CLASS_LABELS), {label: index for index, label in enumerate(CLASS_LABELS)}
+
+
+def build_datasets(prepared_dir):
+    base_dataset = OrderedImageFolder(prepared_dir)
+    if len(base_dataset) == 0:
+        raise SystemExit('Prepared dataset is empty. Run prepare_dataset.py first.')
+
+    eval_transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+    train_transform = transforms.Compose([
+        transforms.RandomResizedCrop(224, scale=(0.82, 1.0)),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.ColorJitter(brightness=0.16, contrast=0.16, saturation=0.12, hue=0.03),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+    ])
+
+    generator = torch.Generator().manual_seed(RANDOM_SEED)
+    indices = torch.randperm(len(base_dataset), generator=generator).tolist()
+    val_size = max(1, int(len(base_dataset) * 0.2))
+    train_size = len(base_dataset) - val_size
+    if train_size <= 0:
+        raise SystemExit('Need at least two prepared images to create train/validation splits.')
+
+    val_indices = indices[:val_size]
+    train_indices = indices[val_size:]
+
+    train_dataset = Subset(OrderedImageFolder(prepared_dir, transform=train_transform), train_indices)
+    val_dataset = Subset(OrderedImageFolder(prepared_dir, transform=eval_transform), val_indices)
+    return base_dataset, train_dataset, val_dataset, train_indices, val_indices
+
+
+def build_training_sampler(base_dataset, train_indices):
+    train_targets = [base_dataset.targets[index] for index in train_indices]
+    class_counts = Counter(train_targets)
+    sample_weights = [1.0 / max(class_counts[label], 1) for label in train_targets]
+    sampler = WeightedRandomSampler(
+        weights=torch.as_tensor(sample_weights, dtype=torch.double),
+        num_samples=len(sample_weights),
+        replacement=True,
+    )
+    class_weights = [
+        len(train_targets) / max(len(CLASS_LABELS) * class_counts.get(index, 0), 1)
+        for index in range(len(CLASS_LABELS))
+    ]
+    return sampler, class_counts, torch.tensor(class_weights, dtype=torch.float32)
+
+
+def evaluate_model(model, dataloader, device):
+    predictions = []
+    targets = []
+
+    model.eval()
+    with torch.no_grad():
+        for images, labels in dataloader:
+            images = images.to(device)
+            labels = labels.to(device)
+            logits = model(images)
+            batch_predictions = torch.argmax(logits, dim=1)
+            predictions.extend(batch_predictions.cpu().tolist())
+            targets.extend(labels.cpu().tolist())
+
+    report = classification_report(
+        targets,
+        predictions,
+        labels=list(range(len(CLASS_LABELS))),
+        target_names=CLASS_LABELS,
+        output_dict=True,
+        zero_division=0,
+    )
+    accuracy = accuracy_score(targets, predictions) if targets else 0.0
+    macro_f1 = report.get('macro avg', {}).get('f1-score', 0.0)
+
+    return {
+        'accuracy': float(accuracy),
+        'macro_f1': float(macro_f1),
+        'report': report,
+    }
+
+
+def build_metrics_payload(
+    base_dataset,
+    train_indices,
+    val_indices,
+    class_counts,
+    best_metrics,
+    checkpoint_path,
+):
+    dataset_counts = Counter(base_dataset.targets)
+    report = best_metrics['report']
+
+    return {
+        'model_name': 'proctor_monitor',
+        'dataset_slug': os.environ.get('PROCTOR_KAGGLE_DATASET', ''),
+        'class_labels': CLASS_LABELS,
+        'dataset_class_distribution': {
+            CLASS_LABELS[index]: int(dataset_counts.get(index, 0))
+            for index in range(len(CLASS_LABELS))
+        },
+        'train_class_distribution': {
+            CLASS_LABELS[index]: int(class_counts.get(index, 0))
+            for index in range(len(CLASS_LABELS))
+        },
+        'train_size': int(len(train_indices)),
+        'validation_size': int(len(val_indices)),
+        'validation_accuracy': round(float(best_metrics['accuracy']), 4),
+        'macro_f1': round(float(best_metrics['macro_f1']), 4),
+        'per_class_precision': {
+            label: round(float(report[label]['precision']), 4)
+            for label in CLASS_LABELS
+        },
+        'per_class_recall': {
+            label: round(float(report[label]['recall']), 4)
+            for label in CLASS_LABELS
+        },
+        'per_class_f1': {
+            label: round(float(report[label]['f1-score']), 4)
+            for label in CLASS_LABELS
+        },
+        'confusion_matrix_path': '',
+        'checkpoint_path': str(checkpoint_path),
+        'onnx_export_path': 'ml-service/trained_models/proctor_monitor.onnx',
+        'notes': 'Weighted sampler and weighted loss enabled; heuristic runtime remains face-only when no ONNX model is loaded.',
+    }
 
 
 def main():
@@ -27,78 +176,85 @@ def main():
     artifacts_dir = base_dir / 'artifacts'
     artifacts_dir.mkdir(parents=True, exist_ok=True)
 
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-    ])
+    torch.manual_seed(RANDOM_SEED)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(RANDOM_SEED)
 
-    dataset = datasets.ImageFolder(prepared_dir, transform=transform)
-    if len(dataset) == 0:
-        raise SystemExit('Prepared dataset is empty. Run prepare_dataset.py first.')
+    base_dataset, train_dataset, val_dataset, train_indices, val_indices = build_datasets(prepared_dir)
+    sampler, train_class_counts, class_weights = build_training_sampler(base_dataset, train_indices)
 
-    train_size = int(len(dataset) * 0.8)
-    val_size = len(dataset) - train_size
-    train_set, val_set = random_split(dataset, [train_size, val_size])
-
-    train_loader = DataLoader(train_set, batch_size=16, shuffle=True)
-    val_loader = DataLoader(val_set, batch_size=16, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=16, sampler=sampler)
+    val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
 
     model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
-    model.classifier[3] = nn.Linear(model.classifier[3].in_features, len(dataset.classes))
+    model.classifier[3] = nn.Linear(model.classifier[3].in_features, len(CLASS_LABELS))
 
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-4)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model.to(device)
 
-    epochs = 3
-    best_val_accuracy = 0.0
+    criterion = nn.CrossEntropyLoss(weight=class_weights.to(device))
+    optimizer = optim.Adam(model.parameters(), lr=1e-4)
+    epochs = int(os.environ.get('PROCTOR_TRAIN_EPOCHS', '5'))
+
+    checkpoint_path = artifacts_dir / 'best_model.pt'
+    metrics_path = artifacts_dir / 'training_metrics.json'
+    best_score = -1.0
+    best_metrics = None
 
     for epoch in range(epochs):
         model.train()
+        running_loss = 0.0
+
         for images, labels in train_loader:
-            images, labels = images.to(device), labels.to(device)
+            images = images.to(device)
+            labels = labels.to(device)
+
             optimizer.zero_grad()
             logits = model(images)
             loss = criterion(logits, labels)
             loss.backward()
             optimizer.step()
 
-        model.eval()
-        correct = 0
-        total = 0
-        with torch.no_grad():
-            for images, labels in val_loader:
-                images, labels = images.to(device), labels.to(device)
-                logits = model(images)
-                predictions = torch.argmax(logits, dim=1)
-                total += labels.size(0)
-                correct += (predictions == labels).sum().item()
+            running_loss += float(loss.item()) * labels.size(0)
 
-        val_accuracy = correct / total if total else 0.0
-        print(f'Epoch {epoch + 1}/{epochs} - val_accuracy={val_accuracy:.4f}')
+        evaluation = evaluate_model(model, val_loader, device)
+        average_loss = running_loss / max(len(train_indices), 1)
+        print(
+            f'Epoch {epoch + 1}/{epochs} - '
+            f'train_loss={average_loss:.4f} '
+            f'val_accuracy={evaluation["accuracy"]:.4f} '
+            f'val_macro_f1={evaluation["macro_f1"]:.4f}'
+        )
 
-        if val_accuracy >= best_val_accuracy:
-            best_val_accuracy = val_accuracy
+        score = evaluation['macro_f1'] + (evaluation['accuracy'] * 0.01)
+        if score >= best_score:
+            best_score = score
+            best_metrics = evaluation
             torch.save(
                 {
                     'state_dict': model.state_dict(),
-                    'classes': dataset.classes,
+                    'classes': list(CLASS_LABELS),
+                    'expected_labels': list(CLASS_LABELS),
                 },
-                artifacts_dir / 'best_model.pt',
+                checkpoint_path,
             )
 
-    metrics = {
-        'validation_accuracy': round(best_val_accuracy, 4),
-        'classes': dataset.classes,
-        'expected_labels': CLASS_LABELS,
-        'checkpoint_path': str(artifacts_dir / 'best_model.pt'),
-    }
-    with open(artifacts_dir / 'training_metrics.json', 'w', encoding='utf-8') as handle:
+    if best_metrics is None:
+        raise SystemExit('Training completed without producing validation metrics.')
+
+    metrics = build_metrics_payload(
+        base_dataset,
+        train_indices,
+        val_indices,
+        train_class_counts,
+        best_metrics,
+        checkpoint_path,
+    )
+    with open(metrics_path, 'w', encoding='utf-8') as handle:
         json.dump(metrics, handle, indent=2)
 
-    print('Saved checkpoint to', artifacts_dir / 'best_model.pt')
-    print('Saved metrics to', artifacts_dir / 'training_metrics.json')
+    print('Saved checkpoint to', checkpoint_path)
+    print('Saved metrics to', metrics_path)
 
 
 if __name__ == '__main__':

@@ -4,9 +4,10 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, Map, TrendingUp, Code2, User, LogOut, 
-  Menu, Zap, Sparkles, PlayCircle, X
+  Menu, Sparkles, PlayCircle, X
 } from 'lucide-react';
 import styles from './StudentLayout.module.css';
+import websiteLogo from '../../assets/websiteLogo.jpeg';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', badge: null },
@@ -81,8 +82,12 @@ export default function StudentLayout({ children }) {
       <aside className={`${styles.sidebar} ${mobileOpen ? styles.sidebarOpen : ''}`}>
         {/* Logo with glow effect */}
         <div className={styles.logoWrapper}>
-          <Zap className={styles.logoIcon} size={24} />
-          <span className={styles.logoText}>DSA Master</span>
+          <img
+            src={websiteLogo}
+            alt="Zerith logo"
+            className={styles.logoImage}
+          />
+          <span className={styles.logoText}>Zerith</span>
           {/* Close button for mobile */}
           <button 
             className={styles.closeButton}
@@ -167,7 +172,11 @@ export default function StudentLayout({ children }) {
           >
             <Menu size={22} />
           </button>
-          <span className={styles.mobileLogo}>DSA Master</span>
+          <img
+            src={websiteLogo}
+            alt="Zerith logo"
+            className={styles.mobileLogoImage}
+          />
           <div style={{ width: 24 }} />
         </div>
 

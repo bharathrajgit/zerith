@@ -6,6 +6,7 @@ import api from '../../services/api';
 import { getHint } from '../../services/geminiService';
 import { useAuth } from '../../context/AuthContext';
 import usePracticeMonitoring from '../../hooks/usePracticeMonitoring';
+import { LockScreen } from '../../components/malpractice/MalpracticeMonitor';
 import MonitoringConsentModal from '../../components/common/MonitoringConsentModal';
 import CameraMonitoringLayer from '../../components/common/CameraMonitoringLayer';
 import {
@@ -23,24 +24,35 @@ const ROUND_CONFIG = {
     label: 'MCQ Round',
     color: '#22c55e',
     bgClass: styles.roundBasic,
-    passScore: 4,
+    passRatio: 0.8,
     timePerQ: 60,
   },
   Medium: {
     label: 'Round 2: Medium',
     color: '#f59e0b',
     bgClass: styles.roundMedium,
-    passScore: 4,
+    passRatio: 0.8,
     timePerQ: 90,
   },
   Hard: {
     label: 'Round 3: Hard',
     color: '#ef4444',
     bgClass: styles.roundHard,
-    passScore: 3,
+    passRatio: 0.6,
     timePerQ: 120,
   },
 };
+
+const getRequiredCorrectAnswers = (round, totalQuestions) => {
+  const ratio = ROUND_CONFIG[round]?.passRatio || 0;
+  return Math.ceil(Math.max(Number(totalQuestions) || 0, 0) * ratio);
+};
+
+const formatSignal = (signal = '') =>
+  String(signal || '')
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 
 /* ================================================================
    Timer Display Component (Memoized for performance)
@@ -125,31 +137,39 @@ export default function AssessmentPage() {
   const [attemptNumber, setAttemptNumber] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [slideDirection, setSlideDirection] = useState('right');
+  const [lockCheckLoading, setLockCheckLoading] = useState(true);
+  const [isLockedByMalpractice, setIsLockedByMalpractice] = useState(false);
+  const [lockInfo, setLockInfo] = useState(null);
 
   // ─── Anti‑malpractice session data ─────────────────────────
   // ─── All answers collected ─────────────────────────────────
   const answersRef = useRef([]);
   const timerRef = useRef(null);
   const questionCardRef = useRef(null);
+  const isSubmittingAnswerRef = useRef(false);
   
   // Single-round assessment flow: always use Basic MCQs.
   const resolvedRound = 'Basic';
   const config = ROUND_CONFIG[resolvedRound];
+  const totalQuestions = questions.length;
+  const requiredCorrectAnswers = getRequiredCorrectAnswers(resolvedRound, totalQuestions);
 
   const handleMonitoringStatusChange = useCallback((nextState) => {
+    const topAlert = Array.isArray(nextState?.alerts) ? nextState.alerts[0] : null;
+    const alertMessage = topAlert?.message || 'Monitoring warning';
+
     if (nextState.finalFlagged) {
-      toast.error(
-        `Monitoring flag raised for this session. Warning ${nextState.warningCount}/${nextState.warningLimit}.`
-      );
+      toast.error(`${alertMessage}. Warning ${nextState.warningCount}/${nextState.warningLimit}.`);
       return;
     }
 
     if ((nextState.warningCount || 0) > 0) {
-      toast(`Monitoring warning ${nextState.warningCount}/${nextState.warningLimit}`, {
-        icon: '⚠️',
+      toast(`${alertMessage}. Warning ${nextState.warningCount}/${nextState.warningLimit}`, {
+        icon: '!',
       });
     }
   }, []);
+
 
   const {
     browserMetrics,
@@ -163,6 +183,7 @@ export default function AssessmentPage() {
     startMonitoring,
     stream,
     trackBrowserEvent,
+    visionState,
   } = usePracticeMonitoring({
     sessionType: 'assessment',
     topicId,
@@ -211,6 +232,33 @@ export default function AssessmentPage() {
       if (copyThrottleTimer) clearTimeout(copyThrottleTimer);
     };
   }, [screen, trackBrowserEvent]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkLock = async () => {
+      try {
+        const response = await api.get('/malpractice/check-lock');
+        if (!isMounted) return;
+        if (response.data?.isLocked) {
+          setIsLockedByMalpractice(true);
+          setLockInfo(response.data);
+        }
+      } catch (error) {
+        console.error('Lock check failed:', error);
+      } finally {
+        if (isMounted) {
+          setLockCheckLoading(false);
+        }
+      }
+    };
+
+    checkLock();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // ─── Fetch questions on mount ──────────────────────────────
   useEffect(() => {
@@ -275,8 +323,15 @@ export default function AssessmentPage() {
 
   // ─── Start the question round ──────────────────────────────
   const startRound = async () => {
-    const monitoringReady = await startMonitoring();
-    if (!monitoringReady) return;
+    if (!moduleId) {
+      toast.error('Assessment setup is still loading. Please try again in a moment.');
+      return;
+    }
+
+    const monitoringApproved = await startMonitoring();
+    if (!monitoringApproved) {
+      return;
+    }
 
     setCurrentIndex(0);
     setTimeLeft(config.timePerQ);
@@ -287,6 +342,7 @@ export default function AssessmentPage() {
     setCurrentCorrectAnswer(null);
     setHintText(null);
     setIsCorrect(false);
+    isSubmittingAnswerRef.current = false;
     answersRef.current = [];
     setScreen('question');
   };
@@ -294,7 +350,9 @@ export default function AssessmentPage() {
   // ─── Handle answer submission ──────────────────────────────
   const handleSubmit = useCallback(
     async (optionIndex) => {
-      if (submitted) return;
+      if (submitted || isSubmittingAnswerRef.current) return;
+      isSubmittingAnswerRef.current = true;
+
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
@@ -305,7 +363,10 @@ export default function AssessmentPage() {
       setSubmitted(true);
 
       const currentQ = questions[currentIndex];
-      if (!currentQ) return;
+      if (!currentQ) {
+        isSubmittingAnswerRef.current = false;
+        return;
+      }
 
       // Fetch correct answer to determine isCorrect
       let correctAnswerValue = null;
@@ -343,6 +404,7 @@ export default function AssessmentPage() {
         timeTaken: config.timePerQ - timeLeft,
         hintsUsed: hintText ? 1 : 0,
       });
+      isSubmittingAnswerRef.current = false;
     },
     [submitted, questions, currentIndex, timeLeft, config.timePerQ, hintText]
   );
@@ -429,6 +491,7 @@ export default function AssessmentPage() {
         setCurrentCorrectAnswer(null);
         setHintText(null);
         setIsCorrect(false);
+        isSubmittingAnswerRef.current = false;
         setIsTransitioning(false);
         setSlideDirection('right');
         
@@ -448,23 +511,25 @@ export default function AssessmentPage() {
   const submitAssessment = async () => {
     setScreen('loading');
     try {
+      if (sessionId) {
+        await finishMonitoring(
+          {
+            topicId,
+            moduleId,
+          },
+          { keepalive: false }
+        ).catch(() => null);
+      }
+
       const { data } = await api.post('/assessment/submit', {
         topicId,
         moduleId,
         round: resolvedRound,
         submissions: answersRef.current,
         sessionData: browserMetrics,
-        monitoringSessionId: sessionId,
+        monitoringSessionId: sessionId || undefined,
       });
       if (data.success) {
-        await finishMonitoring(
-          {
-            assessmentId: data.data?.assessmentId,
-            topicId,
-            moduleId,
-          },
-          { keepalive: true }
-        );
         setResults(data.data);
         // Add a small delay for smooth transition
         setTimeout(() => {
@@ -480,40 +545,120 @@ export default function AssessmentPage() {
   };
 
   // ─── Loading state ─────────────────────────────────────────
-  const monitoringUi = (
-    <>
-      <MonitoringConsentModal {...consentModal} />
-      {stream ? (
-        <CameraMonitoringLayer
-          stream={stream}
-          captureVideoRef={captureVideoRef}
-          hidden={isMobile}
-        />
-      ) : null}
-    </>
+  const activeMonitoringAlert = Array.isArray(visionState?.alerts) ? visionState.alerts[0] : null;
+  const monitoringRiskLevel = sessionState?.riskLevel || visionState?.riskLevel || 'NONE';
+  const monitoringWarningCount = Number(sessionState?.warningCount || 0);
+  const monitoringWarningLimit = Number(sessionState?.warningLimit || (user?.institutionId ? 2 : 3));
+  const monitoringSignals = Array.isArray(sessionState?.signals) ? sessionState.signals : [];
+  const monitoringStatusClass =
+    sessionState?.finalFlagged || monitoringRiskLevel === 'HIGH'
+      ? styles.monitoringDanger
+      : monitoringWarningCount > 0 || monitoringRiskLevel === 'MEDIUM'
+      ? styles.monitoringWarn
+      : styles.monitoringSafe;
+  const monitoringStatusLabel = sessionState?.finalFlagged
+    ? 'Flagged for review'
+    : isMonitoring
+    ? 'Live monitoring active'
+    : 'Monitoring starts with the round';
+
+  const monitoringUi = isMonitoring ? (
+    <CameraMonitoringLayer
+      stream={stream}
+      captureVideoRef={captureVideoRef}
+      hidden={isMobile}
+      width={190}
+      height={140}
+    />
+  ) : null;
+
+  const monitoringModal = <MonitoringConsentModal {...consentModal} />;
+
+  const monitoringBadge = (
+    <div className={`${styles.monitoringPanel} ${monitoringStatusClass}`}>
+      <div className={styles.monitoringPanelHeader}>
+        <div>
+          <p className={styles.monitoringEyebrow}>Assessment integrity</p>
+          <h3 className={styles.monitoringTitle}>{monitoringStatusLabel}</h3>
+        </div>
+        <span className={styles.monitoringRiskPill}>{monitoringRiskLevel}</span>
+      </div>
+      <div className={styles.monitoringStats}>
+        <div className={styles.monitoringStat}>
+          <span className={styles.monitoringStatLabel}>Warnings</span>
+          <strong className={styles.monitoringStatValue}>
+            {monitoringWarningCount}/{monitoringWarningLimit}
+          </strong>
+        </div>
+        <div className={styles.monitoringStat}>
+          <span className={styles.monitoringStatLabel}>Evidence</span>
+          <strong className={styles.monitoringStatValue}>
+            {Number(visionState?.evidenceCount || 0)}
+          </strong>
+        </div>
+        <div className={styles.monitoringStat}>
+          <span className={styles.monitoringStatLabel}>Last scan</span>
+          <strong className={styles.monitoringStatValue}>
+            {visionState?.updatedAt ? 'Just now' : 'Pending'}
+          </strong>
+        </div>
+      </div>
+      {monitoringSignals.length > 0 ? (
+        <div className={styles.monitoringSignalRow}>
+          {monitoringSignals.slice(0, 3).map((signal) => (
+            <span key={signal} className={styles.monitoringSignalChip}>
+              {formatSignal(signal)}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <p className={styles.monitoringHint}>
+          Keep your face visible and stay on this tab until the round is complete.
+        </p>
+      )}
+    </div>
   );
 
-  const monitoringBadge = isMonitoring ? (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: '0.45rem',
-        padding: '0.55rem 0.8rem',
-        borderRadius: 999,
-        background: 'rgba(15, 118, 110, 0.16)',
-        border: '1px solid rgba(45, 212, 191, 0.26)',
-        color: '#99f6e4',
-        fontSize: '0.82rem',
-        fontWeight: 700,
-      }}
-    >
-      Camera Active
-      <span style={{ color: '#ccfbf1' }}>
-        Warnings {sessionState?.warningCount || 0}/{sessionState?.warningLimit || (user?.institutionId ? 2 : 3)}
-      </span>
+  const monitoringLiveAlert = activeMonitoringAlert || monitoringWarningCount > 0 || sessionState?.finalFlagged ? (
+    <div className={`${styles.monitoringAlert} ${monitoringStatusClass}`}>
+      <div className={styles.monitoringAlertHeader}>
+        <AlertTriangle size={16} />
+        <span>
+          {activeMonitoringAlert?.message
+            || (sessionState?.finalFlagged
+              ? 'This assessment has been flagged for review.'
+              : `Warnings recorded: ${monitoringWarningCount}/${monitoringWarningLimit}`)}
+        </span>
+      </div>
+      <p className={styles.monitoringAlertMeta}>
+        Confidence: {Math.round(Number(visionState?.confidence || activeMonitoringAlert?.confidence || 0) * 100)}%
+        {' '}| Risk level: {monitoringRiskLevel}
+      </p>
     </div>
   ) : null;
+
+  if (lockCheckLoading) {
+    return (
+      <StudentLayout>
+        <div className={styles.loadingContainer}>
+          <div className={styles.spinner}>
+            <div className={styles.spinnerRing} />
+          </div>
+          <p className={styles.loadingText}>Checking assessment access...</p>
+          <div className={styles.loadingDots}>
+            <span className={styles.loadingDot} style={{ animationDelay: '0s' }} />
+            <span className={styles.loadingDot} style={{ animationDelay: '0.2s' }} />
+            <span className={styles.loadingDot} style={{ animationDelay: '0.4s' }} />
+          </div>
+        </div>
+        {monitoringModal}
+      </StudentLayout>
+    );
+  }
+
+  if (isLockedByMalpractice && lockInfo) {
+    return <LockScreen lockInfo={lockInfo} />;
+  }
 
   if (screen === 'loading') {
     return (
@@ -529,7 +674,7 @@ export default function AssessmentPage() {
             <span className={styles.loadingDot} style={{ animationDelay: '0.4s' }} />
           </div>
         </div>
-        {monitoringUi}
+        {monitoringModal}
       </StudentLayout>
     );
   }
@@ -547,9 +692,9 @@ export default function AssessmentPage() {
             <h1 className={styles.introTitle}>{topicName}</h1>
             <div className={styles.introInfo}>
               {[
-                { value: '5', label: 'Questions' },
+                { value: String(totalQuestions), label: 'Questions' },
                 { value: `${config.timePerQ}s`, label: 'Per Question' },
-                { value: `${config.passScore}/5`, label: 'To Pass' },
+                { value: `${requiredCorrectAnswers}/${totalQuestions || 1}`, label: 'To Pass' },
               ].map((item, i) => (
                 <div 
                   key={i} 
@@ -562,7 +707,7 @@ export default function AssessmentPage() {
               ))}
             </div>
             <p className={styles.introNote}>
-              You must get at least {config.passScore} out of 5 correct
+              You must get at least {requiredCorrectAnswers} out of {totalQuestions}
               to unlock the next step.
             </p>
             <p className={styles.introNote}>
@@ -579,6 +724,7 @@ export default function AssessmentPage() {
           </div>
         </div>
         {monitoringUi}
+        {monitoringModal}
       </StudentLayout>
     );
   }
@@ -604,6 +750,7 @@ export default function AssessmentPage() {
               </button>
             </div>
           </div>
+          {monitoringModal}
         </StudentLayout>
       );
     }
@@ -617,13 +764,14 @@ export default function AssessmentPage() {
               MCQ
             </span>
             <span className={`${styles.questionCount} ${styles.fadeIn}`}>
-              Q {currentIndex + 1} of 5
+              Q {currentIndex + 1} of {totalQuestions}
             </span>
             <TimerDisplay timeLeft={timeLeft} totalTime={config.timePerQ} />
           </div>
           <div style={{ marginBottom: '0.85rem' }}>
             {monitoringBadge}
           </div>
+          {monitoringLiveAlert}
 
           {/* Question card with animation */}
           <div 
@@ -756,21 +904,23 @@ export default function AssessmentPage() {
           </div>
 
           {/* Progress dots */}
-          <ProgressDots total={5} current={currentIndex} />
+          <ProgressDots total={totalQuestions} current={currentIndex} />
         </div>
         {monitoringUi}
+        {monitoringModal}
       </StudentLayout>
     );
   }
 
   // ─── Result screen ────────────────────────────────────────
   if (screen === 'result' && results) {
+    const resultQuestionCount = results.totalQuestions || results.results?.length || totalQuestions || 0;
     const correct = results.results
       ? results.results.filter((r) => r.isCorrect).length
       : 0;
     const accuracy = results.results
       ? Math.round(
-          (results.results.filter((r) => r.isCorrect).length / 5) * 100
+          (results.results.filter((r) => r.isCorrect).length / Math.max(resultQuestionCount, 1)) * 100
         )
       : 0;
     const avgTime =
@@ -809,6 +959,7 @@ export default function AssessmentPage() {
           <div style={{ marginBottom: '0.9rem' }}>
             {monitoringBadge}
           </div>
+          {monitoringLiveAlert}
           {/* Score card with animation */}
           <div className={`${styles.resultCard} ${styles.fadeInUp}`}>
             <div className={`${styles.resultBadge} ${
@@ -834,20 +985,23 @@ export default function AssessmentPage() {
                   stroke={passed ? '#22c55e' : '#ef4444'}
                   strokeWidth="10"
                   strokeDasharray={377}
-                  strokeDashoffset={377 - (377 * correct) / 5}
+                  strokeDashoffset={377 - (377 * correct) / Math.max(resultQuestionCount, 1)}
                   strokeLinecap="round"
                   className={styles.scoreCircleProgress}
                 />
               </svg>
               <div className={styles.scoreInner}>
                 <span className={styles.scoreNumber}>{correct}</span>
-                <span className={styles.scoreTotal}>/ 5 Correct</span>
+                <span className={styles.scoreTotal}>/ {resultQuestionCount} Correct</span>
               </div>
             </div>
 
             <p className={styles.accuracyText}>{accuracy}% Accuracy</p>
             <p className={styles.avgTimeText}>
               Average: {avgTime} seconds per question
+            </p>
+            <p className={styles.avgTimeText}>
+              Pass mark: {results.requiredCorrectAnswers || getRequiredCorrectAnswers(resolvedRound, resultQuestionCount)} / {resultQuestionCount}
             </p>
           </div>
 
@@ -924,6 +1078,7 @@ export default function AssessmentPage() {
             )}
         </div>
         {monitoringUi}
+        {monitoringModal}
       </StudentLayout>
     );
   }

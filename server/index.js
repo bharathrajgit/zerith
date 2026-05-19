@@ -22,6 +22,7 @@ const codingRoutes = require('./routes/coding.routes');
 const progressionRoutes = require('./routes/progression.routes');
 const videoRoutes = require('./routes/video.routes');
 const monitoringRoutes = require('./routes/monitoring.routes');
+const malpracticeRoutes = require('./routes/malpractice');
 
 const app = express();
 
@@ -51,6 +52,8 @@ app.use('/api/coding', codingRoutes);
 app.use('/api/progression', progressionRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/monitoring', monitoringRoutes);
+app.use('/api/malpractice', malpracticeRoutes.studentRouter);
+app.use('/api/institution/malpractice', malpracticeRoutes.institutionRouter);
 
 // Global error handler – prints ANY error value
 app.use((err, req, res, next) => {

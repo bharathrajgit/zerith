@@ -1,5 +1,6 @@
 const MonitoringSession = require('../models/MonitoringSession');
 const MalpracticeLog = require('../models/MalpracticeLog');
+const MonitoringEvidence = require('../models/MonitoringEvidence');
 const antiMalpractice = require('./antiMalpractice');
 
 const RISK_ORDER = {
@@ -10,13 +11,235 @@ const RISK_ORDER = {
 };
 
 const WARNING_COOLDOWN_MS = 25 * 1000;
+const EVIDENCE_COOLDOWN_MS = 30 * 1000;
+const EVIDENCE_RETENTION_DAYS = 30;
+const FACE_MISSING_EVIDENCE_CONFIDENCE_THRESHOLD = Number(
+  process.env.MONITORING_FACE_MISSING_EVIDENCE_CONFIDENCE || 0.7
+);
+const EVIDENCE_TRIGGER_PRIORITY = [
+  'MULTIPLE_FACES',
+  'PHONE_VISIBLE',
+  'EXTRA_SCREEN_VISIBLE',
+  'FACE_MISSING',
+];
 
 const uniqueStrings = (values = []) => [...new Set((values || []).filter(Boolean).map(String))];
 
 const maxRiskLevel = (left = 'NONE', right = 'NONE') =>
   (RISK_ORDER[right] || 0) > (RISK_ORDER[left] || 0) ? right : left;
 
-const normalizeWarningLimit = (user) => (user?.institutionId ? 2 : 3);
+const normalizeWarningLimit = () => 3;
+
+const buildEvidenceExpiry = (capturedAt = new Date()) =>
+  new Date(capturedAt.getTime() + (EVIDENCE_RETENTION_DAYS * 24 * 60 * 60 * 1000));
+
+const decodeBase64ImageBuffer = (imageData) => {
+  if (!imageData || typeof imageData !== 'string') return null;
+
+  try {
+    const encoded = imageData.includes(',') ? imageData.split(',', 2)[1] : imageData;
+    return Buffer.from(encoded, 'base64');
+  } catch (_error) {
+    return null;
+  }
+};
+
+const getSessionEvidenceStateValue = (session, triggerCode) => {
+  if (!session?.evidenceCaptureState || !triggerCode) return null;
+
+  if (typeof session.evidenceCaptureState.get === 'function') {
+    return session.evidenceCaptureState.get(triggerCode) || null;
+  }
+
+  return session.evidenceCaptureState[triggerCode] || null;
+};
+
+const setSessionEvidenceStateValue = (session, triggerCode, capturedAt) => {
+  if (!session || !triggerCode || !capturedAt) return;
+
+  if (!session.evidenceCaptureState || typeof session.evidenceCaptureState.get !== 'function') {
+    session.evidenceCaptureState = new Map(
+      Object.entries(session.evidenceCaptureState || {})
+    );
+  }
+
+  session.evidenceCaptureState.set(triggerCode, capturedAt);
+  if (typeof session.markModified === 'function') {
+    session.markModified('evidenceCaptureState');
+  }
+};
+
+const getEvidenceSummaryForSession = async (monitoringSessionId) => {
+  const [summary] = await MonitoringEvidence.aggregate([
+    { $match: { monitoringSessionId } },
+    { $sort: { capturedAt: -1, _id: -1 } },
+    {
+      $group: {
+        _id: null,
+        evidenceCount: { $sum: 1 },
+        latestEvidenceAt: { $first: '$capturedAt' },
+        latestEvidenceTrigger: { $first: '$triggerCode' },
+      },
+    },
+  ]);
+
+  return {
+    evidenceCount: Number(summary?.evidenceCount || 0),
+    latestEvidenceAt: summary?.latestEvidenceAt || null,
+    latestEvidenceTrigger: summary?.latestEvidenceTrigger || '',
+    hasEvidence: Number(summary?.evidenceCount || 0) > 0,
+  };
+};
+
+const applyEvidenceSummaryToLog = async (logId, monitoringSessionId) => {
+  if (!logId) return null;
+
+  const summary = monitoringSessionId
+    ? await getEvidenceSummaryForSession(monitoringSessionId)
+    : {
+        evidenceCount: 0,
+        latestEvidenceAt: null,
+        latestEvidenceTrigger: '',
+        hasEvidence: false,
+      };
+
+  await MalpracticeLog.findByIdAndUpdate(logId, {
+    $set: summary,
+  });
+
+  return summary;
+};
+
+const backfillEvidenceLogLink = async (monitoringSessionId, malpracticeLogId) => {
+  if (!monitoringSessionId || !malpracticeLogId) return;
+
+  await MonitoringEvidence.updateMany(
+    {
+      monitoringSessionId,
+      $or: [
+        { malpracticeLogId: null },
+        { malpracticeLogId: { $ne: malpracticeLogId } },
+      ],
+    },
+    {
+      $set: {
+        malpracticeLogId,
+      },
+    }
+  );
+};
+
+const isEvidenceCooldownActive = (session, triggerCode, now = new Date()) => {
+  const lastCaptureAt = getSessionEvidenceStateValue(session, triggerCode);
+  if (!lastCaptureAt) return false;
+  return (now.getTime() - new Date(lastCaptureAt).getTime()) < EVIDENCE_COOLDOWN_MS;
+};
+
+const qualifiesFaceMissingEvidence = (session, alert = {}, confidence = 0) => {
+  const previousDetections = session?.visionFindings?.latestDetections || {};
+  const previousFaceMissing = !!previousDetections.faceMissing;
+  const nextConfidence = Number(alert.confidence ?? confidence ?? 0);
+
+  return previousFaceMissing || nextConfidence >= FACE_MISSING_EVIDENCE_CONFIDENCE_THRESHOLD;
+};
+
+const selectEvidenceTrigger = (session, alerts = [], confidence = 0) => {
+  const byCode = new Map((alerts || []).map((alert) => [alert.code, alert]));
+  const now = new Date();
+
+  for (const triggerCode of EVIDENCE_TRIGGER_PRIORITY) {
+    const alert = byCode.get(triggerCode);
+    if (!alert) continue;
+
+    if (
+      triggerCode === 'FACE_MISSING' &&
+      !qualifiesFaceMissingEvidence(session, alert, confidence)
+    ) {
+      continue;
+    }
+
+    if (isEvidenceCooldownActive(session, triggerCode, now)) {
+      continue;
+    }
+
+    return { alert, triggerCode, capturedAt: now };
+  }
+
+  return null;
+};
+
+const captureMonitoringEvidence = async ({
+  session,
+  alerts = [],
+  imageData,
+  metadata = {},
+  riskLevel = 'LOW',
+  confidence = 0,
+  modelSource = 'heuristic',
+}) => {
+  if (!session?.institutionId) {
+    return {
+      evidenceCaptured: false,
+      evidenceTrigger: null,
+      evidenceCount: 0,
+    };
+  }
+
+  const trigger = selectEvidenceTrigger(session, alerts, confidence);
+  if (!trigger) {
+    const summary = await getEvidenceSummaryForSession(session._id);
+    return {
+      evidenceCaptured: false,
+      evidenceTrigger: null,
+      evidenceCount: summary.evidenceCount,
+    };
+  }
+
+  const imageBuffer = decodeBase64ImageBuffer(imageData);
+  if (!imageBuffer?.length) {
+    const summary = await getEvidenceSummaryForSession(session._id);
+    return {
+      evidenceCaptured: false,
+      evidenceTrigger: null,
+      evidenceCount: summary.evidenceCount,
+    };
+  }
+
+  const existingLog = await MalpracticeLog.findOne({
+    monitoringSessionId: session._id,
+  }).select('_id monitoringSessionId');
+
+  await MonitoringEvidence.create({
+    monitoringSessionId: session._id,
+    malpracticeLogId: existingLog?._id || null,
+    institutionId: session.institutionId,
+    userId: session.userId,
+    sessionType: session.sessionType,
+    triggerCode: trigger.triggerCode,
+    riskLevel: String(trigger.alert?.severity || riskLevel || 'LOW').toUpperCase(),
+    capturedAt: trigger.capturedAt,
+    expiresAt: buildEvidenceExpiry(trigger.capturedAt),
+    contentType: 'image/jpeg',
+    imageBuffer,
+    width: Number(metadata.width || 0),
+    height: Number(metadata.height || 0),
+    modelSource: modelSource === 'onnx' ? 'onnx' : 'heuristic',
+    confidence: Number(trigger.alert?.confidence ?? confidence ?? 0),
+  });
+
+  setSessionEvidenceStateValue(session, trigger.triggerCode, trigger.capturedAt);
+
+  const summary = await getEvidenceSummaryForSession(session._id);
+  if (existingLog?._id) {
+    await applyEvidenceSummaryToLog(existingLog._id, session._id);
+  }
+
+  return {
+    evidenceCaptured: true,
+    evidenceTrigger: trigger.triggerCode,
+    evidenceCount: summary.evidenceCount,
+  };
+};
 
 const mergeBrowserMetrics = (session, metrics = {}) => {
   const next = {
@@ -83,6 +306,8 @@ const summarizeVisionFindings = (session, detections = {}, confidence = 0) => {
     headPoseAway: !!(session.visionFindings?.headPoseAway || detections.headPoseAway),
     gazeAway: !!(session.visionFindings?.gazeAway || detections.gazeAway),
     faceMissing: !!(session.visionFindings?.faceMissing || detections.faceMissing),
+    phoneVisible: !!(session.visionFindings?.phoneVisible || detections.phoneVisible),
+    extraScreenVisible: !!(session.visionFindings?.extraScreenVisible || detections.extraScreenVisible),
     faceCount: Math.max(Number(session.visionFindings?.faceCount || 1), Number(detections.faceCount || 0)),
     confidence: Math.max(Number(session.visionFindings?.confidence || 0), Number(confidence || 0)),
     latestDetections: detections || {},
@@ -143,6 +368,8 @@ const upsertMalpracticeLogForSession = async (session) => {
   const payload = buildMalpracticePayload(session);
   if (!payload.shouldPersist) return null;
 
+  const evidenceSummary = await getEvidenceSummaryForSession(session._id);
+
   const update = {
     userId: session.userId,
     institutionId: session.institutionId || null,
@@ -165,9 +392,15 @@ const upsertMalpracticeLogForSession = async (session) => {
       headPoseAway: !!session.visionFindings?.headPoseAway,
       gazeAway: !!session.visionFindings?.gazeAway,
       faceMissing: !!session.visionFindings?.faceMissing,
+      phoneVisible: !!session.visionFindings?.phoneVisible,
+      extraScreenVisible: !!session.visionFindings?.extraScreenVisible,
       faceCount: Number(session.visionFindings?.faceCount || 0),
       confidence: Number(session.visionFindings?.confidence || 0),
     },
+    evidenceCount: evidenceSummary.evidenceCount,
+    latestEvidenceAt: evidenceSummary.latestEvidenceAt,
+    latestEvidenceTrigger: evidenceSummary.latestEvidenceTrigger,
+    hasEvidence: evidenceSummary.hasEvidence,
     sessionData: {
       ipAddress: '',
       tabSwitches: Number(session.browserMetrics?.tabSwitches || 0),
@@ -180,11 +413,16 @@ const upsertMalpracticeLogForSession = async (session) => {
     },
   };
 
-  return MalpracticeLog.findOneAndUpdate(
+  const log = await MalpracticeLog.findOneAndUpdate(
     { monitoringSessionId: session._id },
     { $set: update },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
+
+  await backfillEvidenceLogLink(session._id, log._id);
+  await applyEvidenceSummaryToLog(log._id, session._id);
+
+  return log;
 };
 
 const finalizeSession = async (session, finishPayload = {}) => {
@@ -223,13 +461,21 @@ module.exports = {
   addEvent,
   addWarning,
   applyRisk,
+  applyEvidenceSummaryToLog,
+  backfillEvidenceLogLink,
   buildMalpracticePayload,
+  captureMonitoringEvidence,
   closeActiveSessionsForUser,
+  EVIDENCE_COOLDOWN_MS,
+  EVIDENCE_RETENTION_DAYS,
+  FACE_MISSING_EVIDENCE_CONFIDENCE_THRESHOLD,
   finalizeSession,
   getBrowserAnalysis,
+  getEvidenceSummaryForSession,
   maxRiskLevel,
   mergeBrowserMetrics,
   normalizeWarningLimit,
+  selectEvidenceTrigger,
   summarizeVisionFindings,
   uniqueStrings,
   upsertMalpracticeLogForSession,

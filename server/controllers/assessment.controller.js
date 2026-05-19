@@ -1,5 +1,4 @@
 // server/controllers/assessment.controller.js
-const mongoose = require('mongoose');
 const Assessment = require('../models/Assessment');
 const Progress = require('../models/Progress');
 const PerformanceLog = require('../models/PerformanceLog');
@@ -7,7 +6,6 @@ const MCQ = require('../models/MCQ');
 const CodingProblem = require('../models/CodingProblem');
 const User = require('../models/User');
 const Topic = require('../models/Topic');
-const Module = require('../models/Module');
 const MonitoringSession = require('../models/MonitoringSession');
 const {
   generateRoadmap,
@@ -24,7 +22,6 @@ const {
   calculateAssessmentScore,
   evaluatePass,
   calculateMasteryScore,
-  calculatePlacementReadiness,
 } = require('../services/scoreCalculator');
 const { inferPlacementReadiness } = require('../services/userReadinessService');
 const { logActivity } = require('../services/streakService');
@@ -54,6 +51,33 @@ const buildWeakAreaTopicPayload = (progressDoc) => {
       ? (progressDoc.hintsUsed || 0) / progressDoc.totalAttempts
       : 0,
   };
+};
+
+const normalizeAssessmentSubmissions = (submissions = []) => {
+  const deduped = [];
+  const indexById = new Map();
+
+  submissions.forEach((submission) => {
+    if (!submission?.mcqId) return;
+
+    const key = String(submission.mcqId);
+    const normalized = {
+      mcqId: submission.mcqId,
+      selectedAnswer: submission.selectedAnswer ?? -1,
+      timeTaken: Math.max(0, Number(submission.timeTaken) || 0),
+      hintsUsed: Math.max(0, Number(submission.hintsUsed) || 0),
+    };
+
+    if (indexById.has(key)) {
+      deduped[indexById.get(key)] = normalized;
+      return;
+    }
+
+    indexById.set(key, deduped.length);
+    deduped.push(normalized);
+  });
+
+  return deduped;
 };
 
 // @desc    Submit a regular assessment round
@@ -112,9 +136,22 @@ const submitAssessment = async (req, res, next) => {
       });
     }
 
+    const normalizedSubmissions = normalizeAssessmentSubmissions(submissions);
+    if (!normalizedSubmissions.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one valid MCQ submission is required',
+      });
+    }
+
     // Fetch the full MCQs to get correct answers
-    const mcqIds = submissions.map((s) => s.mcqId);
-    const questions = await MCQ.find({ _id: { $in: mcqIds } });
+    const mcqIds = normalizedSubmissions.map((submission) => submission.mcqId);
+    const questions = await MCQ.find({
+      _id: { $in: mcqIds },
+      topicId,
+      moduleId,
+      isActive: true,
+    });
     if (questions.length !== mcqIds.length) {
       return res.status(404).json({
         success: false,
@@ -123,8 +160,8 @@ const submitAssessment = async (req, res, next) => {
     }
 
     // Calculate score
-    const scoreResult = calculateAssessmentScore(questions, submissions);
-    const { passed, passCriteria } = evaluatePass(
+    const scoreResult = calculateAssessmentScore(questions, normalizedSubmissions);
+    const { passed, passCriteria, requiredCorrectAnswers } = evaluatePass(
       round,
       scoreResult.correctAnswers,
       scoreResult.totalQuestions
@@ -141,7 +178,7 @@ const submitAssessment = async (req, res, next) => {
         selectedAnswer: r.selectedAnswer,
         isCorrect: r.isCorrect,
         timeTaken: r.timeTaken,
-        hintsUsed: submissions.find((s) => s.mcqId.toString() === r.mcqId.toString())?.hintsUsed || 0,
+        hintsUsed: normalizedSubmissions.find((s) => s.mcqId.toString() === r.mcqId.toString())?.hintsUsed || 0,
       })),
       totalQuestions: scoreResult.totalQuestions,
       correctAnswers: scoreResult.correctAnswers,
@@ -195,7 +232,7 @@ const submitAssessment = async (req, res, next) => {
     const roundField = 'round1Score';
     progress[roundField] = Math.max(progress[roundField], scoreResult.accuracy);
     progress.totalAttempts += 1;
-    progress.hintsUsed += submissions.reduce((sum, s) => sum + (s.hintsUsed || 0), 0);
+    progress.hintsUsed += normalizedSubmissions.reduce((sum, s) => sum + (s.hintsUsed || 0), 0);
     const timeSpent = scoreResult.questionResults.reduce((sum, r) => sum + r.timeTaken, 0) / 60; // minutes
     progress.timeSpentMinutes += timeSpent;
     progress.lastAttemptAt = new Date();
@@ -213,7 +250,7 @@ const submitAssessment = async (req, res, next) => {
 
     // Mastery score
     const hintUsageRate =
-      submissions.reduce((sum, s) => sum + (s.hintsUsed || 0), 0) / submissions.length;
+      normalizedSubmissions.reduce((sum, s) => sum + (s.hintsUsed || 0), 0) / normalizedSubmissions.length;
     const { masteryScore, masteryLevel } = calculateMasteryScore(
       progress.round1Score,
       progress.codingScore,
@@ -276,7 +313,7 @@ const submitAssessment = async (req, res, next) => {
       }
     } else if (sessionData) {
       try {
-        const answersForAnalysis = submissions.map((sub) => ({
+        const answersForAnalysis = normalizedSubmissions.map((sub) => ({
           questionId: sub.mcqId,
           selectedOption: sub.selectedAnswer,
           timeToAnswer: sub.timeTaken,
@@ -360,6 +397,10 @@ const submitAssessment = async (req, res, next) => {
       data: {
         results: scoreResult.questionResults,
         passed,
+        totalQuestions: scoreResult.totalQuestions,
+        correctAnswers: scoreResult.correctAnswers,
+        requiredCorrectAnswers,
+        passCriteria,
         nextAction,
         masteryScore: progress.masteryScore,
         masteryLevel,
@@ -384,8 +425,16 @@ const submitDiagnostic = async (req, res, next) => {
       });
     }
 
-    const mcqIds = submissions.map((s) => s.mcqId);
-    const questions = await MCQ.find({ _id: { $in: mcqIds } });
+    const normalizedSubmissions = normalizeAssessmentSubmissions(submissions);
+    if (!normalizedSubmissions.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one valid MCQ submission is required',
+      });
+    }
+
+    const mcqIds = normalizedSubmissions.map((submission) => submission.mcqId);
+    const questions = await MCQ.find({ _id: { $in: mcqIds }, isActive: true });
     if (questions.length !== mcqIds.length) {
       return res.status(404).json({
         success: false,
@@ -393,7 +442,7 @@ const submitDiagnostic = async (req, res, next) => {
       });
     }
 
-    const scoreResult = calculateAssessmentScore(questions, submissions);
+    const scoreResult = calculateAssessmentScore(questions, normalizedSubmissions);
 
     const assessment = await Assessment.create({
       userId: req.user._id,

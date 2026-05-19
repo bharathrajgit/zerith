@@ -5,8 +5,13 @@ const Assessment = require('../models/Assessment');
 const Streak = require('../models/Streak');
 const PerformanceLog = require('../models/PerformanceLog');
 const MalpracticeLog = require('../models/MalpracticeLog');
+const MonitoringEvidence = require('../models/MonitoringEvidence');
 const Institution = require('../models/Institution');
 const MonitoringSession = require('../models/MonitoringSession');
+const {
+  applyEvidenceSummaryToLog,
+  backfillEvidenceLogLink,
+} = require('../services/monitoringService');
 const { syncInstitutionRoster } = require('../services/institutionRosterService');
 
 // ─── Helper: get students of the institution ────────
@@ -370,6 +375,90 @@ const getMalpracticeReport = async (req, res, next) => {
   }
 };
 
+// @desc    Evidence metadata for a malpractice log
+// @route   GET /api/institution/analytics/malpractice/:logId/evidence
+// @access  Private (Institution)
+const getMalpracticeEvidence = async (req, res, next) => {
+  try {
+    const log = await MalpracticeLog.findOne({
+      _id: req.params.logId,
+      institutionId: req.institution._id,
+    }).select('_id monitoringSessionId hasEvidence');
+
+    if (!log) {
+      return res.status(404).json({
+        success: false,
+        message: 'Malpractice log not found',
+      });
+    }
+
+    if (log.monitoringSessionId) {
+      await backfillEvidenceLogLink(log.monitoringSessionId, log._id);
+    }
+
+    const evidenceDocs = await MonitoringEvidence.find({
+      malpracticeLogId: log._id,
+    })
+      .sort({ capturedAt: -1, _id: -1 })
+      .select('capturedAt triggerCode riskLevel confidence')
+      .lean();
+
+    if (!evidenceDocs.length && log.monitoringSessionId) {
+      await applyEvidenceSummaryToLog(log._id, log.monitoringSessionId);
+    }
+
+    res.json({
+      success: true,
+      data: evidenceDocs.map((item) => ({
+        id: item._id,
+        capturedAt: item.capturedAt,
+        triggerCode: item.triggerCode,
+        riskLevel: item.riskLevel,
+        confidence: Number(item.confidence || 0),
+        imageUrl: `/institution/analytics/malpractice/evidence/${item._id}/image`,
+      })),
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Stream malpractice evidence image
+// @route   GET /api/institution/analytics/malpractice/evidence/:evidenceId/image
+// @access  Private (Institution)
+const streamMalpracticeEvidenceImage = async (req, res, next) => {
+  try {
+    const evidence = await MonitoringEvidence.findById(req.params.evidenceId)
+      .select('malpracticeLogId contentType imageBuffer');
+
+    if (!evidence?.malpracticeLogId) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evidence image not found',
+      });
+    }
+
+    const log = await MalpracticeLog.findOne({
+      _id: evidence.malpracticeLogId,
+      institutionId: req.institution._id,
+    }).select('_id');
+
+    if (!log) {
+      return res.status(404).json({
+        success: false,
+        message: 'Evidence image not found',
+      });
+    }
+
+    res.setHeader('Content-Type', evidence.contentType || 'image/jpeg');
+    res.setHeader('Content-Length', evidence.imageBuffer?.length || 0);
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.status(200).end(evidence.imageBuffer);
+  } catch (err) {
+    next(err);
+  }
+};
+
 // @desc    Placement prediction timeline for students
 // @route   GET /api/institution/analytics/placement-prediction
 // @access  Private (Institution)
@@ -498,9 +587,13 @@ const updateMalpracticeStatus = async (req, res, next) => {
     log.status = status;
     log.reviewNote = String(reviewNote || '').trim();
     await log.save();
+    const monitoringSessionId = log.monitoringSessionId?._id || log.monitoringSessionId || null;
+    await log.populate('userId', 'name email');
+    await log.populate('assessmentId', 'topicId completedAt');
+    await log.populate('monitoringSessionId', 'sessionType finalStatus warningCount warningLimit');
 
-    if (log.monitoringSessionId) {
-      await MonitoringSession.findByIdAndUpdate(log.monitoringSessionId, {
+    if (monitoringSessionId) {
+      await MonitoringSession.findByIdAndUpdate(monitoringSessionId, {
         finalStatus: status,
       });
     }
@@ -520,6 +613,8 @@ module.exports = {
   getStudentDetailReport,
   getAtRiskStudents,
   getMalpracticeReport,
+  getMalpracticeEvidence,
   getPlacementPredictionReport,
+  streamMalpracticeEvidenceImage,
   updateMalpracticeStatus,
 };

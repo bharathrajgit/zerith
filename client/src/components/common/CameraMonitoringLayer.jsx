@@ -2,6 +2,40 @@ import { useEffect, useRef, useState } from 'react';
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+const resolveViewport = () => ({
+  width: typeof window === 'undefined' ? 1280 : window.innerWidth,
+  height: typeof window === 'undefined' ? 720 : window.innerHeight,
+});
+
+const attachStreamToVideo = (video, stream, onReady) => {
+  if (!video) return () => {};
+
+  if (!stream) {
+    video.srcObject = null;
+    return () => {};
+  }
+
+  if (video.srcObject !== stream) {
+    video.srcObject = stream;
+  }
+
+  const handleReady = () => {
+    onReady?.();
+    const playback = video.play?.();
+    if (playback?.catch) {
+      playback.catch(() => {});
+    }
+  };
+
+  if (video.readyState >= 1) {
+    handleReady();
+    return () => {};
+  }
+
+  video.addEventListener('loadedmetadata', handleReady);
+  return () => video.removeEventListener('loadedmetadata', handleReady);
+};
+
 export default function CameraMonitoringLayer({
   stream,
   captureVideoRef,
@@ -11,38 +45,64 @@ export default function CameraMonitoringLayer({
 }) {
   const previewVideoRef = useRef(null);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
-  const [position, setPosition] = useState(() => ({
-    x: Math.max(16, window.innerWidth - (width + 32)),
-    y: 88,
-  }));
+  const [position, setPosition] = useState(() => {
+    const viewport = resolveViewport();
+    return {
+      x: Math.max(12, viewport.width - (width + 24)),
+      y: Math.min(88, Math.max(12, viewport.height - height - 12)),
+    };
+  });
   const [dragging, setDragging] = useState(false);
+  const [previewReady, setPreviewReady] = useState(false);
 
   useEffect(() => {
-    if (!captureVideoRef?.current) return;
-    captureVideoRef.current.srcObject = stream || null;
-  }, [captureVideoRef, stream]);
-
-  useEffect(() => {
-    if (!previewVideoRef.current) return;
-    previewVideoRef.current.srcObject = stream || null;
+    setPreviewReady(false);
   }, [stream]);
+
+  useEffect(() => attachStreamToVideo(captureVideoRef?.current, stream), [captureVideoRef, stream]);
+
+  useEffect(
+    () => attachStreamToVideo(previewVideoRef.current, stream, () => setPreviewReady(true)),
+    [stream]
+  );
+
+  useEffect(() => {
+    const onResize = () => {
+      const viewport = resolveViewport();
+      setPosition((current) => ({
+        x: clamp(current.x, 12, Math.max(12, viewport.width - width - 12)),
+        y: clamp(current.y, 12, Math.max(12, viewport.height - height - 12)),
+      }));
+    };
+
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [height, width]);
 
   useEffect(() => {
     if (!dragging) return undefined;
 
     const onMove = (event) => {
-      const nextX = clamp(event.clientX - dragOffsetRef.current.x, 12, Math.max(12, window.innerWidth - width - 12));
-      const nextY = clamp(event.clientY - dragOffsetRef.current.y, 12, Math.max(12, window.innerHeight - height - 12));
+      const nextX = clamp(
+        event.clientX - dragOffsetRef.current.x,
+        12,
+        Math.max(12, window.innerWidth - width - 12)
+      );
+      const nextY = clamp(
+        event.clientY - dragOffsetRef.current.y,
+        12,
+        Math.max(12, window.innerHeight - height - 12)
+      );
       setPosition({ x: nextX, y: nextY });
     };
 
     const onUp = () => setDragging(false);
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
     return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
     };
   }, [dragging, height, width]);
 
@@ -74,7 +134,7 @@ export default function CameraMonitoringLayer({
         >
           <button
             type="button"
-            onMouseDown={(event) => {
+            onPointerDown={(event) => {
               const rect = event.currentTarget.parentElement?.getBoundingClientRect();
               dragOffsetRef.current = {
                 x: event.clientX - (rect?.left || 0),
@@ -95,6 +155,7 @@ export default function CameraMonitoringLayer({
               fontSize: '0.72rem',
               fontWeight: 700,
               cursor: 'grab',
+              touchAction: 'none',
             }}
           >
             Drag Camera
@@ -115,6 +176,31 @@ export default function CameraMonitoringLayer({
           >
             Monitoring Active
           </div>
+          {!previewReady ? (
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 1,
+                display: 'grid',
+                placeItems: 'center',
+                padding: '1rem',
+                textAlign: 'center',
+                color: '#cbd5e1',
+                background:
+                  'linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(2, 6, 23, 0.84))',
+                fontSize: '0.8rem',
+                lineHeight: 1.5,
+              }}
+            >
+              <div>
+                <strong style={{ display: 'block', color: '#eff6ff', marginBottom: '0.35rem' }}>
+                  Starting camera preview
+                </strong>
+                Keep this window visible while monitoring starts.
+              </div>
+            </div>
+          ) : null}
           <video
             ref={previewVideoRef}
             autoPlay

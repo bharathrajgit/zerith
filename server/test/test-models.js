@@ -6,6 +6,7 @@ const User = require('../models/User');
 const Institution = require('../models/Institution');
 const MalpracticeLog = require('../models/MalpracticeLog');
 const DiagnosticSession = require('../models/DiagnosticSession');
+const MonitoringEvidence = require('../models/MonitoringEvidence');
 
 (async () => {
     console.log(process.env.MONGO_URI)
@@ -17,6 +18,7 @@ const DiagnosticSession = require('../models/DiagnosticSession');
     console.log(' - User:', User.modelName);
     console.log(' - Institution:', Institution.modelName);
     console.log(' - MalpracticeLog:', MalpracticeLog.modelName);
+    console.log(' - MonitoringEvidence:', MonitoringEvidence.modelName);
     console.log(' - DiagnosticSession:', DiagnosticSession.modelName);
 
     await mongoose.disconnect();

@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
           <span className={styles.logoIcon}>
             <Zap size={18} />
           </span>
-          DSA Master
+          Zerith
         </div>
 
         {/* Warning banner */}

@@ -1,0 +1,39 @@
+{
+  "model": "VotingClassifier (RF + GB + LR)",
+  "feature_names": [
+    "mcq_score",
+    "mcq_basic_accuracy",
+    "mcq_medium_accuracy",
+    "mcq_hard_accuracy",
+    "mcq_avg_response_time",
+    "mcq_hint_usage_rate",
+    "coding_score",
+    "basic_coding_score",
+    "medium_coding_score",
+    "hard_coding_score",
+    "coding_attempt_rate",
+    "test_case_pass_rate",
+    "coding_time_efficiency",
+    "coding_completion_rate",
+    "combined_score",
+    "hard_performance_ratio",
+    "consistency_score"
+  ],
+  "n_features": 17,
+  "sample_count": 5130,
+  "class_distribution": {
+    "Beginner": 1986,
+    "Placement-Ready": 1363,
+    "Intermediate": 1781
+  },
+  "cv_mean_accuracy": 0.9787524366471734,
+  "cv_std_accuracy": 0.0016768665237899922,
+  "training_sources": {
+    "synthetic": 3600,
+    "python_learning": 30,
+    "daily_coding": 1500
+  },
+  "kaggle_sample_count": 1530,
+  "trained_at": "2026-05-18T09:11:15.736634+00:00",
+  "model_path": "D:\\VS Code Folder\\dsa-platform\\ml-service\\trained_models\\diagnostic_classifier.joblib"
+}

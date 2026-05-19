@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail, Lock, Eye, EyeOff, User, Phone,
-  Building2, MapPin, Globe, Zap, ArrowLeft,
+  Building2, MapPin, Globe, CheckCircle, Copy, Zap, ArrowLeft,
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import styles from './Auth.module.css';
 
@@ -75,7 +76,11 @@ export default function InstitutionRegister() {
       });
       if (result.success) {
         setSuccessData({ code: result.institutionCode });
+      } else {
+        toast.error(result.message || 'Registration failed');
       }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -174,7 +179,7 @@ export default function InstitutionRegister() {
             <span className={`${styles.logoIcon} ${styles.logoIconInstitution}`}>
               <Building2 size={18} />
             </span>
-            DSA Master
+            Zerith
           </Link>
 
           <h2 className={`${styles.title} ${styles.titleInstitution}`}>Register Your Institution</h2>

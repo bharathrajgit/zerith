@@ -11,6 +11,11 @@ const malpracticeLogSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Assessment',
     },
+    assessmentReference: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     monitoringSessionId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'MonitoringSession',
@@ -40,6 +45,42 @@ const malpracticeLogSchema = new mongoose.Schema(
       ref: 'CodingProblem',
       default: null,
     },
+    violationType: {
+      type: String,
+      enum: [
+        'gaze_away',
+        'multiple_faces',
+        'mobile_detected',
+        'tab_switch',
+        'copy_attempt',
+        'behavioral_anomaly',
+      ],
+      default: null,
+    },
+    confidence: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 1,
+    },
+    detectedObject: {
+      type: String,
+      default: '',
+      trim: true,
+    },
+    violationImage: {
+      type: String,
+      default: '',
+    },
+    warningNumber: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    resultedInLock: {
+      type: Boolean,
+      default: false,
+    },
     riskLevel: {
       type: String,
       enum: ['LOW', 'MEDIUM', 'HIGH'],
@@ -65,6 +106,9 @@ const malpracticeLogSchema = new mongoose.Schema(
       tabSwitches: { type: Number, default: 0 },
       copyAttempts: { type: Number, default: 0 },
       windowBlurCount: { type: Number, default: 0 },
+      gazeWarnings: { type: Number, default: 0 },
+      faceWarnings: { type: Number, default: 0 },
+      deviceDetections: { type: Number, default: 0 },
       avgAnswerTime: Number,
       timingStdDev: Number,
       totalQuestions: Number,
@@ -103,8 +147,27 @@ const malpracticeLogSchema = new mongoose.Schema(
       headPoseAway: { type: Boolean, default: false },
       gazeAway: { type: Boolean, default: false },
       faceMissing: { type: Boolean, default: false },
+      phoneVisible: { type: Boolean, default: false },
+      extraScreenVisible: { type: Boolean, default: false },
       faceCount: { type: Number, default: 0 },
       confidence: { type: Number, default: 0 },
+    },
+    evidenceCount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    latestEvidenceAt: {
+      type: Date,
+      default: null,
+    },
+    latestEvidenceTrigger: {
+      type: String,
+      default: '',
+    },
+    hasEvidence: {
+      type: Boolean,
+      default: false,
     },
     similarSessionId: {
       type: mongoose.Schema.Types.ObjectId,

@@ -15,11 +15,13 @@ def main():
     base_dir = Path(__file__).resolve().parent
     artifacts_dir = base_dir / 'artifacts'
     checkpoint_path = artifacts_dir / 'best_model.pt'
+    metrics_path = artifacts_dir / 'training_metrics.json'
     if not checkpoint_path.exists():
         raise SystemExit('Checkpoint not found. Run train_proctor_model.py first.')
 
     payload = torch.load(checkpoint_path, map_location='cpu')
     classes = payload.get('classes', [])
+    expected_labels = payload.get('expected_labels', classes)
 
     model = models.mobilenet_v3_small(weights=None)
     model.classifier[3] = nn.Linear(model.classifier[3].in_features, len(classes))
@@ -42,7 +44,14 @@ def main():
     )
 
     with open(output_dir / 'proctor_labels.json', 'w', encoding='utf-8') as handle:
-        json.dump({'labels': classes}, handle, indent=2)
+        json.dump({'labels': expected_labels, 'sourceClasses': classes}, handle, indent=2)
+
+    if metrics_path.exists():
+        with open(metrics_path, 'r', encoding='utf-8') as handle:
+            metrics = json.load(handle)
+        metrics['onnx_export_path'] = 'ml-service/trained_models/proctor_monitor.onnx'
+        with open(output_dir / 'proctor_training_report.json', 'w', encoding='utf-8') as handle:
+            json.dump(metrics, handle, indent=2)
 
     print('Exported ONNX model to', onnx_path)
 

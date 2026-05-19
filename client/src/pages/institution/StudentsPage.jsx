@@ -363,7 +363,7 @@ function ConfirmDialog({ message, onConfirm, onCancel }) {
       <div className={styles.modalBox} onClick={(event) => event.stopPropagation()}>
         <p>{message}</p>
         <div className={styles.modalBtns}>
-          <button onClick={onCancel}>Cancel</button>
+          <button className={styles.outlineBtn} onClick={onCancel}><X size={14} /> Cancel</button>
           <button className={styles.dangerBtn} onClick={onConfirm}>Confirm</button>
         </div>
       </div>
@@ -412,7 +412,7 @@ function MoveStudentModal({ student, departments, onClose, onConfirm }) {
             .map((department) => <option key={department.code} value={department.code}>{department.name}</option>)}
         </select>
         <div className={styles.modalBtns}>
-          <button onClick={onClose}>Cancel</button>
+          <button className={styles.outlineBtn} onClick={onClose}><X size={14} /> Cancel</button>
           <button
             className={styles.primaryBtn}
             onClick={() => onConfirm({

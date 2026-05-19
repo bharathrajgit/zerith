@@ -1,353 +1,417 @@
-/* client/src/pages/institution/MalpracticePage.module.css */
-
-/* ================================================================
-   Base & Animations
-   ================================================================ */
 .page {
+  display: grid;
+  gap: 1.5rem;
   padding-bottom: 2rem;
-  animation: fadeIn 0.5s ease;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(15px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
 .title {
-  font-size: 1.75rem;
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 1.9rem;
   font-weight: 700;
-  color: white;
-  margin-bottom: 2rem;
-  animation: fadeInUp 0.5s ease both;
 }
 
-/* ================================================================
-   Stats Cards
-   ================================================================ */
-.statsRow {
+.subtitle {
+  margin: 0.45rem 0 0;
+  color: #64748b;
+  max-width: 720px;
+  line-height: 1.6;
+}
+
+.statsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
-  margin-bottom: 1.5rem;
 }
+
 .statCard {
-  background: #111120;
+  background: linear-gradient(180deg, rgba(17, 17, 32, 0.98), rgba(10, 10, 15, 0.98));
   border: 1px solid #1e1e35;
-  border-radius: 1rem;
-  padding: 1.25rem;
-  text-align: center;
-  transition: transform 0.2s, box-shadow 0.3s;
-  animation: fadeInUp 0.6s ease both;
+  border-radius: 18px;
+  padding: 1.2rem;
+  display: grid;
+  gap: 0.45rem;
 }
-.statCard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+
+.statDanger {
+  border-color: rgba(239, 68, 68, 0.28);
 }
-.statRed { border-color: rgba(239,68,68,0.3); }
-.statAmber { border-color: rgba(245,158,11,0.3); }
-.statGreen { border-color: rgba(34,197,94,0.3); }
+
+.statWarning {
+  border-color: rgba(245, 158, 11, 0.28);
+}
+
+.statPrimary {
+  border-color: rgba(99, 102, 241, 0.32);
+}
+
+.statLabel {
+  color: #64748b;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .statValue {
-  display: block;
+  color: #f1f5f9;
   font-size: 2rem;
   font-weight: 700;
-  color: white;
-  margin-bottom: 0.25rem;
-}
-.statLabel {
-  font-size: 0.8rem;
-  color: #94a3b8;
 }
 
-/* ================================================================
-   Filter Buttons
-   ================================================================ */
-.filterRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-  animation: fadeInUp 0.6s ease both;
-  animation-delay: 0.1s;
-}
-.filterBtn {
-  padding: 0.35rem 1.1rem;
-  border-radius: 2rem;
-  border: 1px solid #1e1e35;
-  background: transparent;
-  color: #94a3b8;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.filterBtn:hover {
-  border-color: #6366f1;
-  color: white;
-  background: rgba(99,102,241,0.05);
-}
-.activeFilter {
-  background: #6366f1;
-  border-color: #6366f1;
-  color: white;
-  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
-}
-
-/* ================================================================
-   Alert List
-   ================================================================ */
-.alertList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.alertCard {
+.filtersCard,
+.tableCard {
   background: #111120;
   border: 1px solid #1e1e35;
-  border-radius: 0.75rem;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: border-color 0.3s, transform 0.2s, box-shadow 0.3s;
-  animation: slideUp 0.5s ease both;
+  border-radius: 18px;
+  padding: 1.2rem;
 }
-.alertCard:hover {
-  border-color: #2d2d50;
-  transform: translateX(4px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+
+.filtersRow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.9rem;
 }
-.alertHigh { border-left: 4px solid #ef4444; }
-.alertMedium { border-left: 4px solid #f59e0b; }
-.alertLow { border-left: 4px solid #94a3b8; }
-.alertBody {
-  flex: 1;
-  cursor: pointer;
-  min-width: 0;
+
+.filterField {
+  display: grid;
+  gap: 0.45rem;
+  color: #f1f5f9;
+  font-size: 0.88rem;
 }
-.alertHeader {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.5rem;
-}
-.alertStudent {
-  font-weight: 600;
-  color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.riskBadge {
-  padding: 0.15rem 0.6rem;
-  border-radius: 2rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  flex-shrink: 0;
-}
-.riskHigh { background: rgba(239,68,68,0.15); color: #f87171; }
-.riskMedium { background: rgba(245,158,11,0.15); color: #fbbf24; }
-.riskLow { background: rgba(148,163,184,0.15); color: #94a3b8; }
-.alertFlags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-bottom: 0.5rem;
-}
-.flagTag {
-  padding: 0.15rem 0.5rem;
-  background: rgba(100,116,139,0.2);
-  color: #cbd5e1;
-  border-radius: 2rem;
-  font-size: 0.7rem;
-}
-.alertMeta {
-  display: flex;
-  gap: 1rem;
-  font-size: 0.75rem;
+
+.filterField span {
   color: #64748b;
 }
-.similarityScore {
-  color: #f59e0b;
-  font-weight: 500;
+
+.filterField select,
+.filterField input {
+  width: 100%;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  color: #f1f5f9;
+  outline: none;
 }
-.alertActions {
-  display: flex;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  margin-left: 1rem;
+
+.filterField select:focus,
+.filterField input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.16);
 }
-.reviewBtn,
-.dismissBtn {
-  padding: 0.35rem 0.85rem;
-  border-radius: 0.5rem;
-  border: none;
-  font-size: 0.75rem;
-  cursor: pointer;
+
+.searchField {
+  margin-top: 0.9rem;
+}
+
+.searchInputWrap {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  transition: all 0.2s;
+  gap: 0.65rem;
+  background: #0a0a0f;
+  border: 1px solid #1e1e35;
+  border-radius: 12px;
+  padding: 0 0.9rem;
 }
-.reviewBtn {
-  background: rgba(34,197,94,0.15);
-  color: #4ade80;
-  border: 1px solid rgba(34,197,94,0.3);
+
+.searchInputWrap svg {
+  color: #64748b;
+  flex-shrink: 0;
 }
-.reviewBtn:hover {
-  background: rgba(34,197,94,0.25);
+
+.searchInputWrap input {
+  border: 0;
+  background: transparent;
+  padding-left: 0;
+}
+
+.tableHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tableHeader h2 {
+  margin: 0;
+  color: #f1f5f9;
+  font-size: 1.1rem;
+}
+
+.tableHeader span {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.95rem 0.75rem;
+  border-top: 1px solid rgba(30, 30, 53, 0.9);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.table th {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.table td {
+  color: #f1f5f9;
+  font-size: 0.92rem;
+}
+
+.studentCell {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.studentCell strong {
+  color: #f1f5f9;
+}
+
+.studentCell span {
+  color: #64748b;
+  font-size: 0.82rem;
+}
+
+.riskBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  border-radius: 999px;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.riskLOW {
+  background: rgba(34, 197, 94, 0.16);
+  color: #22c55e;
+}
+
+.riskMEDIUM {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
+}
+
+.riskHIGH {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ef4444;
+}
+
+.evidenceButton {
+  width: 60px;
+  height: 45px;
+  border: 1px solid #1e1e35;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #0a0a0f;
+  padding: 0;
+  cursor: pointer;
+}
+
+.thumbnail,
+.thumbnailPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.thumbnail {
+  object-fit: cover;
+}
+
+.thumbnailPlaceholder {
+  color: #64748b;
+}
+
+.noEvidence,
+.noAction {
+  color: #64748b;
+  font-size: 0.84rem;
+}
+
+.unlockButton,
+.pageButton,
+.primaryButton,
+.secondaryButton {
+  border: 1px solid #1e1e35;
+  border-radius: 12px;
+  padding: 0.72rem 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.unlockButton {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.unlockButton:hover,
+.pageButton:hover,
+.primaryButton:hover,
+.secondaryButton:hover {
   transform: translateY(-1px);
+  border-color: #6366f1;
 }
-.dismissBtn {
-  background: rgba(239,68,68,0.1);
-  color: #f87171;
-  border: 1px solid rgba(239,68,68,0.2);
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  color: #64748b;
 }
-.dismissBtn:hover {
-  background: rgba(239,68,68,0.2);
-  transform: translateY(-1px);
+
+.pageButton {
+  background: #0a0a0f;
+  color: #f1f5f9;
+}
+
+.pageButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .emptyState {
+  border: 1px dashed rgba(30, 30, 53, 0.85);
+  border-radius: 14px;
+  padding: 2rem;
   text-align: center;
-  padding: 3rem;
   color: #64748b;
-  background: #111120;
-  border-radius: 1rem;
-  border: 1px solid #1e1e35;
-  animation: fadeIn 0.4s ease;
 }
 
-/* ================================================================
-   Modal / Detail Overlay
-   ================================================================ */
-.overlay {
+.modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
-  backdrop-filter: blur(4px);
-  z-index: 100;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.2s ease;
+  padding: 1.5rem;
 }
-.modalBox {
+
+.modalCard {
+  width: min(720px, 100%);
   background: #111120;
-  border: 1px solid #2d2d50;
-  border-radius: 1rem;
-  padding: 1.75rem;
-  width: 90%;
-  max-width: 520px;
+  border: 1px solid #1e1e35;
+  border-radius: 20px;
+  padding: 1.4rem;
   position: relative;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-  animation: slideUp 0.3s ease;
+  display: grid;
+  gap: 1rem;
 }
-.closeBtn {
+
+.closeButton {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: none;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.closeBtn:hover {
-  color: white;
-}
-.modalBox h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 1.5rem;
-}
-.detailGrid {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 0.85rem;
-  margin: 1.5rem 0;
-  font-size: 0.85rem;
-  color: #e2e8f0;
-}
-.detailGrid span:nth-child(odd) {
+  border: 0;
+  background: transparent;
   color: #64748b;
-  font-weight: 500;
+  cursor: pointer;
 }
-.riskScoreBar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+
+.modalHeader h3 {
+  margin: 0;
+  color: #f1f5f9;
 }
-.riskScoreBar > div:first-child {
-  flex: 1;
-  height: 8px;
-  background: #1e1e35;
-  border-radius: 4px;
+
+.modalHeader p {
+  margin: 0.35rem 0 0;
+  color: #64748b;
+}
+
+.modalImageWrap {
+  min-height: 320px;
+  border-radius: 16px;
   overflow: hidden;
-}
-.riskScoreFill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
-.reasonsText {
-  font-size: 0.8rem;
-  color: #f87171;
-  word-break: break-word;
-}
-.recommendation {
-  margin-top: 1rem;
-  padding: 0.85rem;
-  background: rgba(245,158,11,0.1);
-  border: 1px solid rgba(245,158,11,0.2);
-  border-radius: 0.5rem;
-  font-size: 0.85rem;
-  color: #fbbf24;
-  line-height: 1.5;
+  border: 1px solid #1e1e35;
+  background: #0a0a0f;
+  display: grid;
+  place-items: center;
 }
 
-/* ================================================================
-   Skeleton Loading
-   ================================================================ */
-.skeletonCard {
-  height: 100px;
-  background: linear-gradient(
-    90deg,
-    #1e1e35 25%,
-    #2a2a40 50%,
-    #1e1e35 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 0.75rem;
-  margin-bottom: 0.75rem;
+.modalImage {
+  max-width: 600px;
+  max-height: 450px;
+  width: 100%;
+  object-fit: contain;
 }
 
-/* ================================================================
-   Responsive
-   ================================================================ */
-@media (max-width: 600px) {
-  .alertCard {
+.modalPlaceholder {
+  color: #64748b;
+  text-align: center;
+  padding: 2rem;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.secondaryButton {
+  background: transparent;
+  color: #f1f5f9;
+}
+
+.primaryButton {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #f1f5f9;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  .pageHeader,
+  .tableHeader,
+  .pagination,
+  .modalActions {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
-  .alertActions {
-    margin-left: 0;
-    margin-top: 0.75rem;
-    width: 100%;
-    justify-content: flex-end;
+
+  .table th,
+  .table td {
+    min-width: 120px;
   }
 }

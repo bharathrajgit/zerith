@@ -45,6 +45,8 @@ export default function StudentLogin() {
         return;
       }
       navigate('/dashboard');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ export default function StudentLogin() {
           <span className={`${styles.logoIcon} ${styles.logoIconStudent}`}>
             <Zap size={18} />
           </span>
-          DSA Master
+          Zerith
         </Link>
 
         <h1 className={`${styles.title} ${styles.titleStudent}`}>Welcome back</h1>

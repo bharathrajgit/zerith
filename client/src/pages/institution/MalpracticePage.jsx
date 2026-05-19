@@ -1,169 +1,547 @@
-// client/src/pages/institution/MalpracticePage.jsx
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AlertTriangle,
+  Download,
+  Image as ImageIcon,
+  Search,
+  Unlock,
+  X,
+} from 'lucide-react';
+import toast from 'react-hot-toast';
 import InstitutionLayout from '../../components/layout/InstitutionLayout';
 import api from '../../services/api';
-import toast from 'react-hot-toast';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
 import styles from './MalpracticePage.module.css';
 
-const FLAG_LABELS = {
-  TAB_SWITCH: { icon: '🔀', label: 'Tab switched' },
-  COPY_ATTEMPT: { icon: '📋', label: 'Copy detected' },
-  WINDOW_BLUR: { icon: '👁', label: 'Left window' },
-  SPEED: { icon: '⚡', label: 'Too fast' },
-  TIMING_ANOMALY: { icon: '⏱', label: 'Suspicious timing' },
-  PATTERN_SHIFT: { icon: '📊', label: 'Pattern shift' },
-  MULTIPLE_FACES: { icon: 'ðŸ‘¥', label: 'Multiple faces' },
-  HEAD_POSE_AWAY: { icon: 'ðŸ§­', label: 'Head turned away' },
-  GAZE_AWAY: { icon: 'ðŸ‘€', label: 'Looking away' },
-  FACE_MISSING: { icon: 'ðŸ“·', label: 'Face missing' },
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'All Types' },
+  { value: 'gaze_away', label: 'Gaze Away' },
+  { value: 'multiple_faces', label: 'Multiple Faces' },
+  { value: 'mobile_detected', label: 'Mobile Detected' },
+  { value: 'tab_switch', label: 'Tab Switch' },
+  { value: 'copy_attempt', label: 'Copy Attempt' },
+];
+
+const RISK_OPTIONS = [
+  { value: 'ALL', label: 'All Risk' },
+  { value: 'LOW', label: 'LOW' },
+  { value: 'MEDIUM', label: 'MEDIUM' },
+  { value: 'HIGH', label: 'HIGH' },
+];
+
+const TYPE_LABELS = {
+  gaze_away: 'Gaze Away',
+  multiple_faces: 'Multiple Faces',
+  mobile_detected: 'Mobile Detected',
+  tab_switch: 'Tab Switch',
+  copy_attempt: 'Copy Attempt',
+  behavioral_anomaly: 'Behavioral Anomaly',
+};
+
+const EMPTY_STATS = {
+  totalViolations: 0,
+  highRiskCount: 0,
+  lockedStudentsCount: 0,
+  mobileDetections: 0,
+  tabSwitchCount: 0,
+  topOffenders: [],
+  recentAlerts: [],
+};
+
+const formatDateTime = (value) => (
+  value ? new Date(value).toLocaleString() : 'N/A'
+);
+
+const revokeObjectUrls = (map) => {
+  Object.values(map || {}).forEach((url) => {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  });
 };
 
 export default function MalpracticePage() {
-  const [logs, setLogs] = useState({ high: [], medium: [], low: [] });
-  const [summary, setSummary] = useState({ total: 0, highCount: 0, mediumCount: 0, lowCount: 0 });
+  const previewUrlsRef = useRef({});
+  const [stats, setStats] = useState(EMPTY_STATS);
+  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All');
-  const [selectedLog, setSelectedLog] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    violationType: 'all',
+    riskLevel: 'ALL',
+    search: '',
+    from: '',
+    to: '',
+  });
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [previewUrls, setPreviewUrls] = useState({});
+  const [modalState, setModalState] = useState({
+    open: false,
+    log: null,
+    imageUrl: '',
+    loading: false,
+  });
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const { data } = await api.get('/institution/analytics/malpractice');
-        if (data.success) {
-          setLogs({ high: data.data.high || [], medium: data.data.medium || [], low: data.data.low || [] });
-          setSummary(data.data.summary || { total: 0, highCount: 0, mediumCount: 0, lowCount: 0 });
-        }
-      } catch { /* ignore */ }
-      finally { setLoading(false); }
-    };
-    fetch();
-  }, []);
+  const loadStats = async () => {
+    setStatsLoading(true);
 
-  const allLogs = [...logs.high, ...logs.medium, ...logs.low];
-  const filteredLogs = filter === 'All' ? allLogs : allLogs.filter((l) => l.riskLevel === filter.toUpperCase() || l.status === filter);
-
-  const handleStatusUpdate = async (logId, newStatus) => {
     try {
-      const { data } = await api.patch(`/institution/analytics/malpractice/${logId}/status`, {
-        status: newStatus,
-      });
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to update malpractice status');
+      const { data } = await api.get('/institution/malpractice/stats');
+      if (data?.success) {
+        setStats({
+          ...EMPTY_STATS,
+          ...data,
+        });
       }
-
-      const updateList = (list) => list.map((l) => (l._id === logId ? { ...l, ...data.data } : l));
-      setLogs((prev) => ({ high: updateList(prev.high), medium: updateList(prev.medium), low: updateList(prev.low) }));
-      if (selectedLog?._id === logId) setSelectedLog({ ...selectedLog, ...data.data });
-      toast.success(`Marked as ${newStatus}`);
-    } catch (err) {
-      toast.error(err?.response?.data?.message || err.message || 'Failed to update malpractice status');
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Failed to load malpractice stats');
+    } finally {
+      setStatsLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <InstitutionLayout>
-        <div className={styles.page}>
-          {Array.from({ length: 3 }).map((_, i) => <div key={i} className={styles.skeletonCard} />)}
-        </div>
-      </InstitutionLayout>
-    );
-  }
+  const loadLogs = async (nextPage = page, nextFilters = filters) => {
+    setLoading(true);
+
+    try {
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        limit: '20',
+      });
+
+      if (nextFilters.riskLevel) {
+        params.set('riskLevel', nextFilters.riskLevel);
+      }
+      if (nextFilters.violationType) {
+        params.set('violationType', nextFilters.violationType);
+      }
+      if (nextFilters.search.trim()) {
+        params.set('search', nextFilters.search.trim());
+      }
+      if (nextFilters.from) {
+        params.set('from', nextFilters.from);
+      }
+      if (nextFilters.to) {
+        params.set('to', nextFilters.to);
+      }
+
+      const { data } = await api.get(`/institution/malpractice/logs?${params.toString()}`);
+      setLogs(Array.isArray(data?.logs) ? data.logs : []);
+      setTotalPages(Math.max(1, Number(data?.totalPages || 1)));
+    } catch (error) {
+      toast.error(error?.response?.data?.message || 'Failed to load malpractice logs');
+      setLogs([]);
+      setTotalPages(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
+
+  useEffect(() => {
+    loadLogs(page, filters);
+  }, [page, filters]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadPreviews = async () => {
+      revokeObjectUrls(previewUrlsRef.current);
+      previewUrlsRef.current = {};
+      setPreviewUrls({});
+
+      const visibleEvidenceLogs = logs.filter((log) => log.hasEvidence && log.latestEvidenceId);
+      if (!visibleEvidenceLogs.length) {
+        return;
+      }
+
+      const previewResults = await Promise.allSettled(
+        visibleEvidenceLogs.map(async (log) => {
+          const response = await api.get(
+            `/institution/analytics/malpractice/evidence/${log.latestEvidenceId}/image`,
+            { responseType: 'blob' }
+          );
+
+          return {
+            id: log._id,
+            url: URL.createObjectURL(response.data),
+          };
+        })
+      );
+
+      if (cancelled) {
+        previewResults.forEach((result) => {
+          if (result.status === 'fulfilled') {
+            URL.revokeObjectURL(result.value.url);
+          }
+        });
+        return;
+      }
+
+      const nextUrls = {};
+      previewResults.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          nextUrls[result.value.id] = result.value.url;
+        }
+      });
+
+      previewUrlsRef.current = nextUrls;
+      setPreviewUrls(nextUrls);
+    };
+
+    loadPreviews();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logs]);
+
+  useEffect(() => () => {
+    revokeObjectUrls(previewUrlsRef.current);
+  }, []);
+
+  const handleFilterChange = (field, value) => {
+    setPage(1);
+    setFilters((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  };
+
+  const handleUnlock = async (log) => {
+    if (!log?.userId?._id) return;
+
+    try {
+      const { data } = await api.post('/institution/malpractice/unlock', {
+        studentId: log.userId._id,
+        reason: 'Institution manual override',
+      });
+
+      if (!data?.success) {
+        throw new Error(data?.message || 'Unlock failed');
+      }
+
+      toast.success('Student unlocked');
+      await Promise.all([loadStats(), loadLogs(page, filters)]);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || 'Failed to unlock student');
+    }
+  };
+
+  const openEvidence = async (log) => {
+    if (!log?.hasEvidence || !log.latestEvidenceId) {
+      return;
+    }
+
+    const existingUrl = previewUrlsRef.current[log._id];
+    if (existingUrl) {
+      setModalState({
+        open: true,
+        log,
+        imageUrl: existingUrl,
+        loading: false,
+      });
+      return;
+    }
+
+    setModalState({
+      open: true,
+      log,
+      imageUrl: '',
+      loading: true,
+    });
+
+    try {
+      const response = await api.get(
+        `/institution/analytics/malpractice/evidence/${log.latestEvidenceId}/image`,
+        { responseType: 'blob' }
+      );
+      const url = URL.createObjectURL(response.data);
+      previewUrlsRef.current = {
+        ...previewUrlsRef.current,
+        [log._id]: url,
+      };
+      setPreviewUrls((current) => ({
+        ...current,
+        [log._id]: url,
+      }));
+      setModalState({
+        open: true,
+        log,
+        imageUrl: url,
+        loading: false,
+      });
+    } catch (error) {
+      setModalState({
+        open: false,
+        log: null,
+        imageUrl: '',
+        loading: false,
+      });
+      toast.error(error?.response?.data?.message || 'Failed to load evidence image');
+    }
+  };
+
+  const closeModal = () => {
+    setModalState({
+      open: false,
+      log: null,
+      imageUrl: '',
+      loading: false,
+    });
+  };
+
+  const downloadEvidence = () => {
+    if (!modalState.imageUrl || !modalState.log) return;
+
+    const anchor = document.createElement('a');
+    anchor.href = modalState.imageUrl;
+    anchor.download = `malpractice-${modalState.log._id}.jpg`;
+    anchor.click();
+  };
 
   return (
     <InstitutionLayout>
       <div className={styles.page}>
-        <h1 className={styles.title}>🛡️ Malpractice Reports</h1>
-
-        {/* Stats */}
-        <div className={styles.statsRow}>
-          <div className={`${styles.statCard} ${styles.statRed}`}><span className={styles.statValue}>{summary.highCount}</span><span className={styles.statLabel}>High Risk</span></div>
-          <div className={`${styles.statCard} ${styles.statAmber}`}><span className={styles.statValue}>{summary.mediumCount}</span><span className={styles.statLabel}>Medium Risk</span></div>
-          <div className={`${styles.statCard} ${styles.statGreen}`}><span className={styles.statValue}>{allLogs.filter((l) => l.status === 'reviewed' || l.status === 'dismissed').length}</span><span className={styles.statLabel}>Resolved</span></div>
-        </div>
-
-        {/* Filter tabs */}
-        <div className={styles.filterRow}>
-          {['All', 'HIGH', 'MEDIUM', 'pending', 'reviewed', 'dismissed', 'confirmed'].map((f) => (
-            <button key={f} className={`${styles.filterBtn} ${filter === f ? styles.activeFilter : ''}`} onClick={() => setFilter(f)}>
-              {f === 'pending' ? 'Pending' : f === 'reviewed' ? 'Reviewed' : f === 'dismissed' ? 'Dismissed' : f === 'confirmed' ? 'Confirmed' : f === 'All' ? 'All' : f}
-            </button>
-          ))}
-        </div>
-
-        {/* Alert cards */}
-        {filteredLogs.length === 0 ? (
-          <div className={styles.emptyState}>✅ No alerts match this filter.</div>
-        ) : (
-          <div className={styles.alertList}>
-            {filteredLogs.map((log) => (
-              <div key={log._id} className={`${styles.alertCard} ${log.riskLevel === 'HIGH' ? styles.alertHigh : log.riskLevel === 'MEDIUM' ? styles.alertMedium : styles.alertLow}`}>
-                <div className={styles.alertBody} onClick={() => setSelectedLog(log)}>
-                  <div className={styles.alertHeader}>
-                    <span className={styles.alertStudent}>{log.userId?.name || 'Unknown Student'}</span>
-                    <span className={`${styles.riskBadge} ${log.riskLevel === 'HIGH' ? styles.riskHigh : log.riskLevel === 'MEDIUM' ? styles.riskMedium : styles.riskLow}`}>{log.riskLevel}</span>
-                  </div>
-                  <div className={styles.alertFlags}>
-                    {log.flags?.map((f) => (
-                      <span key={f} className={styles.flagTag}>{FLAG_LABELS[f]?.icon || '•'} {FLAG_LABELS[f]?.label || f}</span>
-                    ))}
-                  </div>
-                  <div className={styles.alertMeta}>
-                    <span>{new Date(log.createdAt).toLocaleDateString()}</span>
-                    {log.warningCount > 0 && <span>Warnings: {log.warningCount}/{log.warningLimit || 0}</span>}
-                    {log.sourceFlags?.length > 0 && <span>{log.sourceFlags.join(', ')}</span>}
-                    {log.similarityScore > 0.5 && <span className={styles.similarityScore}>Similarity: {(log.similarityScore * 100).toFixed(0)}%</span>}
-                  </div>
-                </div>
-                <div className={styles.alertActions}>
-                  <button onClick={() => handleStatusUpdate(log._id, 'reviewed')} className={styles.reviewBtn}><CheckCircle size={14} /> Review</button>
-                  <button onClick={() => handleStatusUpdate(log._id, 'dismissed')} className={styles.dismissBtn}><XCircle size={14} /> Dismiss</button>
-                </div>
-              </div>
-            ))}
+        <div className={styles.pageHeader}>
+          <div>
+            <h1 className={styles.title}>Malpractice Monitoring</h1>
+            <p className={styles.subtitle}>Review warnings, evidence, and active locks across institution-linked assessments.</p>
           </div>
-        )}
+        </div>
 
-        {/* Detail Modal */}
-        {selectedLog && (
-          <div className={styles.overlay} onClick={() => setSelectedLog(null)}>
-            <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
-              <button className={styles.closeBtn} onClick={() => setSelectedLog(null)}><XCircle size={18} /></button>
-              <h3>Session Detail</h3>
-              <div className={styles.detailGrid}>
-                <span>Student:</span><span>{selectedLog.userId?.name || 'Unknown'}</span>
-                <span>Risk Level:</span><span className={`${styles.riskBadge} ${selectedLog.riskLevel === 'HIGH' ? styles.riskHigh : styles.riskMedium}`}>{selectedLog.riskLevel}</span>
-                <span>Risk Score:</span>
-                <div className={styles.riskScoreBar}>
-                  <div className={styles.riskScoreFill} style={{ width: `${(selectedLog.riskScore || 0) * 100}%`, backgroundColor: (selectedLog.riskScore || 0) >= 0.6 ? '#ef4444' : '#f59e0b' }} />
-                  <span>{((selectedLog.riskScore || 0) * 100).toFixed(0)}%</span>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Total Violations</span>
+            <strong className={styles.statValue}>{statsLoading ? '...' : stats.totalViolations}</strong>
+          </div>
+          <div className={`${styles.statCard} ${styles.statDanger}`}>
+            <span className={styles.statLabel}>High Risk Cases</span>
+            <strong className={styles.statValue}>{statsLoading ? '...' : stats.highRiskCount}</strong>
+          </div>
+          <div className={`${styles.statCard} ${styles.statWarning}`}>
+            <span className={styles.statLabel}>Currently Locked Students</span>
+            <strong className={styles.statValue}>{statsLoading ? '...' : stats.lockedStudentsCount}</strong>
+          </div>
+          <div className={`${styles.statCard} ${styles.statPrimary}`}>
+            <span className={styles.statLabel}>Mobile Detections</span>
+            <strong className={styles.statValue}>{statsLoading ? '...' : stats.mobileDetections}</strong>
+          </div>
+        </div>
+
+        <div className={styles.filtersCard}>
+          <div className={styles.filtersRow}>
+            <label className={styles.filterField}>
+              <span>Violation Type</span>
+              <select
+                value={filters.violationType}
+                onChange={(event) => handleFilterChange('violationType', event.target.value)}
+              >
+                {TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className={styles.filterField}>
+              <span>Risk Level</span>
+              <select
+                value={filters.riskLevel}
+                onChange={(event) => handleFilterChange('riskLevel', event.target.value)}
+              >
+                {RISK_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className={styles.filterField}>
+              <span>From</span>
+              <input
+                type="date"
+                value={filters.from}
+                onChange={(event) => handleFilterChange('from', event.target.value)}
+              />
+            </label>
+
+            <label className={styles.filterField}>
+              <span>To</span>
+              <input
+                type="date"
+                value={filters.to}
+                onChange={(event) => handleFilterChange('to', event.target.value)}
+              />
+            </label>
+          </div>
+
+          <label className={`${styles.filterField} ${styles.searchField}`}>
+            <span>Search Student</span>
+            <div className={styles.searchInputWrap}>
+              <Search size={16} />
+              <input
+                type="text"
+                placeholder="Search by name, username, or email"
+                value={filters.search}
+                onChange={(event) => handleFilterChange('search', event.target.value)}
+              />
+            </div>
+          </label>
+        </div>
+
+        <div className={styles.tableCard}>
+          <div className={styles.tableHeader}>
+            <h2>Violation Logs</h2>
+            <span>{loading ? 'Loading...' : `${logs.length} items on this page`}</span>
+          </div>
+
+          {loading ? (
+            <div className={styles.emptyState}>Loading malpractice logs...</div>
+          ) : logs.length === 0 ? (
+            <div className={styles.emptyState}>No malpractice logs match the current filters.</div>
+          ) : (
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Type</th>
+                    <th>Risk</th>
+                    <th>Time</th>
+                    <th>Evidence</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {logs.map((log) => (
+                    <tr key={log._id}>
+                      <td>
+                        <div className={styles.studentCell}>
+                          <strong>{log.userId?.name || 'Unknown Student'}</strong>
+                          <span>{log.userId?.email || 'No email'}</span>
+                        </div>
+                      </td>
+                      <td>{TYPE_LABELS[log.violationType] || 'Monitoring Alert'}</td>
+                      <td>
+                        <span className={`${styles.riskBadge} ${styles[`risk${log.riskLevel}`] || ''}`}>
+                          {log.riskLevel}
+                        </span>
+                      </td>
+                      <td>{formatDateTime(log.createdAt)}</td>
+                      <td>
+                        {log.hasEvidence && log.latestEvidenceId ? (
+                          <button
+                            type="button"
+                            className={styles.evidenceButton}
+                            onClick={() => openEvidence(log)}
+                          >
+                            {previewUrls[log._id] ? (
+                              <img
+                                src={previewUrls[log._id]}
+                                alt={`${TYPE_LABELS[log.violationType] || 'Evidence'} thumbnail`}
+                                className={styles.thumbnail}
+                              />
+                            ) : (
+                              <span className={styles.thumbnailPlaceholder}>
+                                <ImageIcon size={16} />
+                              </span>
+                            )}
+                          </button>
+                        ) : (
+                          <span className={styles.noEvidence}>No image</span>
+                        )}
+                      </td>
+                      <td>
+                        {log.isCurrentlyLocked ? (
+                          <button
+                            type="button"
+                            className={styles.unlockButton}
+                            onClick={() => handleUnlock(log)}
+                          >
+                            <Unlock size={14} />
+                            Unlock
+                          </button>
+                        ) : (
+                          <span className={styles.noAction}>Unlocked</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className={styles.pagination}>
+            <button
+              type="button"
+              className={styles.pageButton}
+              disabled={page <= 1}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+            >
+              Previous
+            </button>
+            <span>Page {page} of {totalPages}</span>
+            <button
+              type="button"
+              className={styles.pageButton}
+              disabled={page >= totalPages}
+              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        {modalState.open ? (
+          <div className={styles.modalOverlay} onClick={closeModal}>
+            <div className={styles.modalCard} onClick={(event) => event.stopPropagation()}>
+              <button type="button" className={styles.closeButton} onClick={closeModal}>
+                <X size={18} />
+              </button>
+
+              <div className={styles.modalHeader}>
+                <div>
+                  <h3>{modalState.log?.userId?.name || 'Unknown Student'}</h3>
+                  <p>
+                    {TYPE_LABELS[modalState.log?.violationType] || 'Monitoring Alert'} • {formatDateTime(modalState.log?.createdAt)}
+                  </p>
                 </div>
-                <span>Tab Switches:</span><span>{selectedLog.sessionData?.tabSwitches || 0}</span>
-                <span>Copy Attempts:</span><span>{selectedLog.sessionData?.copyAttempts || 0}</span>
-                <span>Window Blurs:</span><span>{selectedLog.sessionData?.windowBlurCount || 0}</span>
-                <span>Avg Answer Time:</span><span>{selectedLog.sessionData?.avgAnswerTime?.toFixed(1) || 'N/A'}s</span>
-                <span>Timing StdDev:</span><span>{selectedLog.sessionData?.timingStdDev?.toFixed(1) || 'N/A'}s</span>
-                <span>Flags:</span><span>{selectedLog.flags?.join(', ') || 'None'}</span>
-                <span>Reasons:</span><span className={styles.reasonsText}>{selectedLog.reasons?.join('; ') || 'N/A'}</span>
-                <span>Warnings:</span><span>{selectedLog.warningCount || 0}/{selectedLog.warningLimit || 0}</span>
-                <span>Sources:</span><span>{selectedLog.sourceFlags?.join(', ') || 'N/A'}</span>
-                <span>Face Count:</span><span>{selectedLog.visionFindings?.faceCount ?? 'N/A'}</span>
-                <span>Looking Away:</span><span>{selectedLog.visionFindings?.gazeAway ? 'Yes' : 'No'}</span>
-                <span>Head Away:</span><span>{selectedLog.visionFindings?.headPoseAway ? 'Yes' : 'No'}</span>
-                <span>Multiple Faces:</span><span>{selectedLog.visionFindings?.multipleFaces ? 'Yes' : 'No'}</span>
-                <span>Face Missing:</span><span>{selectedLog.visionFindings?.faceMissing ? 'Yes' : 'No'}</span>
               </div>
-              <p className={styles.recommendation}>
-                {selectedLog.riskLevel === 'HIGH'
-                  ? '⚠️ Strongly recommend investigation. Multiple suspicious behaviors detected.'
-                  : selectedLog.riskLevel === 'MEDIUM'
-                  ? 'Monitor this student. Some unusual patterns present.'
-                  : 'Minor irregularities. Likely benign.'}
-              </p>
+
+              <div className={styles.modalImageWrap}>
+                {modalState.loading ? (
+                  <div className={styles.modalPlaceholder}>Loading evidence image...</div>
+                ) : modalState.imageUrl ? (
+                  <img
+                    src={modalState.imageUrl}
+                    alt={TYPE_LABELS[modalState.log?.violationType] || 'Evidence'}
+                    className={styles.modalImage}
+                  />
+                ) : (
+                  <div className={styles.modalPlaceholder}>Evidence image unavailable.</div>
+                )}
+              </div>
+
+              <div className={styles.modalActions}>
+                <button type="button" className={styles.secondaryButton} onClick={closeModal}>
+                  Close
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={downloadEvidence}
+                  disabled={!modalState.imageUrl}
+                >
+                  <Download size={16} />
+                  Download
+                </button>
+              </div>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </InstitutionLayout>
   );

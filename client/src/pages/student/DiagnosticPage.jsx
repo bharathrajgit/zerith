@@ -10,135 +10,237 @@ import {
   Check,
   ChevronRight,
   Clock,
+  Code2,
+  Play,
   RefreshCw,
   Sparkles,
   Target,
+  Terminal,
   Trophy,
   X,
 } from 'lucide-react';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import usePracticeMonitoring from '../../hooks/usePracticeMonitoring';
-import MonitoringConsentModal from '../../components/common/MonitoringConsentModal';
-import CameraMonitoringLayer from '../../components/common/CameraMonitoringLayer';
+import MalpracticeMonitor, { LockScreen } from '../../components/malpractice/MalpracticeMonitor';
 import styles from './DiagnosticPage.module.css';
 
 const playBeep = () => {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
 
-    osc.type = 'sine';
-    osc.frequency.value = 880;
+    oscillator.type = 'sine';
+    oscillator.frequency.value = 880;
     gain.gain.value = 0.15;
 
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
-    osc.stop(ctx.currentTime + 0.2);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.2);
+    oscillator.stop(context.currentTime + 0.2);
   } catch {
-    // Ignore audio errors quietly.
+    // Ignore audio issues quietly.
   }
 };
 
-const formatTopic = (topic) =>
-  topic
+const formatTopic = (topic = '') =>
+  String(topic)
     .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 
-const formatQuestionRange = (minQuestions, maxQuestions) => `${minQuestions}-${maxQuestions}`;
+const formatPercentage = (value) => `${Math.round(Number(value || 0) * 100)}%`;
 
-const formatPercentage = (score) => {
-  if (typeof score !== 'number') return '0%';
-  return `${score.toFixed(1)}%`;
+const formatClock = (seconds) => {
+  const safe = Math.max(0, Math.floor(Number(seconds || 0)));
+  const minutes = Math.floor(safe / 60);
+  const remaining = safe % 60;
+  return `${String(minutes).padStart(2, '0')}:${String(remaining).padStart(2, '0')}`;
 };
 
-const ProgressBar = ({ score, color = 'primary' }) => {
-  const percentage = Math.min(100, Math.max(0, score));
-  const colorClass = color === 'success' ? styles.progressSuccess : 
-                     color === 'warning' ? styles.progressWarning : 
-                     styles.progressPrimary;
-  
-  return (
-    <div className={styles.progressContainer}>
-      <div className={`${styles.progressBar} ${colorClass}`} style={{ width: `${percentage}%` }} />
-    </div>
-  );
-};
+const formatResultStatus = (status = '') =>
+  String(status || 'not_attempted')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (character) => character.toUpperCase());
 
-const AnimatedScore = ({ value, label, icon: Icon }) => {
-  const [displayValue, setDisplayValue] = useState(0);
-  const targetValue = typeof value === 'number' ? value : 0;
-  
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const increment = targetValue / steps;
-    let current = 0;
-    
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= targetValue) {
-        setDisplayValue(targetValue);
-        clearInterval(timer);
-      } else {
-        setDisplayValue(Math.round(current));
+const formatCaseBlock = (value = '') =>
+  String(value ?? '')
+    .replace(/\r\n/g, '\n')
+    .replace(/;/g, ';\n');
+
+const formatJavaCode = (source = '') => {
+  const lines = String(source || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\t/g, '    ')
+    .split('\n');
+
+  let indentLevel = 0;
+  let previousBlank = false;
+  const formatted = [];
+
+  lines.forEach((line) => {
+    const trimmed = line.replace(/\s+$/g, '').trim();
+
+    if (!trimmed) {
+      if (formatted.length && !previousBlank) {
+        formatted.push('');
       }
-    }, duration / steps);
-    
-    return () => clearInterval(timer);
-  }, [targetValue]);
-  
-  return (
-    <div className={styles.animatedDetailBox}>
-      {Icon && <Icon size={20} className={styles.detailIcon} />}
-      <span className={styles.detailLabel}>{label}</span>
-      <strong className={styles.detailValue}>
-        {label.includes('%') ? `${displayValue}%` : displayValue}
-      </strong>
-    </div>
-  );
+      previousBlank = true;
+      return;
+    }
+
+    previousBlank = false;
+    const leadingClosers = trimmed.match(/^}+/)?.[0]?.length || 0;
+    const effectiveIndent = Math.max(0, indentLevel - leadingClosers);
+
+    formatted.push(`${'    '.repeat(effectiveIndent)}${trimmed}`);
+
+    const openingBraces = (trimmed.match(/{/g) || []).length;
+    const closingBraces = (trimmed.match(/}/g) || []).length;
+    indentLevel = Math.max(0, indentLevel + openingBraces - closingBraces);
+  });
+
+  return formatted.join('\n').trimEnd();
 };
 
-const getAchievementBadge = (score) => {
-  if (score >= 90) return { emoji: '🏆', title: 'Outstanding!', color: 'gold' };
-  if (score >= 75) return { emoji: '⭐', title: 'Excellent!', color: 'purple' };
-  if (score >= 60) return { emoji: '🎯', title: 'Great Job!', color: 'blue' };
-  if (score >= 40) return { emoji: '💪', title: 'Good Progress!', color: 'green' };
-  return { emoji: '📈', title: 'Keep Learning!', color: 'orange' };
-};
+const INDENT_UNIT = '    ';
 
-const getMotivationalMessage = (level, score) => {
-  const messages = {
-    'Beginner': [
-      "Great start! Every expert was once a beginner.",
-      "You've taken the first step towards mastery!",
-      "Begin with determination, end with excellence."
-    ],
-    'Intermediate': [
-      "Impressive progress! You're building strong foundations.",
-      "You're on the right track to becoming proficient!",
-      "Intermediate skills open doors to advanced concepts."
-    ],
-    'Placement-Ready': [
-      "Outstanding! You're ready for real-world challenges.",
-      "Placement-ready! Your hard work is paying off.",
-      "You've mastered the fundamentals. Time to shine!"
-    ]
+const getLineBounds = (value, position) => {
+  const safePosition = Math.max(0, Math.min(position, value.length));
+  const lineStart = value.lastIndexOf('\n', Math.max(0, safePosition - 1)) + 1;
+  let lineEnd = value.indexOf('\n', safePosition);
+  if (lineEnd === -1) {
+    lineEnd = value.length;
+  }
+
+  return {
+    lineStart,
+    lineEnd,
+    line: value.slice(lineStart, lineEnd),
   };
-  
-  const levelMessages = messages[level] || messages['Beginner'];
-  return levelMessages[Math.floor(Math.random() * levelMessages.length)];
 };
+
+const getLeadingWhitespace = (line = '') => line.match(/^\s*/)?.[0] || '';
+
+const indentSelectedLines = (value, start, end) => {
+  const { lineStart } = getLineBounds(value, start);
+  let lineEnd = value.indexOf('\n', end);
+  if (lineEnd === -1) {
+    lineEnd = value.length;
+  }
+
+  const lines = value.slice(lineStart, lineEnd).split('\n');
+  const nextBlock = lines.map((line) => `${INDENT_UNIT}${line}`).join('\n');
+
+  return {
+    nextValue: `${value.slice(0, lineStart)}${nextBlock}${value.slice(lineEnd)}`,
+    nextSelectionStart: start + INDENT_UNIT.length,
+    nextSelectionEnd: end + (INDENT_UNIT.length * lines.length),
+  };
+};
+
+const outdentLine = (line = '') => {
+  if (line.startsWith(INDENT_UNIT)) {
+    return { nextLine: line.slice(INDENT_UNIT.length), removed: INDENT_UNIT.length };
+  }
+
+  if (line.startsWith('\t')) {
+    return { nextLine: line.slice(1), removed: 1 };
+  }
+
+  const leadingSpaces = line.match(/^ +/)?.[0]?.length || 0;
+  const removed = Math.min(INDENT_UNIT.length, leadingSpaces);
+  return {
+    nextLine: removed > 0 ? line.slice(removed) : line,
+    removed,
+  };
+};
+
+const outdentSelectedLines = (value, start, end) => {
+  const { lineStart } = getLineBounds(value, start);
+  let lineEnd = value.indexOf('\n', end);
+  if (lineEnd === -1) {
+    lineEnd = value.length;
+  }
+
+  const sourceLines = value.slice(lineStart, lineEnd).split('\n');
+  const removedByLine = [];
+  const nextLines = sourceLines.map((line) => {
+    const { nextLine, removed } = outdentLine(line);
+    removedByLine.push(removed);
+    return nextLine;
+  });
+
+  return {
+    nextValue: `${value.slice(0, lineStart)}${nextLines.join('\n')}${value.slice(lineEnd)}`,
+    nextSelectionStart: Math.max(lineStart, start - (removedByLine[0] || 0)),
+    nextSelectionEnd: Math.max(
+      lineStart,
+      end - removedByLine.reduce((sum, removed) => sum + removed, 0)
+    ),
+  };
+};
+
+const difficultyClassMap = {
+  Basic: styles.basicPill,
+  Medium: styles.mediumPill,
+  Hard: styles.hardPill,
+};
+
+const getAchievementBadge = (level) => {
+  if (level === 'Placement-Ready') {
+    return {
+      title: 'Placement Ready',
+      subtitle: 'You are performing strongly across MCQ and coding rounds.',
+    };
+  }
+
+  if (level === 'Intermediate') {
+    return {
+      title: 'Strong Momentum',
+      subtitle: 'Your foundations are solid and your coding signals are improving.',
+    };
+  }
+
+  return {
+    title: 'Foundation Builder',
+    subtitle: 'You now have a clear baseline and a roadmap to build on.',
+  };
+};
+
+const planByLevel = {
+  Beginner: '90-day',
+  Intermediate: '60-day',
+  'Placement-Ready': '30-day',
+};
+
+const createGeneratingState = (title, text) => ({ title, text });
+
+const buildCodingState = (problem) => ({
+  ...problem,
+  draftCode: formatJavaCode(problem.javaStarterCode),
+  startedAt: problem.startedAt || null,
+  expiresAt: problem.startedAt ? new Date(problem.startedAt).getTime() + (problem.timeLimit * 1000) : null,
+  locked: false,
+  opening: false,
+  submitting: false,
+  lastResult: null,
+  attemptsLeft: Math.max(0, 3 - Number(problem.attemptCount || 0)),
+  bestScore: Number(problem.bestScore || 0),
+  attemptCount: Number(problem.attemptCount || 0),
+  timeSpent: Number(problem.timeSpent || 0),
+});
 
 export default function DiagnosticPage() {
   const navigate = useNavigate();
-  const { updateUser, user } = useAuth();
+  const { refreshUser, updateUser, user } = useAuth();
 
   const [screen, setScreen] = useState('welcome');
-  const [sessionToken, setSessionToken] = useState(null);
+  const [generatingState, setGeneratingState] = useState(
+    createGeneratingState('Preparing your question', 'Loading the next step of your diagnostic.')
+  );
+  const [sessionToken, setSessionToken] = useState('');
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [questionNumber, setQuestionNumber] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState(30);
@@ -148,18 +250,27 @@ export default function DiagnosticPage() {
   const [timeLeft, setTimeLeft] = useState(45);
   const [selectedOption, setSelectedOption] = useState(null);
   const [questionResult, setQuestionResult] = useState(null);
-  const [results, setResults] = useState(null);
-  const [perTopicScores, setPerTopicScores] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [sessionError, setSessionError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [analyzingStep, setAnalyzingStep] = useState(0);
+  const [mcqSummary, setMcqSummary] = useState(null);
+  const [codingProblems, setCodingProblems] = useState([]);
+  const [selectedProblemId, setSelectedProblemId] = useState('');
+  const [isCompletingCoding, setIsCompletingCoding] = useState(false);
+  const [results, setResults] = useState(null);
+  const [codingClock, setCodingClock] = useState(Date.now());
+  const [lockCheckLoading, setLockCheckLoading] = useState(true);
+  const [isLockedByMalpractice, setIsLockedByMalpractice] = useState(false);
+  const [lockInfo, setLockInfo] = useState(null);
 
   const timerRef = useRef(null);
   const beepPlayed = useRef(false);
   const analyzingInterval = useRef(null);
-  const sessionDataRef = useRef({
-    changedAnswers: 0,
-  });
+  const sessionDataRef = useRef({ changedAnswers: 0 });
+  const codingExpiryRef = useRef({});
+  const codeEditorRef = useRef(null);
+  const lineNumbersRef = useRef(null);
+  const completedSummaryLoadedRef = useRef(false);
 
   const handleMonitoringStatusChange = useMemo(
     () => (nextState) => {
@@ -172,7 +283,7 @@ export default function DiagnosticPage() {
 
       if ((nextState.warningCount || 0) > 0) {
         toast(`Warning ${nextState.warningCount}/${nextState.warningLimit}: do not switch tabs during the diagnostic.`, {
-          icon: '⚠️',
+          icon: '!',
         });
       }
     },
@@ -197,39 +308,253 @@ export default function DiagnosticPage() {
     onStatusChange: handleMonitoringStatusChange,
   });
 
+  useEffect(() => {
+    let isMounted = true;
+
+    const checkLock = async () => {
+      try {
+        const response = await api.get('/malpractice/check-lock');
+        if (!isMounted) return;
+        if (response.data?.isLocked) {
+          setIsLockedByMalpractice(true);
+          setLockInfo(response.data);
+        }
+      } catch (error) {
+        console.error('Lock check failed:', error);
+      } finally {
+        if (isMounted) {
+          setLockCheckLoading(false);
+        }
+      }
+    };
+
+    checkLock();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   const analyzingMessages = [
-    'Analyzing your answers',
-    'Calculating your readiness level',
-    'Detecting strong and weak topics',
+    'Analyzing your combined MCQ and coding performance',
+    'Estimating your placement readiness',
+    'Finding strong areas and weak patterns',
     'Preparing your roadmap',
   ];
 
-  const strengths = useMemo(
-    () =>
-      Object.entries(perTopicScores)
-        .filter(([, score]) => score >= 60)
-        .sort(([, a], [, b]) => b - a),
-    [perTopicScores]
-  );
-
-  const focusAreas = useMemo(
-    () =>
-      Object.entries(perTopicScores)
-        .filter(([, score]) => score < 60)
-        .sort(([, a], [, b]) => a - b),
-    [perTopicScores]
-  );
-
   const questionRangeLabel = useMemo(
-    () => formatQuestionRange(minQuestions, maxQuestions),
+    () => `${minQuestions}-${maxQuestions}`,
     [minQuestions, maxQuestions]
   );
 
+  const selectedProblem = useMemo(
+    () => codingProblems.find((problem) => problem.problemId === selectedProblemId) || null,
+    [codingProblems, selectedProblemId]
+  );
+
+  const attemptedCodingProblems = useMemo(
+    () => codingProblems.filter((problem) => Number(problem.attemptCount || 0) > 0).length,
+    [codingProblems]
+  );
+
+  const codingTopicScores = useMemo(
+    () => results?.codingTopicScores || {},
+    [results]
+  );
+
+  const focusAreas = useMemo(() => {
+    if (results?.weakAreas?.length) return results.weakAreas;
+    return Object.entries(codingTopicScores)
+      .sort((left, right) => left[1] - right[1])
+      .slice(0, 3)
+      .map(([topic]) => topic);
+  }, [codingTopicScores, results]);
+
+  const strengths = useMemo(() => {
+    if (results?.strongAreas?.length) return results.strongAreas;
+    return Object.entries(codingTopicScores)
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 3)
+      .map(([topic]) => topic);
+  }, [codingTopicScores, results]);
+
+  const currentRemainingSeconds = useMemo(() => {
+    if (!selectedProblem) return 0;
+    if (!selectedProblem.startedAt || !selectedProblem.expiresAt) return selectedProblem.timeLimit;
+    return Math.max(0, Math.ceil((selectedProblem.expiresAt - codingClock) / 1000));
+  }, [codingClock, selectedProblem]);
+
+  const selectedProblemError = useMemo(() => {
+    const visibleResults = selectedProblem?.lastResult?.visibleResults || [];
+    return visibleResults.find((result) => result?.stderr)?.stderr || '';
+  }, [selectedProblem]);
+
+  const selectedProblemStatus = useMemo(
+    () => formatResultStatus(selectedProblem?.lastResult?.status || 'not_attempted'),
+    [selectedProblem]
+  );
+
+  const updateCodingProblem = (problemId, updater) => {
+    setCodingProblems((previous) =>
+      previous.map((problem) => (
+        problem.problemId === problemId
+          ? { ...problem, ...(typeof updater === 'function' ? updater(problem) : updater) }
+          : problem
+      ))
+    );
+  };
+
+  const applyEditorEdit = (nextValue, nextSelectionStart, nextSelectionEnd = nextSelectionStart) => {
+    if (!selectedProblem) return;
+
+    updateCodingProblem(selectedProblem.problemId, {
+      draftCode: nextValue,
+    });
+
+    window.requestAnimationFrame(() => {
+      if (!codeEditorRef.current) return;
+      codeEditorRef.current.focus();
+      codeEditorRef.current.setSelectionRange(nextSelectionStart, nextSelectionEnd);
+    });
+  };
+
+  const syncCodeEditorScroll = (event) => {
+    if (!lineNumbersRef.current) return;
+    lineNumbersRef.current.scrollTop = event.currentTarget.scrollTop;
+  };
+
+  const handleCodeEditorKeyDown = (event) => {
+    if (!selectedProblem) return;
+
+    const textarea = event.currentTarget;
+    const value = textarea.value;
+    const selectionStart = textarea.selectionStart ?? 0;
+    const selectionEnd = textarea.selectionEnd ?? selectionStart;
+    const hasSelection = selectionStart !== selectionEnd;
+
+    if (event.key === 'Tab') {
+      event.preventDefault();
+
+      if (event.shiftKey) {
+        if (hasSelection && value.slice(selectionStart, selectionEnd).includes('\n')) {
+          const result = outdentSelectedLines(value, selectionStart, selectionEnd);
+          applyEditorEdit(result.nextValue, result.nextSelectionStart, result.nextSelectionEnd);
+          return;
+        }
+
+        const { lineStart, lineEnd, line } = getLineBounds(value, selectionStart);
+        const { nextLine, removed } = outdentLine(line);
+        if (!removed) return;
+
+        const nextValue = `${value.slice(0, lineStart)}${nextLine}${value.slice(lineEnd)}`;
+        const nextCursor = Math.max(lineStart, selectionStart - removed);
+        applyEditorEdit(nextValue, nextCursor);
+        return;
+      }
+
+      if (hasSelection && value.slice(selectionStart, selectionEnd).includes('\n')) {
+        const result = indentSelectedLines(value, selectionStart, selectionEnd);
+        applyEditorEdit(result.nextValue, result.nextSelectionStart, result.nextSelectionEnd);
+        return;
+      }
+
+      const nextValue = `${value.slice(0, selectionStart)}${INDENT_UNIT}${value.slice(selectionEnd)}`;
+      const nextCursor = selectionStart + INDENT_UNIT.length;
+      applyEditorEdit(nextValue, nextCursor);
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+
+      const { lineStart, line } = getLineBounds(value, selectionStart);
+      const currentIndent = getLeadingWhitespace(line);
+      const beforeCursor = value.slice(lineStart, selectionStart);
+      const increaseIndent = beforeCursor.trimEnd().endsWith('{');
+      const nextIndent = `${currentIndent}${increaseIndent ? INDENT_UNIT : ''}`;
+      const afterSelection = value.slice(selectionEnd);
+      const closesBlockNext = afterSelection.startsWith('}');
+      const insertion = closesBlockNext
+        ? `\n${nextIndent}\n${currentIndent}`
+        : `\n${nextIndent}`;
+      const nextValue = `${value.slice(0, selectionStart)}${insertion}${afterSelection}`;
+      const nextCursor = selectionStart + 1 + nextIndent.length;
+      applyEditorEdit(nextValue, nextCursor);
+      return;
+    }
+
+    if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key === '{') {
+      event.preventDefault();
+
+      if (hasSelection) {
+        const selectedText = value.slice(selectionStart, selectionEnd);
+        const nextValue = `${value.slice(0, selectionStart)}{${selectedText}}${value.slice(selectionEnd)}`;
+        applyEditorEdit(nextValue, selectionStart + 1, selectionEnd + 1);
+        return;
+      }
+
+      const nextChar = value[selectionEnd] || '';
+      const shouldPair = !nextChar || /\s|[)\]}]/.test(nextChar);
+      const nextValue = shouldPair
+        ? `${value.slice(0, selectionStart)}{}${value.slice(selectionEnd)}`
+        : `${value.slice(0, selectionStart)}{${value.slice(selectionEnd)}`;
+      const nextCursor = selectionStart + 1;
+      applyEditorEdit(nextValue, nextCursor);
+      return;
+    }
+
+    if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key === '}' && !hasSelection) {
+      const { lineStart } = getLineBounds(value, selectionStart);
+      const beforeCursor = value.slice(lineStart, selectionStart);
+
+      if (/^\s*$/.test(beforeCursor) && beforeCursor.endsWith(INDENT_UNIT)) {
+        event.preventDefault();
+
+        const dedented = beforeCursor.slice(0, -INDENT_UNIT.length);
+        if (value[selectionStart] === '}') {
+          const nextValue = `${value.slice(0, lineStart)}${dedented}${value.slice(selectionStart)}`;
+          const nextCursor = lineStart + dedented.length + 1;
+          applyEditorEdit(nextValue, nextCursor);
+          return;
+        }
+
+        const nextValue = `${value.slice(0, lineStart)}${dedented}}${value.slice(selectionEnd)}`;
+        const nextCursor = lineStart + dedented.length + 1;
+        applyEditorEdit(nextValue, nextCursor);
+        return;
+      }
+
+      if (value[selectionStart] === '}') {
+        event.preventDefault();
+        const nextCursor = selectionStart + 1;
+        window.requestAnimationFrame(() => {
+          textarea.setSelectionRange(nextCursor, nextCursor);
+        });
+      }
+    }
+  };
+
+  const formatSelectedProblemCode = () => {
+    if (!selectedProblem) return;
+
+    updateCodingProblem(selectedProblem.problemId, (current) => ({
+      draftCode: formatJavaCode(current.draftCode),
+    }));
+
+    toast.success(`Formatted ${selectedProblem.title}`);
+  };
+
   const loadNextQuestion = async (token, fallbackTarget = totalQuestions, fallbackTime = timePerQuestion) => {
     try {
-      setScreen('loading');
-      const { data } = await api.post('/diagnostic/question', { token });
+      setGeneratingState(
+        createGeneratingState(
+          'Preparing your question',
+          `Loading question ${questionNumber || 1} of ${questionRangeLabel}.`
+        )
+      );
+      setScreen('generating');
 
+      const { data } = await api.post('/diagnostic/question', { token });
       if (!data.success || !data.data) {
         throw new Error(data.message || 'Failed to load question');
       }
@@ -250,16 +575,73 @@ export default function DiagnosticPage() {
     }
   };
 
+  const ensureCodingProblemStarted = async (problemId) => {
+    const problem = codingProblems.find((entry) => entry.problemId === problemId);
+    if (!problem || problem.opening || !sessionToken) return;
+
+    updateCodingProblem(problemId, { opening: true });
+
+    try {
+      const { data } = await api.post('/diagnostic/coding/open', {
+        sessionToken,
+        problemId,
+      });
+
+      if (!data.success || !data.data) {
+        throw new Error(data.message || 'Could not open coding problem');
+      }
+
+      const startedAt = data.data.startedAt ? new Date(data.data.startedAt).getTime() : Date.now();
+
+      updateCodingProblem(problemId, {
+        opening: false,
+        startedAt: data.data.startedAt,
+        expiresAt: startedAt + (problem.timeLimit * 1000),
+        locked: !!data.data.locked,
+      });
+    } catch (error) {
+      updateCodingProblem(problemId, { opening: false });
+      toast.error(error.response?.data?.message || error.message || 'Could not open coding problem.');
+    }
+  };
+
+  const prepareCodingPhase = async (token) => {
+    try {
+      setGeneratingState(
+        createGeneratingState(
+          'Preparing your coding round',
+          'Selecting 10 Java problems and securing hidden test cases on the server.'
+        )
+      );
+      setScreen('generating');
+
+      const { data } = await api.post('/diagnostic/complete', { token });
+      if (!data.success || !data.data?.codingProblems) {
+        throw new Error(data.message || 'Could not prepare coding phase');
+      }
+
+      const problems = data.data.codingProblems.map(buildCodingState);
+      setMcqSummary({
+        mcqScore: Number(data.data.mcqScore || 0),
+        totalProblems: Number(data.data.totalProblems || problems.length),
+      });
+      setCodingProblems(problems);
+      setSelectedProblemId(problems[0]?.problemId || '');
+      setScreen('coding');
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Could not prepare coding phase.';
+      setSessionError(message);
+      setScreen('error');
+      toast.error(message);
+    }
+  };
+
   const startDiagnostic = async () => {
     setIsSubmitting(true);
     setSessionError('');
 
     try {
-      const monitoringReady = await startMonitoring();
-      if (!monitoringReady) return;
-
       const { data } = await api.post('/diagnostic/start');
-
       if (!data.success || !data.data?.token) {
         throw new Error(data.message || 'Could not start diagnostic');
       }
@@ -319,7 +701,7 @@ export default function DiagnosticPage() {
 
       window.setTimeout(() => {
         if (data.data.isComplete) {
-          setScreen('analyzing');
+          prepareCodingPhase(sessionToken);
         } else {
           loadNextQuestion(sessionToken, data.data.currentTarget || totalQuestions, timePerQuestion);
         }
@@ -333,6 +715,164 @@ export default function DiagnosticPage() {
       setIsSubmitting(false);
     }
   };
+
+  const submitCodingProblem = async (problemId, options = {}) => {
+    const problem = codingProblems.find((entry) => entry.problemId === problemId);
+    if (!problem || problem.submitting || problem.locked || !sessionToken) return;
+
+    updateCodingProblem(problemId, { submitting: true });
+
+    try {
+      const { data } = await api.post('/diagnostic/coding/submit', {
+        sessionToken,
+        problemId,
+        code: problem.draftCode,
+        language: 'java',
+      });
+
+      if (!data.success || !data.data) {
+        throw new Error(data.message || 'Could not run coding tests');
+      }
+
+      updateCodingProblem(problemId, (current) => ({
+        submitting: false,
+        attemptCount: 3 - Number(data.data.attemptsLeft || 0),
+        attemptsLeft: Number(data.data.attemptsLeft || 0),
+        bestScore: Number(data.data.bestScore || current.bestScore || 0),
+        lastResult: data.data,
+        locked: options.forceLock ? true : current.locked || Number(data.data.attemptsLeft || 0) <= 0,
+      }));
+
+      toast.success(
+        options.auto ? `Auto-submitted ${problem.title}` : `Tests completed for ${problem.title}`
+      );
+    } catch (error) {
+      updateCodingProblem(problemId, (current) => ({
+        submitting: false,
+        locked: options.forceLock ? true : current.locked,
+      }));
+      toast.error(error.response?.data?.message || error.message || 'Coding submission failed.');
+    }
+  };
+
+  const completeCodingPhase = async () => {
+    if (!sessionToken || isCompletingCoding) return;
+
+    setIsCompletingCoding(true);
+    setScreen('analyzing');
+
+    try {
+      const { data } = await api.post('/diagnostic/coding/complete', {
+        sessionToken,
+      });
+
+      if (!data.success || !data.data) {
+        throw new Error(data.message || 'Could not complete diagnostic');
+      }
+
+      updateUser({
+        diagnosticCompleted: true,
+        currentLevel: data.data.level,
+        diagnosticScore: data.data.combinedScore,
+        placementReadiness: data.data.placementReadiness,
+      });
+
+      try {
+        await refreshUser();
+      } catch {
+        // The optimistic auth update is already in place.
+      }
+
+      localStorage.setItem('dsa_diag_completed', 'true');
+      setResults(data.data);
+      setScreen('results');
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Could not complete diagnostic.';
+      setSessionError(message);
+      setScreen('error');
+      toast.error(message);
+    } finally {
+      setIsCompletingCoding(false);
+    }
+  };
+
+  const restartLanding = () => {
+    setScreen('welcome');
+    setSessionError('');
+    setSelectedOption(null);
+    setQuestionResult(null);
+    setCurrentQuestion(null);
+    setCodingProblems([]);
+    setSelectedProblemId('');
+    setResults(null);
+  };
+
+  const handleViewRoadmap = async () => {
+    try {
+      await refreshUser();
+    } catch {
+      // Navigation can continue with the existing client state.
+    }
+
+    navigate('/roadmap');
+  };
+
+  useEffect(() => {
+    const loadCompletedSummary = async () => {
+      completedSummaryLoadedRef.current = true;
+      setGeneratingState(
+        createGeneratingState(
+          'Loading your diagnostic result',
+          'Preparing your latest level, coding breakdown, and roadmap handoff.'
+        )
+      );
+      setScreen('generating');
+
+      try {
+        const { data } = await api.get('/diagnostic/summary');
+        if (!data.success || !data.data) {
+          throw new Error(data.message || 'Could not load your diagnostic summary');
+        }
+
+        setResults({
+          ...data.data,
+          breakdown: Array.isArray(data.data.breakdown) ? data.data.breakdown : [],
+          weakAreas: Array.isArray(data.data.weakAreas) ? data.data.weakAreas : [],
+          strongAreas: Array.isArray(data.data.strongAreas) ? data.data.strongAreas : [],
+          confidenceExplanation: data.data.confidenceExplanation || '',
+          codingTopicScores: data.data.codingTopicScores || {},
+        });
+        setScreen('results');
+      } catch (error) {
+        completedSummaryLoadedRef.current = false;
+        const restoredLevel = user?.currentLevel || 'Beginner';
+        setResults({
+          level: restoredLevel,
+          mcqScore: 0,
+          codingScore: 0,
+          confidence: 0,
+          placementReadiness: Number(user?.placementReadiness || user?.diagnosticScore || 0),
+          breakdown: [],
+          weakAreas: [],
+          strongAreas: [],
+          confidenceExplanation: '',
+          codingTopicScores: {},
+          recommendedPlan: planByLevel[restoredLevel] || '90-day',
+        });
+        setScreen('results');
+      }
+    };
+
+    if (
+      screen === 'welcome' &&
+      user?.diagnosticCompleted &&
+      !sessionToken &&
+      !results &&
+      !completedSummaryLoadedRef.current
+    ) {
+      loadCompletedSummary();
+    }
+  }, [results, screen, sessionToken, user?.currentLevel, user?.diagnosticCompleted, user?.diagnosticScore, user?.placementReadiness]);
 
   useEffect(() => {
     if (screen !== 'question' || selectedOption !== null || isSubmitting) {
@@ -363,20 +903,54 @@ export default function DiagnosticPage() {
         window.clearInterval(timerRef.current);
       }
     };
-  }, [screen, selectedOption, isSubmitting, sessionToken, currentQuestion, timePerQuestion, timeLeft]);
+  }, [screen, selectedOption, isSubmitting, sessionToken, currentQuestion, timePerQuestion]);
 
   useEffect(() => {
+    if (screen !== 'coding' || !selectedProblemId) return;
+    ensureCodingProblemStarted(selectedProblemId);
+  }, [screen, selectedProblemId]);
+
+  useEffect(() => {
+    if (screen !== 'coding' || !selectedProblem) return undefined;
+
+    const interval = window.setInterval(() => {
+      setCodingClock(Date.now());
+
+      const current = codingProblems.find((problem) => problem.problemId === selectedProblem.problemId);
+      if (!current || !current.startedAt || current.locked || !current.expiresAt) return;
+
+      const remaining = Math.max(0, Math.ceil((current.expiresAt - Date.now()) / 1000));
+      if (remaining <= 0 && !codingExpiryRef.current[current.problemId]) {
+        codingExpiryRef.current[current.problemId] = true;
+        const shouldAutoSubmit = Boolean(current.draftCode?.trim()) && Number(current.attemptsLeft || 0) > 0;
+
+        if (shouldAutoSubmit) {
+          submitCodingProblem(current.problemId, { auto: true, forceLock: true });
+        } else {
+          updateCodingProblem(current.problemId, { locked: true });
+        }
+      }
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, [screen, selectedProblem, codingProblems]);
+
+  useEffect(() => {
+    return undefined;
+
     let copyThrottleTimer;
 
+    const shouldMonitor = () => screen === 'question' || screen === 'coding';
+
     const handleVisibility = () => {
-      if (document.hidden && screen === 'question') {
+      if (document.hidden && shouldMonitor()) {
         trackBrowserEvent('tabSwitches');
-        toast('Do not switch tabs during the test. This session is monitored.', { icon: '⚠️' });
+        toast('Do not switch tabs during the test. This session is monitored.', { icon: '!' });
       }
     };
 
     const handleCopy = () => {
-      if (screen === 'question' && !copyThrottleTimer) {
+      if (shouldMonitor() && !copyThrottleTimer) {
         trackBrowserEvent('copyAttempts');
         copyThrottleTimer = window.setTimeout(() => {
           copyThrottleTimer = null;
@@ -385,7 +959,7 @@ export default function DiagnosticPage() {
     };
 
     const handleBlur = () => {
-      if (screen === 'question') {
+      if (shouldMonitor()) {
         trackBrowserEvent('windowBlurCount');
       }
     };
@@ -410,45 +984,7 @@ export default function DiagnosticPage() {
   }, [finishMonitoring]);
 
   useEffect(() => {
-    if (screen !== 'analyzing' || !sessionToken) {
-      return undefined;
-    }
-
-    const completeDiagnostic = async () => {
-      try {
-        const { data } = await api.post('/diagnostic/complete', {
-          token: sessionToken,
-          sessionData: {
-            ...browserMetrics,
-            changedAnswers: sessionDataRef.current.changedAnswers,
-          },
-          monitoringSessionId: sessionId,
-        });
-
-        if (!data.success || !data.data) {
-          throw new Error(data.message || 'Could not complete diagnostic');
-        }
-
-        updateUser({
-          diagnosticCompleted: true,
-          currentLevel: data.data.level,
-          diagnosticScore: data.data.score,
-          placementReadiness: data.data.placementReadiness,
-        });
-
-        localStorage.setItem('dsa_diag_completed', 'true');
-        setResults(data.data);
-        setPerTopicScores(data.data.perTopicScores || {});
-        setScreen('results');
-      } catch (error) {
-        const message = error.response?.data?.message || error.message || 'Could not complete diagnostic.';
-        setSessionError(message);
-        setScreen('error');
-        toast.error(message);
-      }
-    };
-
-    completeDiagnostic();
+    if (screen !== 'analyzing') return undefined;
 
     analyzingInterval.current = window.setInterval(() => {
       setAnalyzingStep((previous) => (previous + 1) % analyzingMessages.length);
@@ -459,14 +995,32 @@ export default function DiagnosticPage() {
         window.clearInterval(analyzingInterval.current);
       }
     };
-  }, [browserMetrics, finishMonitoring, navigate, screen, sessionId, sessionToken, updateUser]);
+  }, [screen]);
 
-  const restartLanding = () => {
-    setScreen('welcome');
-    setSessionError('');
-    setSelectedOption(null);
-    setQuestionResult(null);
-  };
+  const codeLineNumbers = selectedProblem
+    ? Array.from({ length: (selectedProblem.draftCode || '').split('\n').length }, (_, index) => index + 1).join('\n')
+    : '';
+
+  const resultBadge = results ? getAchievementBadge(results.level) : null;
+  const breakdownRows = Array.isArray(results?.breakdown) ? results.breakdown : [];
+
+  if (lockCheckLoading) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.shell}>
+          <section className={styles.centerCard}>
+            <RefreshCw size={28} className={`${styles.loaderIcon} ${styles.spin}`} />
+            <h2 className={styles.centerTitle}>Checking diagnostic access</h2>
+            <p className={styles.centerText}>Please wait while your malpractice lock status is verified.</p>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLockedByMalpractice && lockInfo) {
+    return <LockScreen lockInfo={lockInfo} />;
+  }
 
   return (
     <div className={styles.page}>
@@ -481,24 +1035,24 @@ export default function DiagnosticPage() {
                 <p className={styles.eyebrow}>Diagnostic Assessment</p>
                 <h1 className={styles.title}>Start your DSA level test</h1>
                 <p className={styles.subtitle}>
-                  This page is your diagnostic landing screen. Read the test details below,
-                  then click Start to begin the assessment.
+                  You will first complete the adaptive MCQ round, then solve 10 Java coding problems.
+                  Your final level and roadmap are generated from both phases together.
                 </p>
               </div>
             </div>
 
             <div className={styles.detailsGrid}>
               <div className={styles.detailBox}>
-                <span className={styles.detailLabel}>Questions</span>
+                <span className={styles.detailLabel}>MCQ questions</span>
                 <strong className={styles.detailValue}>{minQuestions} to {maxQuestions}</strong>
               </div>
               <div className={styles.detailBox}>
-                <span className={styles.detailLabel}>Time per question</span>
-                <strong className={styles.detailValue}>{timePerQuestion} seconds</strong>
+                <span className={styles.detailLabel}>Coding round</span>
+                <strong className={styles.detailValue}>10 Java problems</strong>
               </div>
               <div className={styles.detailBox}>
-                <span className={styles.detailLabel}>Difficulty</span>
-                <strong className={styles.detailValue}>Adaptive Java DSA</strong>
+                <span className={styles.detailLabel}>Difficulty mix</span>
+                <strong className={styles.detailValue}>2 Basic, 3 Medium, 5 Hard</strong>
               </div>
               <div className={styles.detailBox}>
                 <span className={styles.detailLabel}>Result</span>
@@ -512,11 +1066,11 @@ export default function DiagnosticPage() {
                 <span>Before you start</span>
               </div>
               <div className={styles.ruleList}>
-                <div className={styles.ruleItem}>You cannot go back to previous questions.</div>
-                <div className={styles.ruleItem}>Each question auto-submits when the timer ends.</div>
-                <div className={styles.ruleItem}>Only one attempt is allowed for each student account.</div>
-                <div className={styles.ruleItem}>Your roadmap will be generated from this score.</div>
-                <div className={styles.ruleItem}>Do not switch tabs or leave the test window. Warnings will be recorded.</div>
+                <div className={styles.ruleItem}>You cannot go back to previous MCQ questions.</div>
+                <div className={styles.ruleItem}>Every coding problem allows up to 3 submissions, and the best score counts.</div>
+                <div className={styles.ruleItem}>Coding timers are server-authoritative. The screen timer is only a guide.</div>
+                <div className={styles.ruleItem}>You can finish the diagnostic at any time during the coding phase.</div>
+                <div className={styles.ruleItem}>Do not switch tabs or leave the test window. Warnings are recorded.</div>
               </div>
             </div>
 
@@ -532,7 +1086,7 @@ export default function DiagnosticPage() {
                 {isSubmitting ? (
                   <>
                     <RefreshCw size={18} className={styles.spin} />
-                    <span>Starting test...</span>
+                    <span>Starting diagnostic...</span>
                   </>
                 ) : (
                   <>
@@ -545,13 +1099,11 @@ export default function DiagnosticPage() {
           </section>
         )}
 
-        {screen === 'loading' && (
+        {screen === 'generating' && (
           <section className={styles.centerCard}>
             <RefreshCw size={28} className={`${styles.loaderIcon} ${styles.spin}`} />
-            <h2 className={styles.centerTitle}>Preparing your question</h2>
-            <p className={styles.centerText}>
-              Loading question {questionNumber || 1} of {questionRangeLabel}
-            </p>
+            <h2 className={styles.centerTitle}>{generatingState.title}</h2>
+            <p className={styles.centerText}>{generatingState.text}</p>
           </section>
         )}
 
@@ -562,7 +1114,7 @@ export default function DiagnosticPage() {
                 <span className={styles.badge}>Question {questionNumber} / {questionRangeLabel}</span>
                 <span className={styles.topicBadge}>
                   <BookOpen size={14} />
-                  <span>{currentQuestion.topic}</span>
+                  <span>{formatTopic(currentQuestion.topic)}</span>
                 </span>
               </div>
               <div className={styles.timerBadge}>
@@ -573,9 +1125,7 @@ export default function DiagnosticPage() {
 
             <div className={styles.feedback}>
               <AlertCircle size={16} />
-              <span>
-                Monitoring active. Warning {sessionState?.warningCount || 0}/{sessionState?.warningLimit || (user?.institutionId ? 2 : 3)}. Do not switch tabs.
-              </span>
+              <span>Live malpractice monitoring is active for this diagnostic.</span>
             </div>
 
             <div className={styles.questionBlock}>
@@ -619,10 +1169,315 @@ export default function DiagnosticPage() {
               <div className={`${styles.feedback} ${questionResult.isCorrect ? styles.feedbackGood : styles.feedbackBad}`}>
                 {questionResult.isCorrect ? <Check size={18} /> : <X size={18} />}
                 <span>
-                  {questionResult.isCorrect ? 'Correct answer. Moving to next question.' : 'Incorrect answer. Moving to next question.'}
+                  {questionResult.isCorrect ? 'Correct answer. Preparing the next step.' : 'Answer recorded. Preparing the next step.'}
                 </span>
               </div>
             ) : null}
+          </section>
+        )}
+
+        {screen === 'coding' && selectedProblem && (
+          <section className={`${styles.card} ${styles.codingCard}`}>
+            <div className={styles.codingHeader}>
+              <div>
+                <p className={styles.eyebrow}>Coding Phase</p>
+                <h2 className={styles.codingTitle}>Java diagnostic problems</h2>
+                <p className={styles.subtitle}>
+                  Complete the diagnostic whenever you are ready. Hidden tests stay on the server.
+                </p>
+              </div>
+              <div className={styles.codingSummary}>
+                <div className={styles.summaryBox}>
+                  <span className={styles.detailLabel}>MCQ score</span>
+                  <strong className={styles.detailValue}>{mcqSummary?.mcqScore ?? 0} / 50</strong>
+                </div>
+                <div className={styles.summaryBox}>
+                  <span className={styles.detailLabel}>Attempted</span>
+                  <strong className={styles.detailValue}>{attemptedCodingProblems} / 10</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.feedback}>
+              <AlertCircle size={16} />
+              <span>Live malpractice monitoring is active for this diagnostic.</span>
+            </div>
+
+            <div className={styles.problemTabs}>
+              {codingProblems.map((problem, index) => {
+                const isActive = problem.problemId === selectedProblemId;
+                const remaining = problem.expiresAt
+                  ? Math.max(0, Math.ceil((problem.expiresAt - codingClock) / 1000))
+                  : problem.timeLimit;
+
+                return (
+                  <button
+                    key={problem.problemId}
+                    type="button"
+                    className={`${styles.problemTab} ${isActive ? styles.problemTabActive : ''}`}
+                    onClick={() => setSelectedProblemId(problem.problemId)}
+                  >
+                    <span>Problem {index + 1}</span>
+                    <strong>{problem.title}</strong>
+                    <span className={`${styles.difficultyPill} ${difficultyClassMap[problem.difficulty] || ''}`}>
+                      {problem.difficulty}
+                    </span>
+                    <span className={styles.tabMeta}>{problem.attemptCount}/3 attempts</span>
+                    <span className={styles.tabMeta}>
+                      {problem.startedAt ? formatClock(remaining) : formatClock(problem.timeLimit)}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className={styles.problemLayout}>
+              <div className={styles.problemPanel}>
+                <div className={styles.problemHeader}>
+                  <div>
+                    <div className={styles.problemTitleRow}>
+                      <h3 className={styles.problemTitle}>{selectedProblem.title}</h3>
+                      <span className={`${styles.difficultyPill} ${difficultyClassMap[selectedProblem.difficulty] || ''}`}>
+                        {selectedProblem.difficulty}
+                      </span>
+                    </div>
+                    <p className={styles.problemTopic}>Topic: {selectedProblem.topic}</p>
+                  </div>
+
+                  <div className={styles.problemHeaderMeta}>
+                    <div className={`${styles.timerDisplay} ${currentRemainingSeconds < 120 ? styles.timerDanger : ''}`}>
+                      <Clock size={16} />
+                      <span>{formatClock(currentRemainingSeconds)}</span>
+                    </div>
+                    <div className={styles.scoreBox}>
+                      <span>Best score</span>
+                      <strong>{formatPercentage(selectedProblem.bestScore)}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.problemDescription}>
+                  <div className={styles.sectionTitle}>
+                    <BookOpen size={18} />
+                    <span>Problem Brief</span>
+                  </div>
+                  <p>{selectedProblem.description}</p>
+                </div>
+
+                <div className={styles.problemMetaGrid}>
+                  <div className={styles.metaCard}>
+                    <span className={styles.detailLabel}>Attempts remaining</span>
+                    <div className={styles.dotsRow}>
+                      {Array.from({ length: 3 }, (_, index) => {
+                        const filled = index < Number(selectedProblem.attemptsLeft || 0);
+                        return (
+                          <span
+                            key={index}
+                            className={`${styles.attemptDot} ${filled ? styles.attemptDotFilled : styles.attemptDotUsed}`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className={styles.metaCard}>
+                    <span className={styles.detailLabel}>Visible tests</span>
+                    <strong className={styles.detailValue}>{selectedProblem.visibleTestCases.length}</strong>
+                  </div>
+                  <div className={styles.metaCard}>
+                    <span className={styles.detailLabel}>Hidden tests</span>
+                    <strong className={styles.detailValue}>{selectedProblem.hiddenTestCount}</strong>
+                  </div>
+                  <div className={styles.metaCard}>
+                    <span className={styles.detailLabel}>Time limit</span>
+                    <strong className={styles.detailValue}>{Math.round(selectedProblem.timeLimit / 60)} min</strong>
+                  </div>
+                </div>
+
+                <div className={styles.editorCard}>
+                  <div className={styles.editorHeader}>
+                    <div className={styles.editorTitle}>
+                      <Terminal size={16} />
+                      <span>Java Editor</span>
+                    </div>
+                    <div className={styles.editorActions}>
+                      <button
+                        type="button"
+                        className={styles.secondaryButton}
+                        disabled={selectedProblem.submitting || selectedProblem.locked}
+                        onClick={formatSelectedProblemCode}
+                      >
+                        <Sparkles size={16} />
+                        <span>Format Code</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.primaryButton}
+                        disabled={selectedProblem.submitting || selectedProblem.locked}
+                        onClick={() => submitCodingProblem(selectedProblem.problemId)}
+                      >
+                        {selectedProblem.submitting ? (
+                          <>
+                            <RefreshCw size={16} className={styles.spin} />
+                            <span>Running Tests</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play size={16} />
+                            <span>Run Tests</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.editorShell}>
+                    <pre ref={lineNumbersRef} className={styles.lineNumbers} aria-hidden="true">{codeLineNumbers}</pre>
+                    <textarea
+                      ref={codeEditorRef}
+                      className={styles.codeEditor}
+                      spellCheck={false}
+                      value={selectedProblem.draftCode}
+                      disabled={selectedProblem.locked}
+                      onKeyDown={handleCodeEditorKeyDown}
+                      onScroll={syncCodeEditorScroll}
+                      onChange={(event) =>
+                        updateCodingProblem(selectedProblem.problemId, {
+                          draftCode: event.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {selectedProblem.locked ? (
+                    <div className={`${styles.feedback} ${styles.feedbackBad}`}>
+                      <AlertCircle size={16} />
+                      <span>This problem is locked because the timer ended or all attempts were used.</span>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className={styles.section}>
+                  <div className={styles.sectionTitle}>
+                    <Code2 size={18} />
+                    <span>Hints</span>
+                  </div>
+                  <div className={styles.hintList}>
+                    {selectedProblem.hints.map((hint) => (
+                      <div key={hint} className={styles.hintCard}>{hint}</div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <aside className={styles.resultsPanel}>
+                <div className={styles.resultsPanelHero}>
+                  <div className={styles.sectionTitle}>
+                    <Check size={18} />
+                    <span>Visible Test Cases</span>
+                  </div>
+                  <div className={styles.statusCard}>
+                    <span className={styles.detailLabel}>Submission status</span>
+                    <strong className={styles.detailValue}>{selectedProblemStatus}</strong>
+                  </div>
+                </div>
+
+                <div className={styles.testList}>
+                  {selectedProblem.visibleTestCases.map((testCase, index) => {
+                    const testResult = selectedProblem.lastResult?.visibleResults?.[index];
+                    return (
+                      <div key={`${selectedProblem.problemId}-${index}`} className={styles.testCard}>
+                        <div className={styles.testHeader}>
+                          <strong>Test {index + 1}</strong>
+                          {testResult ? (
+                            <span className={testResult.passed ? styles.passBadge : styles.failBadge}>
+                              {testResult.passed ? 'Passed' : 'Failed'}
+                            </span>
+                          ) : (
+                            <span className={styles.pendingBadge}>Pending</span>
+                          )}
+                        </div>
+                        <div className={styles.testBlock}>
+                          <span className={styles.testLabel}>Input</span>
+                          <pre className={styles.testCodeBlock}>{formatCaseBlock(testCase.input)}</pre>
+                        </div>
+                        <div className={styles.testBlock}>
+                          <span className={styles.testLabel}>Expected</span>
+                          <pre className={styles.testCodeBlock}>{formatCaseBlock(testCase.expectedOutput)}</pre>
+                        </div>
+                        {testResult ? (
+                          <>
+                            <div className={styles.testBlock}>
+                              <span className={styles.testLabel}>Actual</span>
+                              <pre className={styles.testCodeBlock}>{formatCaseBlock(testResult.actualOutput || '<empty>')}</pre>
+                            </div>
+                          </>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {selectedProblemError ? (
+                  <div className={styles.compilerCard}>
+                    <div className={styles.sectionTitle}>
+                      <AlertCircle size={16} />
+                      <span>Compiler / Runtime Output</span>
+                    </div>
+                    <pre className={styles.errorCodeBlock}>{selectedProblemError}</pre>
+                  </div>
+                ) : null}
+
+                {selectedProblem.lastResult ? (
+                  <div className={styles.submissionSummary}>
+                    <div className={styles.summaryRow}>
+                      <span>Visible tests</span>
+                      <strong>{selectedProblem.lastResult.passedVisible}/{selectedProblem.lastResult.totalVisible}</strong>
+                    </div>
+                    <div className={styles.summaryRow}>
+                      <span>Hidden tests</span>
+                      <strong>{selectedProblem.lastResult.passedHidden}/{selectedProblem.lastResult.totalHidden}</strong>
+                    </div>
+                    <div className={styles.summaryRow}>
+                      <span>Status</span>
+                      <strong>{selectedProblemStatus}</strong>
+                    </div>
+                  </div>
+                ) : (
+                  <p className={styles.emptyText}>Run tests to view visible-case feedback.</p>
+                )}
+              </aside>
+            </div>
+
+            <div className={styles.footerActions}>
+              <p className={styles.footerNote}>
+                Coding problems are used to merge MCQ and coding into your final level.
+              </p>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => navigate('/dashboard')}
+              >
+                Exit to Dashboard
+              </button>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                disabled={isCompletingCoding}
+                onClick={completeCodingPhase}
+              >
+                {isCompletingCoding ? (
+                  <>
+                    <RefreshCw size={16} className={styles.spin} />
+                    <span>Finalizing</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Complete Diagnostic</span>
+                    <ChevronRight size={16} />
+                  </>
+                )}
+              </button>
+            </div>
           </section>
         )}
 
@@ -630,76 +1485,67 @@ export default function DiagnosticPage() {
           <section className={styles.centerCard}>
             <Brain size={28} className={styles.loaderIcon} />
             <h2 className={styles.centerTitle}>{analyzingMessages[analyzingStep]}</h2>
-            <p className={styles.centerText}>Please wait while your diagnostic result is generated.</p>
+            <p className={styles.centerText}>Please wait while your final diagnostic result is generated.</p>
           </section>
         )}
 
         {screen === 'results' && results && (
           <section className={styles.card}>
             <div className={styles.resultsHeader}>
-              <div className={styles.achievementSection}>
-                <div className={styles.achievementBadge}>
-                  <span className={styles.achievementEmoji}>{getAchievementBadge(results.score || 0).emoji}</span>
-                  <div className={styles.achievementText}>
-                    <h3 className={styles.achievementTitle}>{getAchievementBadge(results.score || 0).title}</h3>
-                    <p className={styles.motivationalMessage}>{getMotivationalMessage(results.level || 'Beginner', results.score || 0)}</p>
-                  </div>
+              <div className={styles.achievementBlock}>
+                <div>
+                  <p className={styles.eyebrow}>Diagnostic Complete</p>
+                  <h2 className={styles.resultsTitle}>{resultBadge?.title}</h2>
+                  <p className={styles.subtitle}>{resultBadge?.subtitle}</p>
                 </div>
-                <span className={`${styles.levelPill} ${styles.animated}`}>
+                <span className={styles.levelPill}>
                   <Award size={16} />
-                  <span>{results.level || 'Diagnostic Completed'}</span>
+                  <span>{results.level}</span>
                 </span>
               </div>
-              <h2 className={styles.resultsTitle}>Your diagnostic result is ready</h2>
-              <p className={styles.subtitle}>
-                Your roadmap has been generated from the current performance summary.
-              </p>
             </div>
 
-            <div className={styles.detailsGrid}>
-              <AnimatedScore 
-                value={results.score ?? 0} 
-                label="Score" 
-                icon={Target} 
-              />
-              <AnimatedScore 
-                value={results.accuracy ?? 0} 
-                label="Accuracy" 
-                icon={Award} 
-              />
-              <AnimatedScore 
-                value={results.correctAnswers ?? 0} 
-                label="Correct answers" 
-                icon={Check} 
-              />
-              <AnimatedScore 
-                value={results.confidence ? Math.round(results.confidence * 100) : 0} 
-                label="Confidence" 
-                icon={Brain} 
-              />
+            <div className={styles.resultsGrid}>
+              <div className={styles.resultCard}>
+                <Target size={18} />
+                <span>MCQ Score</span>
+                <strong>{results.mcqScore} / 50</strong>
+              </div>
+              <div className={styles.resultCard}>
+                <Code2 size={18} />
+                <span>Coding Score</span>
+                <strong>{results.codingScore} / 10</strong>
+              </div>
+              <div className={styles.resultCard}>
+                <Brain size={18} />
+                <span>Confidence</span>
+                <strong>{Math.round(Number(results.confidence || 0) * 100)}%</strong>
+              </div>
+              <div className={styles.resultCard}>
+                <Trophy size={18} />
+                <span>Placement Readiness</span>
+                <strong>{results.placementReadiness}%</strong>
+              </div>
             </div>
+
+            {results.confidenceExplanation ? (
+              <div className={styles.feedback}>
+                <Brain size={16} />
+                <span>{results.confidenceExplanation}</span>
+              </div>
+            ) : null}
 
             <div className={styles.resultsColumns}>
               <div className={styles.resultPanel}>
                 <div className={styles.sectionTitle}>
                   <Trophy size={18} />
-                  <span>Strengths</span>
+                  <span>Strong Areas</span>
                 </div>
-                {strengths.length ? (
-                  <div className={styles.topicList}>
-                    {strengths.map(([topic, score]) => (
-                      <div key={topic} className={styles.topicRow}>
-                        <div className={styles.topicInfo}>
-                          <span>{formatTopic(topic)}</span>
-                          <ProgressBar score={score} color="success" />
-                        </div>
-                        <strong>{formatPercentage(score)}</strong>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className={styles.emptyText}>No strong topics identified yet.</p>
-                )}
+                <div className={styles.pillList}>
+                  {strengths.length ? strengths.map((item) => (
+                    <span key={item} className={styles.strongPill}>{item}</span>
+                  )) : <p className={styles.emptyText}>No standout strengths yet.</p>}
+                </div>
               </div>
 
               <div className={styles.resultPanel}>
@@ -707,26 +1553,48 @@ export default function DiagnosticPage() {
                   <Target size={18} />
                   <span>Focus Areas</span>
                 </div>
-                {focusAreas.length ? (
-                  <div className={styles.topicList}>
-                    {focusAreas.map(([topic, score]) => (
-                      <div key={topic} className={styles.topicRow}>
-                        <div className={styles.topicInfo}>
-                          <span>{formatTopic(topic)}</span>
-                          <ProgressBar score={score} color="warning" />
-                        </div>
-                        <strong>{formatPercentage(score)}</strong>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className={styles.emptyText}>No weak areas detected.</p>
-                )}
+                <div className={styles.pillList}>
+                  {focusAreas.length ? focusAreas.map((item) => (
+                    <span key={item} className={styles.focusPill}>{item}</span>
+                  )) : <p className={styles.emptyText}>No weak areas reported.</p>}
+                </div>
               </div>
             </div>
 
+            <div className={styles.breakdownCard}>
+              <div className={styles.sectionTitle}>
+                <BookOpen size={18} />
+                <span>Coding Breakdown</span>
+              </div>
+              {breakdownRows.length ? (
+                <div className={styles.breakdownTable}>
+                  <div className={styles.breakdownHead}>Problem</div>
+                  <div className={styles.breakdownHead}>Difficulty</div>
+                  <div className={styles.breakdownHead}>Tests</div>
+                  <div className={styles.breakdownHead}>Score</div>
+
+                  {breakdownRows.map((item) => (
+                    <div key={item.problemId} className={styles.breakdownRow}>
+                      <div>{item.title}</div>
+                      <div>
+                        <span className={`${styles.difficultyPill} ${difficultyClassMap[item.difficulty] || ''}`}>
+                          {item.difficulty}
+                        </span>
+                      </div>
+                      <div>{item.passedTotal}/{item.totalTests}</div>
+                      <div>{formatPercentage(item.score)}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className={styles.emptyText}>
+                  Your latest level is restored. Detailed coding breakdown is only available when a completed diagnostic session is stored.
+                </p>
+              )}
+            </div>
+
             <div className={styles.actionRow}>
-              <button className={styles.primaryButton} onClick={() => navigate('/roadmap')}>
+              <button className={styles.primaryButton} onClick={handleViewRoadmap}>
                 <span>View Roadmap</span>
                 <ChevronRight size={18} />
               </button>
@@ -751,12 +1619,15 @@ export default function DiagnosticPage() {
         )}
       </div>
 
-      <MonitoringConsentModal {...consentModal} />
-      {stream ? (
-        <CameraMonitoringLayer
-          stream={stream}
-          captureVideoRef={captureVideoRef}
-          hidden={isMobile}
+      {(screen === 'question' || screen === 'coding') ? (
+        <MalpracticeMonitor
+          sessionType="diagnostic"
+          assessmentId={sessionToken}
+          onLocked={(data) => {
+            setIsLockedByMalpractice(true);
+            setLockInfo(data);
+          }}
+          onWarning={() => {}}
         />
       ) : null}
     </div>

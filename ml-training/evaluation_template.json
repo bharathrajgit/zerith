@@ -6,7 +6,9 @@
     "gaze_away",
     "head_pose_away",
     "multiple_faces",
-    "face_missing"
+    "face_missing",
+    "phone_visible",
+    "extra_screen_visible"
   ],
   "validation_accuracy": 0,
   "macro_f1": 0,

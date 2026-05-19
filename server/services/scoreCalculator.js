@@ -1,5 +1,3 @@
-// server/services/scoreCalculator.js
-
 /**
  * Calculate assessment score for a single round.
  * @param {Array} questions - Array of MCQ objects with correctAnswer
@@ -18,7 +16,7 @@ const calculateAssessmentScore = (questions, submissions) => {
       throw new Error(`MCQ ${submission.mcqId} not found in question set`);
     }
     const isCorrect = Number(submission.selectedAnswer) === question.correctAnswer;
-    if (isCorrect) correctAnswers++;
+    if (isCorrect) correctAnswers += 1;
 
     return {
       mcqId: submission.mcqId,
@@ -31,7 +29,7 @@ const calculateAssessmentScore = (questions, submissions) => {
 
   const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
 
-  const totalTimeTaken = submissions.reduce((sum, s) => sum + (s.timeTaken || 0), 0);
+  const totalTimeTaken = submissions.reduce((sum, submission) => sum + (submission.timeTaken || 0), 0);
   const averageTimeTaken = submissions.length > 0 ? totalTimeTaken / submissions.length : 0;
 
   return {
@@ -43,6 +41,20 @@ const calculateAssessmentScore = (questions, submissions) => {
     passCriteria: '',
     questionResults,
   };
+};
+
+const getRequiredCorrectAnswers = (round, totalQuestions) => {
+  const criteria = {
+    Basic: 0.8,
+    Medium: 0.8,
+    Hard: 0.6,
+    Diagnostic: 0,
+  };
+
+  const requiredRatio = criteria[round] || 0;
+  return round === 'Diagnostic'
+    ? 0
+    : Math.ceil(Math.max(Number(totalQuestions) || 0, 0) * requiredRatio);
 };
 
 /**
@@ -57,32 +69,30 @@ const evaluatePass = (round, correctAnswers, totalQuestions) => {
     Basic: 0.8,
     Medium: 0.8,
     Hard: 0.6,
-    Diagnostic: 0, // no pass/fail
+    Diagnostic: 0,
   };
   const requiredRatio = criteria[round] || 0;
-  const passed = round === 'Diagnostic' ? true : correctAnswers / totalQuestions >= requiredRatio;
+  const requiredCorrectAnswers = getRequiredCorrectAnswers(round, totalQuestions);
+  const passed = round === 'Diagnostic'
+    ? true
+    : Number(correctAnswers || 0) >= requiredCorrectAnswers;
 
   return {
     passed,
+    requiredCorrectAnswers,
     passCriteria:
       round === 'Diagnostic'
-        ? 'Diagnostic test – no pass/fail'
-        : `${Math.round(requiredRatio * 100)}% correct required (${Math.round(requiredRatio * totalQuestions)}/${totalQuestions})`,
+        ? 'Diagnostic test - no pass/fail'
+        : `${Math.round(requiredRatio * 100)}% correct required (${requiredCorrectAnswers}/${totalQuestions})`,
   };
 };
 
 /**
  * Calculate mastery score from multiple round scores and behaviour.
- * Formula:
- *   M = (r1 × 0.20) + (r2 × 0.30) + (r3 × 0.30)
- *     + (coding × 0.20) - (hintRate × 5) - (retryRate × 3)
- * Clamped to 0–100.
- * @param {Number} round1 - score 0-100
- * @param {Number} round2 - score 0-100
- * @param {Number} round3 - score 0-100
- * @param {Number} coding - coding score 0-100
- * @param {Number} hintRate - hints used per question (0-1)
- * @param {Number} retryRate - number of retries (attempts - 1)
+ * @param {Number} mcqScore
+ * @param {Number} codingScore
+ * @param {Number} hintRate
+ * @param {Number} retryRate
  * @returns {Object} { masteryScore, masteryLevel }
  */
 const calculateMasteryScore = (mcqScore = 0, codingScore = 0, hintRate = 0, retryRate = 0) => {
@@ -94,7 +104,6 @@ const calculateMasteryScore = (mcqScore = 0, codingScore = 0, hintRate = 0, retr
   score -= hintRate * 5;
   score -= retryRate * 3;
 
-  // Clamp between 0 and 100
   score = Math.min(100, Math.max(0, Math.round(score)));
 
   let masteryLevel = 'Needs Revision';
@@ -107,7 +116,7 @@ const calculateMasteryScore = (mcqScore = 0, codingScore = 0, hintRate = 0, retr
 
 /**
  * Calculate placement readiness from a map of topic mastery scores.
- * @param {Object} topicMasteryMap - e.g., { "Arrays": 85, "Trees": 70, ... }
+ * @param {Object} topicMasteryMap - e.g., { Arrays: 85, Trees: 70 }
  * @returns {Object} { readinessScore, readinessLevel }
  */
 const calculatePlacementReadiness = (topicMasteryMap) => {
@@ -146,6 +155,7 @@ const calculatePlacementReadiness = (topicMasteryMap) => {
 module.exports = {
   calculateAssessmentScore,
   evaluatePass,
+  getRequiredCorrectAnswers,
   calculateMasteryScore,
   calculatePlacementReadiness,
 };

@@ -4,6 +4,23 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 
 const AuthContext = createContext(null);
+const DIAGNOSTIC_STORAGE_KEY = "dsa_diag_completed";
+
+const syncDiagnosticStorage = (userType, user) => {
+  if (userType !== "student") {
+    localStorage.removeItem(DIAGNOSTIC_STORAGE_KEY);
+    return;
+  }
+
+  const completed = user?.diagnosticCompleted === true;
+  localStorage.setItem(DIAGNOSTIC_STORAGE_KEY, completed ? "true" : "false");
+};
+
+const clearStoredSession = () => {
+  localStorage.removeItem("dsa_token");
+  localStorage.removeItem("dsa_user_type");
+  localStorage.removeItem(DIAGNOSTIC_STORAGE_KEY);
+};
 
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({
@@ -16,11 +33,22 @@ export const AuthProvider = ({ children }) => {
 
   const navigate = useNavigate();
 
+  const persistAuthState = useCallback((user, token, userType) => {
+    if (token) {
+      localStorage.setItem("dsa_token", token);
+    }
+    if (userType) {
+      localStorage.setItem("dsa_user_type", userType);
+    }
+    syncDiagnosticStorage(userType, user);
+  }, []);
+
   const loadUser = useCallback(async () => {
     const token = localStorage.getItem("dsa_token");
     let userType = localStorage.getItem("dsa_user_type");
 
     if (!token) {
+      clearStoredSession();
       setState((prev) => ({ ...prev, isLoading: false }));
       return;
     }
@@ -53,7 +81,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (!userData) throw new Error("Failed to restore session");
-      localStorage.setItem("dsa_user_type", resolvedType);
+      persistAuthState(userData, token, resolvedType);
       setState({
         user: userData,
         token,
@@ -62,11 +90,10 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: true,
       });
     } catch {
-      localStorage.removeItem("dsa_token");
-      localStorage.removeItem("dsa_user_type");
+      clearStoredSession();
       setState({ user: null, token: null, userType: null, isLoading: false, isAuthenticated: false });
     }
-  }, []);
+  }, [persistAuthState]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -74,63 +101,110 @@ export const AuthProvider = ({ children }) => {
   }, [loadUser]);
 
   const loginStudent = async (email, password) => {
-    const res = await api.post("/auth/login", { email, password });
-    const { token } = res.data;
-    const user = res.data.data?.user || res.data.user;
-    const mustResetPassword = res.data.data?.mustResetPassword || res.data.mustResetPassword;
-    localStorage.setItem("dsa_token", token);
-    localStorage.setItem("dsa_user_type", "student");
-    setState({ user, token, userType: "student", isLoading: false, isAuthenticated: true });
-    return { success: true, mustReset: mustResetPassword || user?.mustResetPassword };
+    try {
+      const res = await api.post("/auth/login", { email, password });
+      const { token } = res.data;
+      const user = res.data.data?.user || res.data.user;
+      const mustResetPassword = res.data.data?.mustResetPassword || res.data.mustResetPassword;
+      persistAuthState(user, token, "student");
+      setState({ user, token, userType: "student", isLoading: false, isAuthenticated: true });
+      return { success: true, mustReset: mustResetPassword || user?.mustResetPassword };
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || error?.message || 'Login failed',
+      };
+    }
   };
 
   const loginInstitution = async (email, password) => {
-    const res = await api.post("/institution/auth/login", { email, password });
-    const { token } = res.data;
-    const institution = res.data.data?.institution || res.data.institution;
-    localStorage.setItem("dsa_token", token);
-    localStorage.setItem("dsa_user_type", "institution");
-    setState({ user: institution, token, userType: "institution", isLoading: false, isAuthenticated: true });
-    return { success: true };
+    try {
+      const res = await api.post("/institution/auth/login", { email, password });
+      const { token } = res.data;
+      const institution = res.data.data?.institution || res.data.institution;
+      persistAuthState(institution, token, "institution");
+      setState({ user: institution, token, userType: "institution", isLoading: false, isAuthenticated: true });
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || error?.message || 'Login failed',
+      };
+    }
   };
 
   const registerStudent = async (formData) => {
-    const res = await api.post("/auth/register", formData);
-    const { token } = res.data;
-    const user = res.data.data?.user || res.data.user;
-    const mustResetPassword = res.data.data?.mustResetPassword || user?.mustResetPassword;
-    localStorage.setItem("dsa_token", token);
-    localStorage.setItem("dsa_user_type", "student");
-    setState({ user, token, userType: "student", isLoading: false, isAuthenticated: true });
-    return { success: true, user, mustReset: mustResetPassword || user?.mustResetPassword };
+    try {
+      const res = await api.post("/auth/register", formData);
+      const { token } = res.data;
+      const user = res.data.data?.user || res.data.user;
+      const mustResetPassword = res.data.data?.mustResetPassword || user?.mustResetPassword;
+      persistAuthState(user, token, "student");
+      setState({ user, token, userType: "student", isLoading: false, isAuthenticated: true });
+      return { success: true, user, mustReset: mustResetPassword || user?.mustResetPassword };
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || error?.message || 'Registration failed',
+      };
+    }
   };
 
   const registerInstitution = async (formData) => {
-    const res = await api.post("/institution/auth/register", formData);
-    const { token } = res.data;
-    const institution = res.data.data?.institution || res.data.institution;
-    localStorage.setItem("dsa_token", token);
-    localStorage.setItem("dsa_user_type", "institution");
-    setState({ user: institution, token, userType: "institution", isLoading: false, isAuthenticated: true });
-    return { success: true, institutionCode: institution?.institutionCode };
+    try {
+      const res = await api.post("/institution/auth/register", formData);
+      const { token } = res.data;
+      const institution = res.data.data?.institution || res.data.institution;
+      persistAuthState(institution, token, "institution");
+      setState({ user: institution, token, userType: "institution", isLoading: false, isAuthenticated: true });
+      return { success: true, institutionCode: institution?.institutionCode };
+    } catch (error) {
+      return {
+        success: false,
+        message: error?.response?.data?.message || error?.message || 'Registration failed',
+      };
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem("dsa_token");
-    localStorage.removeItem("dsa_user_type");
+    clearStoredSession();
     setState({ user: null, token: null, userType: null, isLoading: false, isAuthenticated: false });
     navigate("/");
   };
 
   const updateUser = (updates) => {
-    setState((prev) => ({ ...prev, user: { ...prev.user, ...updates } }));
+    setState((prev) => {
+      const nextUser = { ...prev.user, ...updates };
+      syncDiagnosticStorage(prev.userType, nextUser);
+      return { ...prev, user: nextUser };
+    });
   };
+
+  const refreshUser = useCallback(async () => {
+    const activeUserType = state.userType || localStorage.getItem("dsa_user_type");
+    if (!activeUserType) {
+      return { success: false, message: "No active session" };
+    }
+
+    const res = activeUserType === "student"
+      ? await api.get("/auth/me")
+      : await api.get("/institution/auth/profile");
+
+    const user = activeUserType === "student"
+      ? (res.data.data?.user || res.data.user || res.data)
+      : (res.data.data?.institution || res.data.institution || res.data);
+
+    setState((prev) => ({ ...prev, user, userType: activeUserType, isLoading: false, isAuthenticated: true }));
+    syncDiagnosticStorage(activeUserType, user);
+    return { success: true, user };
+  }, [state.userType]);
 
   const updateProfile = async (updates) => {
     try {
       const res = await api.put('/auth/profile', updates);
       if (res.data.success) {
         setState((prev) => ({ ...prev, user: res.data.data.user }));
+        syncDiagnosticStorage("student", res.data.data.user);
         return { success: true, user: res.data.data.user };
       }
       return { success: false, message: res.data.message };
@@ -148,6 +222,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('dsa_token', token);
     }
     localStorage.setItem('dsa_user_type', 'student');
+    syncDiagnosticStorage('student', user);
 
     setState((prev) => ({
       ...prev,
@@ -166,7 +241,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ ...state, loginStudent, loginInstitution, registerStudent, registerInstitution, resetFirstPassword, logout, updateUser, updateProfile }}>
+    <AuthContext.Provider value={{ ...state, loginStudent, loginInstitution, registerStudent, registerInstitution, resetFirstPassword, refreshUser, logout, updateUser, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

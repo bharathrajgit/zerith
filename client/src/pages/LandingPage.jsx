@@ -8,9 +8,11 @@ import {
   ArrowRight, Sparkles, Star, Play, Award, Clock,
   Code, Activity, TrendingDown, ZapOff,
 } from "lucide-react";
+import heroImage from "../assets/hero image.png";
+import logoImage from "../assets/websiteLogo.jpeg";
 
 /* ═══════════════════════════════════════════════════════════
-   GLOBAL STYLES - Enhanced & Production Ready
+   GLOBAL STYLES - Enhanced & Production Ready (Fixed)
 ═══════════════════════════════════════════════════════════ */
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -232,6 +234,31 @@ const GLOBAL_CSS = `
     background-clip: text;
   }
 
+  .lp-hero-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 3rem;
+    align-items: center;
+    width: 100%;
+  }
+
+  .lp-hero-image {
+    width: 100%;
+    max-width: 620px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .lp-logo-image {
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 5px;
+  }
+
   /* Scrollbar Styling */
   ::-webkit-scrollbar {
     width: 8px;
@@ -274,19 +301,14 @@ const GLOBAL_CSS = `
     .lp-footer-links { justify-content: center !important; }
     .lp-pricing-highlight { transform: scale(1) !important; }
     .lp-hero-title { font-size: clamp(2.5rem, 8vw, 5rem) !important; }
-  }
-
-  @media (max-width: 480px) {
-    .lp-stats-grid { grid-template-columns: 1fr !important; }
-    .lp-hero-cta { flex-direction: column !important; }
-    .lp-hero-badge { font-size: 0.7rem !important; }
+    .lp-hero-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
 /* ═══════════════════════════════════════════════════════════
-   ENHANCED COUNT-UP HOOK
+   CUSTOM HOOK – Animated Counter
 ═══════════════════════════════════════════════════════════ */
-function useCountUp(target, duration = 2000, delay = 0) {
+function useCountUp(target, duration = 2500, delay = 0) {
   const ref = useRef(null);
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -318,7 +340,7 @@ function useCountUp(target, duration = 2000, delay = 0) {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function (ease-out cubic)
+      // ease-out cubic
       const eased = 1 - Math.pow(1 - progress, 3);
       
       setCount(Math.floor(eased * target));
@@ -734,7 +756,7 @@ export default function LandingPage() {
       icon: <Brain size={28} color="#6366f1" />,
       num: "01",
       title: "AI Diagnoses You",
-      desc: "20 unique questions generated live by AI. Never stored. Unique every time. Results in 10 minutes.",
+      desc: "50 unique questions generated live by AI. Never stored. Unique every time. Results in 10 minutes.",
       color: "#6366f1",
       bg: "rgba(99, 102, 241, 0.1)",
       border: "rgba(99, 102, 241, 0.25)",
@@ -842,7 +864,7 @@ export default function LandingPage() {
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
-            gap: "0.6rem",
+            gap: "0.75rem",
             fontFamily: "'Space Grotesk', sans-serif",
             fontSize: "1.3rem",
             fontWeight: 800,
@@ -852,7 +874,11 @@ export default function LandingPage() {
           onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.05)"}
           onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
         >
-          <Zap size={24} style={{ color: "#6366f1", flexShrink: 0 }} />
+          <img
+            src={logoImage}
+            alt="Zerith logo"
+            style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 10, background: "rgba(255,255,255,0.05)", padding: 4 }}
+          />
           Zerith
         </button>
 
@@ -1030,7 +1056,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* ── ENHANCED HERO SECTION ── */}
+      {/* ── ENHANCED HERO SECTION (FIXED – NO DUPLICATES) ── */}
       <section style={{
         minHeight: "100vh",
         display: "flex",
@@ -1069,101 +1095,125 @@ export default function LandingPage() {
         <div style={{ 
           position: "relative", 
           zIndex: 1, 
-          maxWidth: "900px", 
+          maxWidth: "1200px", 
           width: "100%", 
           margin: "0 auto",
           opacity: heroAnimationComplete ? 1 : 0,
           transform: heroAnimationComplete ? "translateY(0)" : "translateY(20px)",
           transition: "all 1s cubic-bezier(0.4, 0, 0.2, 1)",
         }}>
-          {/* Enhanced Badge */}
-          <div style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.6rem",
-            background: "rgba(99, 102, 241, 0.15)",
-            border: "1px solid rgba(99, 102, 241, 0.4)",
-            borderRadius: "100px",
-            padding: "0.5rem 1.3rem",
-            fontSize: "0.8rem",
-            fontWeight: 600,
-            color: "#a78bfa",
-            letterSpacing: "0.05em",
-            marginBottom: "2.5rem",
-            animation: "fadeInUp 0.8s ease both",
-            boxShadow: "0 0 30px rgba(99, 102, 241, 0.2)",
-          }}>
-            <Sparkles size={16} color="#6366f1" />
-            AI-Powered &nbsp;•&nbsp; Java Only &nbsp;•&nbsp; Anti-Cheat System
-          </div>
+          <div className="lp-hero-grid">
+            <div>
+              {/* Enhanced Badge */}
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.6rem",
+                background: "rgba(99, 102, 241, 0.15)",
+                border: "1px solid rgba(99, 102, 241, 0.4)",
+                borderRadius: "100px",
+                padding: "0.5rem 1.3rem",
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                color: "#a78bfa",
+                letterSpacing: "0.05em",
+                marginBottom: "2.5rem",
+                animation: "fadeInUp 0.8s ease both",
+                boxShadow: "0 0 30px rgba(99, 102, 241, 0.2)",
+              }}>
+                <Sparkles size={16} color="#6366f1" />
+                AI-Powered &nbsp;•&nbsp; Java Only &nbsp;•&nbsp; Anti-Cheat System
+              </div>
 
-          {/* Enhanced H1 */}
-          <h1 className="lp-hero-title" style={{
-            fontFamily: "'Space Grotesk', sans-serif",
-            fontSize: "clamp(3.5rem, 8vw, 7rem)",
-            fontWeight: 900,
-            lineHeight: 1.05,
-            letterSpacing: "-0.04em",
-            color: "#f1f5f9",
-            marginBottom: "2rem",
-            animation: "fadeInUp 0.8s 0.2s ease both",
-          }}>
-            Master DSA in{" "}
-            <span className="gradient-text" style={{
-              display: "inline-block",
-              background: "linear-gradient(135deg, #6366f1 0%, #a78bfa 40%, #38bdf8 70%, #6366f1 100%)",
-              backgroundSize: "200% 200%",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              animation: "gradientShift 4s ease infinite",
-            }}>
-              90 Days.
-            </span>
-          </h1>
+              {/* Enhanced H1 */}
+              <h1 className="lp-hero-title" style={{
+                fontFamily: "'Space Grotesk', sans-serif",
+                fontSize: "clamp(3.5rem, 8vw, 7rem)",
+                fontWeight: 900,
+                lineHeight: 1.05,
+                letterSpacing: "-0.04em",
+                color: "#f1f5f9",
+                marginBottom: "2rem",
+                animation: "fadeInUp 0.8s 0.2s ease both",
+                textAlign: "left",
+              }}>
+                Master DSA in{" "}
+                <span className="gradient-text" style={{
+                  display: "inline-block",
+                  background: "linear-gradient(135deg, #6366f1 0%, #a78bfa 40%, #38bdf8 70%, #6366f1 100%)",
+                  backgroundSize: "200% 200%",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                  animation: "gradientShift 4s ease infinite",
+                }}>
+                  90 Days.
+                </span>
+              </h1>
 
-          {/* Enhanced Subtitle */}
-          <p style={{
-            fontSize: "clamp(1.1rem, 2vw, 1.25rem)",
-            color: "#94a3b8",
-            maxWidth: "600px",
-            margin: "0 auto 3rem",
-            lineHeight: 1.9,
-            animation: "fadeInUp 0.8s 0.4s ease both",
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 400,
-          }}>
-            The only platform that forces consistent practice, detects your weak areas 
-            with ML, and predicts your placement readiness.
-          </p>
+              {/* Enhanced Subtitle */}
+              <p style={{
+                fontSize: "clamp(1.1rem, 2vw, 1.25rem)",
+                color: "#94a3b8",
+                maxWidth: "600px",
+                margin: "0 auto 3rem 0",
+                lineHeight: 1.9,
+                animation: "fadeInUp 0.8s 0.4s ease both",
+                fontFamily: "'Inter', sans-serif",
+                fontWeight: 400,
+                textAlign: "left",
+              }}>
+                The only platform that forces consistent practice, detects your weak areas 
+                with ML, and predicts your placement readiness.
+              </p>
 
-          {/* Enhanced CTA Buttons */}
-          <div className="lp-hero-cta" style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "1.5rem",
-            flexWrap: "wrap",
-            marginBottom: "5rem",
-            animation: "fadeInUp 0.8s 0.6s ease both",
-          }}>
-            <button 
-              className="lp-btn-p" 
-              style={{ ...buttonPrimary, padding: "1.1rem 2.8rem", fontSize: "1.1rem" }} 
-              onClick={() => navigate("/register")}
-            >
-              <Play size={18} fill="currentColor" />
-              Start Free
-              <ArrowRight size={20} />
-            </button>
-            <button 
-              className="lp-btn-o" 
-              style={{ ...buttonOutline, padding: "1.1rem 2.8rem", fontSize: "1.1rem" }} 
-              onClick={() => scrollTo("institutions")}
-            >
-              For Institutions
-              <ChevronRight size={20} />
-            </button>
+              {/* Enhanced CTA Buttons */}
+              <div className="lp-hero-cta" style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: "1.5rem",
+                flexWrap: "wrap",
+                marginBottom: "5rem",
+                animation: "fadeInUp 0.8s 0.6s ease both",
+              }}>
+                <button 
+                  className="lp-btn-p" 
+                  style={{ ...buttonPrimary, padding: "1.1rem 2.8rem", fontSize: "1.1rem" }} 
+                  onClick={() => navigate("/register")}
+                >
+                  <Play size={18} fill="currentColor" />
+                  Start Free
+                  <ArrowRight size={20} />
+                </button>
+                <button 
+                  className="lp-btn-o" 
+                  style={{ ...buttonOutline, padding: "1.1rem 2.8rem", fontSize: "1.1rem" }} 
+                  onClick={() => scrollTo("institutions")}
+                >
+                  For Institutions
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <div className="lp-hero-image">
+                <img
+                  src={heroImage}
+                  alt="Zerith hero illustration"
+                  style={{
+                    width: "100%",
+                    maxWidth: "560px",
+                    borderRadius: "32px",
+                    boxShadow: "0 40px 120px rgba(15, 23, 42, 0.65)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "rgba(7, 7, 20, 0.85)",
+                    animation: "fadeInUp 0.9s 0.4s ease both",
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Enhanced Stats Row */}
@@ -1176,7 +1226,7 @@ export default function LandingPage() {
             animation: "fadeInUp 0.8s 0.8s ease both",
           }}>
             {[
-              { icon: <BarChart3 size={18} />, text: "11 DSA Modules" },
+              { icon: <BarChart3 size={18} />, text: "14 DSA Modules" },
               { icon: <Brain size={18} />, text: "AI Diagnostic" },
               { icon: <Shield size={18} />, text: "Anti-Malpractice" },
               { icon: <Target size={18} />, text: "Placement Prediction" },
@@ -1443,8 +1493,7 @@ export default function LandingPage() {
               </h3>
               {[
                 "Free AI diagnostic assessment — unique every time",
-                "Personalized 90-day Java DSA roadmap",
-                "AI-powered hints when you're stuck",
+                "Personalized 90/60/30-day Java DSA roadmap",
                 "Real Java code execution environment",
                 "ML-powered placement readiness score",
                 "Streak tracking + consistency analytics",
@@ -1512,7 +1561,7 @@ export default function LandingPage() {
                   marginBottom: "1.8rem",
                 }}>
                   {[
-                    "All 11 DSA modules",
+                    "All 14 DSA modules",
                     "AI diagnostic (unique every time)",
                     "Basic MCQ practice",
                     "20 coding problems/month",

@@ -1,5 +1,5 @@
 ﻿// server/seed/index.js
-// DSA Learning Platform â€“ Complete Seed File
+// DSA Learning Platform – Complete Seed File
 // Based on Kunal Kushwaha's Java + DSA Bootcamp playlist
 // Run: node server/seed/index.js [--fresh]
 
@@ -14,14 +14,17 @@ const Roadmap = require('../models/Roadmap');
 const Assessment = require('../models/Assessment');
 const PerformanceLog = require('../models/PerformanceLog');
 const User = require('../models/User');
+const { normalizeSeedValue } = require('./textSanitizer');
 
-// â”€â”€ Console helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-const log = (msg) => console.log(`  âœ”  ${msg}`);
-const section = (title) => console.log(`\n${'â•'.repeat(64)}\n  ${title}\n${'â•'.repeat(64)}`);
+// -----------------------------------------------------------------------
+//  CONSOLE HELPERS
+// -----------------------------------------------------------------------
+const log = (msg) => console.log(`  ✓  ${msg}`);
+const section = (title) => console.log(`\n${'═'.repeat(64)}\n  ${title}\n${'═'.repeat(64)}`);
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  MODULES  (14)
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ============================================================================
+//  MODULES (14)
+// ============================================================================
 const modules = [
     { order: 1, title: 'Fundamentals', description: 'Core programming concepts, Java basics, OOP and complexity analysis.', courseLevel: 'Beginner' },
     { order: 2, title: 'Patterns', description: 'Nested loop pattern problems to strengthen iteration skills.', courseLevel: 'Beginner' },
@@ -43,17 +46,17 @@ const moduleLevelByOrder = Object.fromEntries(
     modules.map((module) => [module.order, module.courseLevel || 'Beginner'])
 );
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  TOPICS  (47)
-//  videoUrl = YouTube ID ONLY â€“ all verified from official SYLLABUS.md
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ============================================================================
+//  TOPICS (47)
+//  videoUrl = YouTube ID ONLY – all verified from official SYLLABUS.md
+// ============================================================================
 const topics = [
-    // â”€â”€ Module 1: Fundamentals (7 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 1: Fundamentals (7 topics) --------------------
     {
         moduleOrder: 1, order: 1,
         title: 'Flowcharts & Pseudocode',
         videoUrl: 'lhELGQAV4gg',
-        videoTitle: 'Flow of Program â€“ Flowcharts & Pseudocode | Kunal Kushwaha',
+        videoTitle: 'Flow of Program – Flowcharts & Pseudocode | Kunal Kushwaha',
         videoDuration: '25',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
         javaConceptTags: ['flowchart', 'pseudocode', 'algorithm design', 'if condition', 'loops'],
@@ -62,7 +65,7 @@ const topics = [
         moduleOrder: 1, order: 2,
         title: 'Java Architecture & Setup',
         videoUrl: '4EP8YzcN0hQ',
-        videoTitle: 'Introduction to Java â€“ Architecture & Installation | Kunal Kushwaha',
+        videoTitle: 'Introduction to Java – Architecture & Installation | Kunal Kushwaha',
         videoDuration: '35',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
         javaConceptTags: ['JVM', 'JDK', 'JRE', 'bytecode', 'classpath', 'platform independence'],
@@ -71,7 +74,7 @@ const topics = [
         moduleOrder: 1, order: 3,
         title: 'First Java Program & Datatypes',
         videoUrl: 'TAtrPoaJ7gc',
-        videoTitle: 'First Java Program â€“ Input/Output, Debugging and Datatypes | Kunal Kushwaha',
+        videoTitle: 'First Java Program – Input/Output, Debugging and Datatypes | Kunal Kushwaha',
         videoDuration: '55',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
         javaConceptTags: ['primitive types', 'variables', 'type casting', 'Scanner', 'System.out'],
@@ -113,12 +116,12 @@ const topics = [
         javaConceptTags: ['Big-O', 'Big-Theta', 'Big-Omega', 'complexity analysis', 'recurrence relation'],
     },
 
-    // â”€â”€ Module 2: Patterns (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 2: Patterns (3 topics) --------------------
     {
         moduleOrder: 2, order: 1,
         title: 'Star Patterns',
-        videoUrl: 'lsOOs5JEnRw',
-        videoTitle: 'Pattern Questions â€“ Star Patterns | Kunal Kushwaha',
+        videoUrl: 'xzstcj3Cuso',
+        videoTitle: 'Pattern Questions – Star Patterns | Kunal Kushwaha',
         videoDuration: '40',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
         javaConceptTags: ['nested loops', 'pattern printing', 'iteration', 'triangle', 'pyramid'],
@@ -126,7 +129,7 @@ const topics = [
     {
         moduleOrder: 2, order: 2,
         title: 'Number & Character Patterns',
-        videoUrl: 'vtU5k8rRnOg',
+        videoUrl: 'AAAVJB9Bz1Q',
         videoTitle: 'Number and Character Patterns | Kunal Kushwaha',
         videoDuration: '30',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
@@ -135,14 +138,14 @@ const topics = [
     {
         moduleOrder: 2, order: 3,
         title: 'Advanced Pattern Problems',
-        videoUrl: 'FZmbW0X6wQY',
+        videoUrl: 'y48leS-c06M',
         videoTitle: 'Advanced Pattern Problems | Kunal Kushwaha',
         videoDuration: '45',
         difficultyLevel: 'Medium', courseLevel: 'Beginner',
         javaConceptTags: ['diamond pattern', 'butterfly pattern', 'hollow patterns', 'spaces', 'nested loops'],
     },
 
-    // â”€â”€ Module 3: Arrays (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 3: Arrays (3 topics) --------------------
     {
         moduleOrder: 3, order: 1,
         title: '1D Arrays & ArrayList',
@@ -165,13 +168,13 @@ const topics = [
         moduleOrder: 3, order: 3,
         title: 'Array Algorithms (Kadane, Two-Pointer)',
         videoUrl: 'sTdiMLom00U',
-        videoTitle: 'Recursion â€“ Array Problems | Kunal Kushwaha',
+        videoTitle: 'Recursion – Array Problems | Kunal Kushwaha',
         videoDuration: '60',
         difficultyLevel: 'Medium', courseLevel: 'Beginner',
         javaConceptTags: ["Kadane's algorithm", 'two-pointer', 'sliding window', 'prefix sum', 'subarray'],
     },
 
-    // â”€â”€ Module 4: Strings (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 4: Strings (3 topics) --------------------
     {
         moduleOrder: 4, order: 1,
         title: 'String Basics & Immutability',
@@ -194,18 +197,18 @@ const topics = [
         moduleOrder: 4, order: 3,
         title: 'String Pattern Matching',
         videoUrl: 'gdifkIwCJyg',
-        videoTitle: 'Recursion â€“ String Problems | Kunal Kushwaha',
+        videoTitle: 'Recursion – String Problems | Kunal Kushwaha',
         videoDuration: '60',
         difficultyLevel: 'Hard', courseLevel: 'Beginner',
         javaConceptTags: ['KMP algorithm', 'anagram', 'pattern matching', 'palindrome', 'subsequence'],
     },
 
-    // â”€â”€ Module 5: Searching (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 5: Searching (3 topics) --------------------
     {
         moduleOrder: 5, order: 1,
         title: 'Linear Search',
         videoUrl: '_HRA37X8N_Q',
-        videoTitle: 'Linear Search Algorithm â€“ Theory + Code + Questions | Kunal Kushwaha',
+        videoTitle: 'Linear Search Algorithm – Theory + Code + Questions | Kunal Kushwaha',
         videoDuration: '28',
         difficultyLevel: 'Basic', courseLevel: 'Beginner',
         javaConceptTags: ['linear search', 'sequential search', 'O(n)', 'sentinel search'],
@@ -214,7 +217,7 @@ const topics = [
         moduleOrder: 5, order: 2,
         title: 'Binary Search',
         videoUrl: 'f6UU7V3szVw',
-        videoTitle: 'Binary Search Algorithm â€“ Theory + Code | Kunal Kushwaha',
+        videoTitle: 'Binary Search Algorithm – Theory + Code | Kunal Kushwaha',
         videoDuration: '58',
         difficultyLevel: 'Medium', courseLevel: 'Beginner',
         javaConceptTags: ['binary search', 'divide and conquer', 'sorted array', 'O(log n)', 'order-agnostic'],
@@ -223,21 +226,21 @@ const topics = [
         moduleOrder: 5, order: 3,
         title: 'Binary Search Interview Questions',
         videoUrl: 'W9QJ8HaRvJQ',
-        videoTitle: 'Binary Search Interview Questions â€“ Google, Facebook, Amazon | Kunal Kushwaha',
+        videoTitle: 'Binary Search Interview Questions – Google, Facebook, Amazon | Kunal Kushwaha',
         videoDuration: '70',
         difficultyLevel: 'Medium', courseLevel: 'Beginner',
         javaConceptTags: ['first/last occurrence', 'peak element', 'rotated array', 'search answer space'],
     },
 
-    // â”€â”€ Module 6: Sorting (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 6: Sorting (3 topics) --------------------
     {
         moduleOrder: 6, order: 1,
         title: 'Basic Sorting (Bubble, Selection, Insertion)',
         videoUrl: 'F5MZyqRp_IM',
-        videoTitle: 'Bubble Sort Algorithm â€“ Theory + Code | Kunal Kushwaha',
+        videoTitle: 'Bubble Sort Algorithm – Theory + Code | Kunal Kushwaha',
         videoDuration: '30',
         difficultyLevel: 'Basic', courseLevel: 'Intermediate',
-        javaConceptTags: ['bubble sort', 'selection sort', 'insertion sort', 'O(nÂ²)', 'stable sort'],
+        javaConceptTags: ['bubble sort', 'selection sort', 'insertion sort', 'O(n²)', 'stable sort'],
     },
     {
         moduleOrder: 6, order: 2,
@@ -258,7 +261,7 @@ const topics = [
         javaConceptTags: ['counting sort', 'radix sort', 'cyclic sort', 'non-comparison sort', 'O(n)'],
     },
 
-    // â”€â”€ Module 7: Recursion (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 7: Recursion (3 topics) --------------------
     {
         moduleOrder: 7, order: 1,
         title: 'Recursion Fundamentals',
@@ -272,7 +275,7 @@ const topics = [
         moduleOrder: 7, order: 2,
         title: 'Recursive Problem Solving',
         videoUrl: 'JxILxTwHukM',
-        videoTitle: 'Recursion â€“ Subset, Permutation, Dice Throw | Kunal Kushwaha',
+        videoTitle: 'Recursion – Subset, Permutation, Dice Throw | Kunal Kushwaha',
         videoDuration: '70',
         difficultyLevel: 'Medium', courseLevel: 'Intermediate',
         javaConceptTags: ['subsets', 'permutations', 'dice throw', 'recursion tree', 'power set'],
@@ -281,18 +284,18 @@ const topics = [
         moduleOrder: 7, order: 3,
         title: 'Backtracking (N-Queens, Sudoku)',
         videoUrl: 'nC1rbW2YSz0',
-        videoTitle: 'Backtracking â€“ N-Queens, N-Knights, Sudoku Solver | Kunal Kushwaha',
+        videoTitle: 'Backtracking – N-Queens, N-Knights, Sudoku Solver | Kunal Kushwaha',
         videoDuration: '75',
         difficultyLevel: 'Hard', courseLevel: 'Intermediate',
         javaConceptTags: ['backtracking', 'N-Queens', 'Sudoku', 'pruning', 'state space', 'constraint satisfaction'],
     },
 
-    // â”€â”€ Module 8: Linked Lists (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 8: Linked Lists (3 topics) --------------------
     {
         moduleOrder: 8, order: 1,
         title: 'Singly Linked List',
         videoUrl: '58YbpRDc4yw',
-        videoTitle: 'Linked List â€“ Singly, Doubly, Circular | Kunal Kushwaha',
+        videoTitle: 'Linked List – Singly, Doubly, Circular | Kunal Kushwaha',
         videoDuration: '120',
         difficultyLevel: 'Medium', courseLevel: 'Intermediate',
         javaConceptTags: ['singly linked list', 'node', 'head', 'tail', 'insertion', 'deletion', 'traversal'],
@@ -301,7 +304,7 @@ const topics = [
         moduleOrder: 8, order: 2,
         title: 'Doubly Linked List & Reversal',
         videoUrl: '70tx7KcMROc',
-        videoTitle: 'Linked List â€“ Fast Slow Pointer, Cycle Detection, Reversal | Kunal Kushwaha',
+        videoTitle: 'Linked List – Fast Slow Pointer, Cycle Detection, Reversal | Kunal Kushwaha',
         videoDuration: '90',
         difficultyLevel: 'Medium', courseLevel: 'Intermediate',
         javaConceptTags: ['doubly linked list', 'prev pointer', 'fast-slow pointer', 'reversal', 'recursion on LL'],
@@ -310,13 +313,13 @@ const topics = [
         moduleOrder: 8, order: 3,
         title: 'Circular Linked List & Cycle Detection',
         videoUrl: 'zg5v2rlV1tM',
-        videoTitle: 'Backtracking â€“ Maze Problems | Kunal Kushwaha',
+        videoTitle: 'Backtracking – Maze Problems | Kunal Kushwaha',
         videoDuration: '60',
         difficultyLevel: 'Hard', courseLevel: 'Intermediate',
         javaConceptTags: ["circular linked list", "Floyd's algorithm", 'cycle detection', 'slow-fast pointers', 'entry point'],
     },
 
-    // â”€â”€ Module 9: Stack & Queue (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 9: Stack & Queue (3 topics) --------------------
     {
         moduleOrder: 9, order: 1,
         title: 'Stack Implementation',
@@ -345,12 +348,12 @@ const topics = [
         javaConceptTags: ['deque', 'ArrayDeque', 'PriorityQueue', 'min-heap', 'max-heap', 'Comparator'],
     },
 
-    // â”€â”€ Module 10: Trees (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 10: Trees (3 topics) --------------------
     {
         moduleOrder: 10, order: 1,
         title: 'Binary Tree Fundamentals',
         videoUrl: '4s1Tcvm00pA',
-        videoTitle: 'Trees â€“ Introduction | Kunal Kushwaha',
+        videoTitle: 'Trees – Introduction | Kunal Kushwaha',
         videoDuration: '85',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['binary tree', 'node', 'root', 'leaf', 'height', 'depth', 'level order', 'BFS', 'DFS'],
@@ -359,7 +362,7 @@ const topics = [
         moduleOrder: 10, order: 2,
         title: 'Binary Search Tree',
         videoUrl: '9D-vP-jcc-Y',
-        videoTitle: 'BST â€“ Interview Questions | Kunal Kushwaha',
+        videoTitle: 'BST – Interview Questions | Kunal Kushwaha',
         videoDuration: '75',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['BST', 'insertion', 'deletion', 'search', 'inorder', 'successor', 'validate BST'],
@@ -368,18 +371,18 @@ const topics = [
         moduleOrder: 10, order: 3,
         title: 'Tree Traversals & Views',
         videoUrl: 'Qdr3ohMSxBo',
-        videoTitle: 'Tree Traversals â€“ DFS, BFS, Views | Coding Ninjas Java supplement',
+        videoTitle: 'Tree Traversals – DFS, BFS, Views | Coding Ninjas Java supplement',
         videoDuration: '70',
         difficultyLevel: 'Hard', courseLevel: 'Advanced',
         javaConceptTags: ['inorder', 'preorder', 'postorder', 'level-order', 'left view', 'right view', 'top view', 'bottom view'],
     },
 
-    // â”€â”€ Module 11: Heaps & Hashing (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 11: Heaps & Hashing (3 topics) --------------------
     {
         moduleOrder: 11, order: 1,
         title: 'Heap Data Structure',
         videoUrl: 'CVA85JuJEn0',
-        videoTitle: 'Heaps â€“ Introduction & Heap Sort | Kunal Kushwaha',
+        videoTitle: 'Heaps – Introduction & Heap Sort | Kunal Kushwaha',
         videoDuration: '80',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['heap', 'min-heap', 'max-heap', 'heapify', 'heap sort', 'priority queue', 'k-way merge'],
@@ -388,7 +391,7 @@ const topics = [
         moduleOrder: 11, order: 2,
         title: 'HashMap & HashSet Internals',
         videoUrl: 'XLbvmMz8Fr8',
-        videoTitle: 'HashMap Internals â€“ Hashing in Java | Kunal Kushwaha',
+        videoTitle: 'HashMap Internals – Hashing in Java | Kunal Kushwaha',
         videoDuration: '75',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['HashMap', 'HashSet', 'hashing', 'collision', 'chaining', 'load factor', 'open addressing'],
@@ -403,12 +406,12 @@ const topics = [
         javaConceptTags: ['Rabin-Karp', 'rolling hash', 'polynomial hash', 'string hashing', 'pattern search'],
     },
 
-    // â”€â”€ Module 12: Graphs (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 12: Graphs (3 topics) --------------------
     {
         moduleOrder: 12, order: 1,
         title: 'Graph Representation',
         videoUrl: 'gDGw0cvFXPQ',
-        videoTitle: 'Graph Representation â€“ Adjacency List & Matrix | Java supplement',
+        videoTitle: 'Graph Representation – Adjacency List & Matrix | Java supplement',
         videoDuration: '40',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['adjacency matrix', 'adjacency list', 'directed graph', 'undirected graph', 'weighted graph', 'edge list'],
@@ -417,7 +420,7 @@ const topics = [
         moduleOrder: 12, order: 2,
         title: 'BFS & DFS',
         videoUrl: '9RHO6jU--Ss',
-        videoTitle: 'BFS and DFS in Graphs â€“ Java | Kunal Kushwaha supplement',
+        videoTitle: 'BFS and DFS in Graphs – Java | Kunal Kushwaha supplement',
         videoDuration: '65',
         difficultyLevel: 'Medium', courseLevel: 'Advanced',
         javaConceptTags: ['BFS', 'DFS', 'visited array', 'queue', 'stack', 'connected components', 'topological sort'],
@@ -432,7 +435,7 @@ const topics = [
         javaConceptTags: ["Dijkstra", 'shortest path', 'priority queue', 'relaxation', 'weighted graph', 'greedy'],
     },
 
-    // â”€â”€ Module 13: DP (3 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 13: DP (3 topics) --------------------
     {
         moduleOrder: 13, order: 1,
         title: 'DP Fundamentals',
@@ -446,7 +449,7 @@ const topics = [
         moduleOrder: 13, order: 2,
         title: 'Knapsack & Subset DP',
         videoUrl: '4eFBBVGNzLo',
-        videoTitle: '0/1 Knapsack â€“ Dynamic Programming | Java supplement',
+        videoTitle: '0/1 Knapsack – Dynamic Programming | Java supplement',
         videoDuration: '60',
         difficultyLevel: 'Hard', courseLevel: 'Advanced',
         javaConceptTags: ['0/1 knapsack', 'subset sum', 'unbounded knapsack', 'partition equal subset', 'target sum'],
@@ -455,13 +458,13 @@ const topics = [
         moduleOrder: 13, order: 3,
         title: 'DP on Strings & Grid',
         videoUrl: 'guzgnCSafg4',
-        videoTitle: 'DP on Strings â€“ LCS, Edit Distance, Grid DP | Java supplement',
+        videoTitle: 'DP on Strings – LCS, Edit Distance, Grid DP | Java supplement',
         videoDuration: '65',
         difficultyLevel: 'Hard', courseLevel: 'Advanced',
         javaConceptTags: ['LCS', 'edit distance', 'grid DP', 'coin change', 'longest palindromic subsequence'],
     },
 
-    // â”€â”€ Module 14: Advanced DSA (4 topics) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 14: Advanced DSA (4 topics) --------------------
     {
         moduleOrder: 14, order: 1,
         title: 'Tries (Prefix Trees)',
@@ -493,7 +496,7 @@ const topics = [
         moduleOrder: 14, order: 4,
         title: "Mo's Algorithm",
         videoUrl: 'Mp5Dk95G8Ik',
-        videoTitle: "Mo's Algorithm â€“ Offline Range Queries | Java supplement",
+        videoTitle: "Mo's Algorithm – Offline Range Queries | Java supplement",
         videoDuration: '50',
         difficultyLevel: 'Hard', courseLevel: 'Advanced',
         javaConceptTags: ["Mo's algorithm", 'offline queries', 'block decomposition', 'sqrt decomposition', 'range queries'],
@@ -587,22 +590,20 @@ const buildLearningAssets = (topic, isCodingRelevant) => {
     ];
 };
 
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  MCQs  (10 per topic = 470 total)
+// ============================================================================
+//  MCQs (10 per topic = 470 total)
 //  Distribution per topic: 4 Basic, 4 Medium, 2 Hard
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ============================================================================
 const mcqs = [
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 1 â€“ FUNDAMENTALS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 1 – FUNDAMENTALS --------------------
 
-    // Topic 1.1 â€“ Flowcharts & Pseudocode
+    // Topic 1.1 – Flowcharts & Pseudocode
     {
         moduleOrder: 1, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['flowchart', 'symbols'],
         question: 'Which symbol is used to represent a decision in a flowchart?',
         options: ['Rectangle', 'Oval', 'Diamond', 'Parallelogram'], correctAnswer: 2,
-        explanation: 'In Kunal\'s video, a diamond shape represents a decision (yes/no branch) in a flowchart.'
+        explanation: "In Kunal's video, a diamond shape represents a decision (yes/no branch) in a flowchart."
     },
     {
         moduleOrder: 1, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['flowchart', 'start-stop'],
@@ -630,9 +631,9 @@ const mcqs = [
     },
     {
         moduleOrder: 1, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['flowchart', 'primes'],
-        question: 'In the prime-number flowchart from Kunal\'s video, what is the role of the divisor loop?',
-        options: ['Print all numbers', 'Check divisibility from 2 to âˆšn', 'Add all factors', 'Count even numbers'], correctAnswer: 1,
-        explanation: 'The video\'s prime flowchart iterates divisors from 2 up to âˆšn to check divisibility.'
+        question: "In the prime-number flowchart from Kunal's video, what is the role of the divisor loop?",
+        options: ['Print all numbers', 'Check divisibility from 2 to √n', 'Add all factors', 'Count even numbers'], correctAnswer: 1,
+        explanation: 'The video\'s prime flowchart iterates divisors from 2 up to √n to check divisibility.'
     },
     {
         moduleOrder: 1, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['algorithm', 'flowchart'],
@@ -644,12 +645,12 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['pseudocode', 'structure'],
         question: 'Why is pseudocode preferred over actual code for initial algorithm design?',
         options: ['It runs faster', 'It is language-independent and readable', 'It is compiled', 'It uses less memory'], correctAnswer: 1,
-        explanation: 'Pseudocode abstracts syntax details, letting us focus on logic â€“ a key point from Kunal\'s introduction.'
+        explanation: 'Pseudocode abstracts syntax details, letting us focus on logic – a key point from Kunal\'s introduction.'
     },
     {
         moduleOrder: 1, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['flowchart', 'complexity'],
         question: 'A flowchart has a decision diamond with two branches, each containing a loop of n steps. What is the overall time complexity?',
-        options: ['O(1)', 'O(n)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 1,
+        options: ['O(1)', 'O(n)', 'O(n²)', 'O(log n)'], correctAnswer: 1,
         explanation: 'Only one branch of a decision executes; each branch has O(n) steps, so overall complexity is O(n).'
     },
     {
@@ -659,7 +660,7 @@ const mcqs = [
         explanation: 'Pseudocode is not compiled at all; its benefit is clarity and language independence, not execution speed.'
     },
 
-    // Topic 1.2 â€“ Java Architecture & Setup
+    // Topic 1.2 – Java Architecture & Setup
     {
         moduleOrder: 1, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['JVM', 'bytecode'],
         question: 'What does JVM stand for?',
@@ -676,7 +677,7 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['bytecode', 'platform'],
         question: 'Java achieves platform independence through:',
         options: ['Native compilation', 'Bytecode and JVM', 'Direct OS calls', 'C++ interop'], correctAnswer: 1,
-        explanation: 'Java source â†’ bytecode â†’ JVM interprets it on any OS, making it platform-independent per Kunal\'s explanation.'
+        explanation: 'Java source → bytecode → JVM interprets it on any OS, making it platform-independent per Kunal\'s explanation.'
     },
     {
         moduleOrder: 1, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['JRE'],
@@ -721,7 +722,7 @@ const mcqs = [
         explanation: 'Each thread has its own Stack that stores local variables and method call frames; the Heap stores objects.'
     },
 
-    // Topic 1.3 â€“ First Java Program & Datatypes
+    // Topic 1.3 – First Java Program & Datatypes
     {
         moduleOrder: 1, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['main method'],
         question: 'What is the correct signature of the main method in Java?',
@@ -761,7 +762,7 @@ const mcqs = [
     {
         moduleOrder: 1, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['overflow'],
         question: 'What happens if you store 2147483648 in an int variable?',
-        options: ['Compile error', 'Runtime exception', 'Overflow â€“ wraps to negative', 'Truncation'], correctAnswer: 2,
+        options: ['Compile error', 'Runtime exception', 'Overflow – wraps to negative', 'Truncation'], correctAnswer: 2,
         explanation: 'Integer overflow causes wraparound. 2147483647 + 1 wraps to -2147483648 (MIN_VALUE).'
     },
     {
@@ -774,7 +775,7 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['implicit-casting'],
         question: 'Which assignment causes an implicit narrowing warning/error?',
         options: ['double d = 5;', 'float f = 5.0f;', 'byte b = 130;', 'long l = 5;'], correctAnswer: 2,
-        explanation: '130 exceeds byte\'s range (âˆ’128 to 127), causing a compile-time narrowing conversion error.'
+        explanation: '130 exceeds byte\'s range (−128 to 127), causing a compile-time narrowing conversion error.'
     },
     {
         moduleOrder: 1, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['unicode', 'char'],
@@ -783,7 +784,7 @@ const mcqs = [
         explanation: 'char 65 corresponds to ASCII/Unicode \'A\'. Printing a char shows the character, not the number.'
     },
 
-    // Topic 1.4 â€“ Conditionals & Loops
+    // Topic 1.4 – Conditionals & Loops
     {
         moduleOrder: 1, topicOrder: 4, difficulty: 'Basic', questionType: 'conceptual', tags: ['if-else'],
         question: 'Which statement correctly uses if-else in Java?',
@@ -794,7 +795,7 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 4, difficulty: 'Basic', questionType: 'conceptual', tags: ['for-loop'],
         question: 'How many times does `for(int i=0;i<5;i++)` execute?',
         options: ['4', '5', '6', 'Infinite'], correctAnswer: 1,
-        explanation: 'The loop starts at 0, increments, and stops when i reaches 5 â€“ so it executes exactly 5 times (0,1,2,3,4).'
+        explanation: 'The loop starts at 0, increments, and stops when i reaches 5 – so it executes exactly 5 times (0,1,2,3,4).'
     },
     {
         moduleOrder: 1, topicOrder: 4, difficulty: 'Basic', questionType: 'conceptual', tags: ['while-loop'],
@@ -818,13 +819,13 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 4, difficulty: 'Medium', questionType: 'application', tags: ['nested-loops'],
         question: 'What is the total number of iterations for nested loops: outer 3, inner 4?',
         options: ['7', '12', '34', '81'], correctAnswer: 1,
-        explanation: 'Total iterations = outer Ã— inner = 3 Ã— 4 = 12.'
+        explanation: 'Total iterations = outer × inner = 3 × 4 = 12.'
     },
     {
         moduleOrder: 1, topicOrder: 4, difficulty: 'Medium', questionType: 'application', tags: ['switch'],
         question: 'In a switch statement, what happens if there is no `break` after a case?',
         options: ['Compile error', 'Only that case runs', 'Fall-through to next case', 'Loop restarts'], correctAnswer: 2,
-        explanation: 'Without a break, switch falls through to the next case â€“ Kunal demonstrates this with a calculator program.'
+        explanation: 'Without a break, switch falls through to the next case – Kunal demonstrates this with a calculator program.'
     },
     {
         moduleOrder: 1, topicOrder: 4, difficulty: 'Medium', questionType: 'reasoning', tags: ['continue'],
@@ -842,10 +843,10 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 4, difficulty: 'Hard', questionType: 'reasoning', tags: ['infinite-loop'],
         question: 'Which of the following creates an infinite loop?',
         options: ['for(int i=0;i<10;i++)', 'while(true)', 'for(;;)', 'Both B and C'], correctAnswer: 3,
-        explanation: 'Both `while(true)` and `for(;;)` create infinite loops â€“ common Java patterns.'
+        explanation: 'Both `while(true)` and `for(;;)` create infinite loops – common Java patterns.'
     },
 
-    // Topic 1.5 â€“ Functions & Methods
+    // Topic 1.5 – Functions & Methods
     {
         moduleOrder: 1, topicOrder: 5, difficulty: 'Basic', questionType: 'conceptual', tags: ['method', 'signature'],
         question: 'Which is a valid Java method signature?',
@@ -886,13 +887,13 @@ const mcqs = [
         moduleOrder: 1, topicOrder: 5, difficulty: 'Medium', questionType: 'reasoning', tags: ['pass-by-value'],
         question: 'In Java, primitive arguments are passed:',
         options: ['By reference', 'By pointer', 'By value', 'By name'], correctAnswer: 2,
-        explanation: 'Java always passes primitives by value â€“ changes inside the method don\'t affect the original variable.'
+        explanation: 'Java always passes primitives by value – changes inside the method don\'t affect the original variable.'
     },
     {
         moduleOrder: 1, topicOrder: 5, difficulty: 'Medium', questionType: 'reasoning', tags: ['shadowing'],
         question: 'Variable shadowing occurs when:',
         options: ['A local variable has the same name as a field', 'Two methods have the same name', 'A class has no constructor', 'An interface is not implemented'], correctAnswer: 0,
-        explanation: 'Shadowing is when a local variable name hides an instance/class variable â€“ covered in Kunal\'s scoping section.'
+        explanation: 'Shadowing is when a local variable name hides an instance/class variable – covered in Kunal\'s scoping section.'
     },
     {
         moduleOrder: 1, topicOrder: 5, difficulty: 'Hard', questionType: 'reasoning', tags: ['overloading', 'resolution'],
@@ -907,7 +908,7 @@ const mcqs = [
         explanation: 'Infinite recursion (missing base case) keeps pushing frames onto the call stack until it overflows.'
     },
 
-    // Topic 1.6 â€“ OOP
+    // Topic 1.6 – OOP
     {
         moduleOrder: 1, topicOrder: 6, difficulty: 'Basic', questionType: 'conceptual', tags: ['class', 'object'],
         question: 'A class in Java is best described as:',
@@ -969,12 +970,12 @@ const mcqs = [
         explanation: 'The diamond problem (ambiguous method resolution) is why Java disallows multiple class inheritance, using interfaces instead.'
     },
 
-    // Topic 1.7 â€“ Time & Space Complexity
+    // Topic 1.7 – Time & Space Complexity
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Basic', questionType: 'conceptual', tags: ['Big-O', 'O(1)'],
         question: 'O(1) time complexity means:',
         options: ['Linear time', 'Constant time', 'Logarithmic time', 'Quadratic time'], correctAnswer: 1,
-        explanation: 'O(1) means the operation takes constant time regardless of input size â€“ explained by Kunal at the start of the complexity video.'
+        explanation: 'O(1) means the operation takes constant time regardless of input size – explained by Kunal at the start of the complexity video.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Basic', questionType: 'conceptual', tags: ['Big-O', 'O(n)'],
@@ -985,8 +986,8 @@ const mcqs = [
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Basic', questionType: 'conceptual', tags: ['Big-O', 'O(log n)'],
         question: 'Binary Search has time complexity:',
-        options: ['O(n)', 'O(nÂ²)', 'O(log n)', 'O(n log n)'], correctAnswer: 2,
-        explanation: 'Binary Search halves the search space each step â†’ O(log n), a key example in Kunal\'s video.'
+        options: ['O(n)', 'O(n²)', 'O(log n)', 'O(n log n)'], correctAnswer: 2,
+        explanation: 'Binary Search halves the search space each step → O(log n), a key example in Kunal\'s video.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Basic', questionType: 'conceptual', tags: ['space-complexity'],
@@ -995,47 +996,45 @@ const mcqs = [
         explanation: 'Space complexity quantifies the amount of memory an algorithm uses relative to input size.'
     },
     {
-        moduleOrder: 1, topicOrder: 7, difficulty: 'Medium', questionType: 'application', tags: ['nested-loops', 'O(nÂ²)'],
+        moduleOrder: 1, topicOrder: 7, difficulty: 'Medium', questionType: 'application', tags: ['nested-loops', 'O(n²)'],
         question: 'Two nested loops each running n times give complexity:',
-        options: ['O(n)', 'O(n log n)', 'O(nÂ²)', 'O(2n)'], correctAnswer: 2,
-        explanation: 'Each outer iteration triggers n inner iterations â†’ total nÂ² operations â†’ O(nÂ²).'
+        options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(2n)'], correctAnswer: 2,
+        explanation: 'Each outer iteration triggers n inner iterations → total n² operations → O(n²).'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Medium', questionType: 'application', tags: ['Big-Omega'],
-        question: 'Big-Omega (Î©) notation represents:',
+        question: 'Big-Omega (Ω) notation represents:',
         options: ['Upper bound', 'Exact bound', 'Lower bound', 'Average case'], correctAnswer: 2,
-        explanation: 'Î© gives the lower bound (best case) on an algorithm\'s growth rate.'
+        explanation: 'Ω gives the lower bound (best case) on an algorithm\'s growth rate.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Medium', questionType: 'reasoning', tags: ['Big-Theta'],
-        question: 'Big-Theta (Î˜) notation means:',
+        question: 'Big-Theta (Θ) notation means:',
         options: ['Only upper bound', 'Only lower bound', 'Both upper and lower bound (tight bound)', 'Worst case only'], correctAnswer: 2,
-        explanation: 'Î˜ gives a tight bound â€“ the algorithm grows at exactly that rate, not faster or slower asymptotically.'
+        explanation: 'Θ gives a tight bound – the algorithm grows at exactly that rate, not faster or slower asymptotically.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Medium', questionType: 'reasoning', tags: ['drop-constants'],
-        question: 'Why do we drop constants in Big-O? e.g., O(2n) â†’ O(n)?',
+        question: 'Why do we drop constants in Big-O? e.g., O(2n) → O(n)?',
         options: ['Constants are always zero', 'For large n, constants become negligible', 'It is a Java convention', 'JVM optimises constants'], correctAnswer: 1,
         explanation: 'Big-O describes growth rate for large inputs; constant factors don\'t affect the growth rate trend.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Hard', questionType: 'reasoning', tags: ['recurrence'],
         question: 'T(n) = T(n/2) + O(1) solves to:',
-        options: ['O(n)', 'O(log n)', 'O(n log n)', 'O(nÂ²)'], correctAnswer: 1,
+        options: ['O(n)', 'O(log n)', 'O(n log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'This recurrence (binary search pattern) solves to O(log n) by the master theorem / substitution method.'
     },
     {
         moduleOrder: 1, topicOrder: 7, difficulty: 'Hard', questionType: 'reasoning', tags: ['merge-sort-complexity'],
         question: 'T(n) = 2T(n/2) + O(n) solves to:',
-        options: ['O(n)', 'O(n log n)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 1,
+        options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'], correctAnswer: 1,
         explanation: 'This is the merge sort recurrence; by Master Theorem case 2, it solves to O(n log n).'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 2 â€“ PATTERNS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 2 – PATTERNS --------------------
 
-    // Topic 2.1 â€“ Star Patterns
+    // Topic 2.1 – Star Patterns
     {
         moduleOrder: 2, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['nested-loops', 'pattern'],
         question: 'To print a right-angle triangle of stars with n rows, how many loops are needed?',
@@ -1046,7 +1045,7 @@ const mcqs = [
         moduleOrder: 2, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['inner-loop', 'stars'],
         question: 'For row `i` (1-indexed) in a right-angle triangle, how many stars are printed?',
         options: ['n-i', 'i', 'n', 'i*i'], correctAnswer: 1,
-        explanation: 'Row i has exactly i stars. This is the fundamental pattern: row 1 â†’ 1 star, row 2 â†’ 2 stars, etc.'
+        explanation: 'Row i has exactly i stars. This is the fundamental pattern: row 1 → 1 star, row 2 → 2 stars, etc.'
     },
     {
         moduleOrder: 2, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['System.out'],
@@ -1069,8 +1068,8 @@ const mcqs = [
     {
         moduleOrder: 2, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['nested-loops', 'complexity'],
         question: 'Time complexity of printing an n-row star triangle is:',
-        options: ['O(n)', 'O(nÂ²)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
-        explanation: 'Total stars printed = 1+2+...+n = n(n+1)/2 â‰ˆ O(nÂ²).'
+        options: ['O(n)', 'O(n²)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
+        explanation: 'Total stars printed = 1+2+...+n = n(n+1)/2 ≈ O(n²).'
     },
     {
         moduleOrder: 2, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['loop-structure'],
@@ -1097,7 +1096,7 @@ const mcqs = [
         explanation: 'Building each row in a StringBuilder and printing once per row minimises I/O calls and is more efficient.'
     },
 
-    // Topic 2.2 â€“ Number & Character Patterns
+    // Topic 2.2 – Number & Character Patterns
     {
         moduleOrder: 2, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['char-arithmetic', 'ASCII'],
         question: 'The ASCII value of \'A\' is:',
@@ -1131,7 +1130,7 @@ const mcqs = [
     {
         moduleOrder: 2, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['palindrome-row'],
         question: 'Floyd\'s triangle row i contains numbers from:',
-        options: ['1 to i', 'iÂ² to (i+1)Â²', 'A sequence of i consecutive integers continuing from previous row', 'Powers of 2'], correctAnswer: 2,
+        options: ['1 to i', 'i² to (i+1)²', 'A sequence of i consecutive integers continuing from previous row', 'Powers of 2'], correctAnswer: 2,
         explanation: 'Floyd\'s triangle fills consecutive integers row by row; each row continues from where the last left off.'
     },
     {
@@ -1149,7 +1148,7 @@ const mcqs = [
     {
         moduleOrder: 2, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['number-pattern', 'complexity'],
         question: 'Printing an n-row number pattern (row i has i numbers) has space complexity:',
-        options: ['O(nÂ²)', 'O(n)', 'O(1)', 'O(n log n)'], correctAnswer: 2,
+        options: ['O(n²)', 'O(n)', 'O(1)', 'O(n log n)'], correctAnswer: 2,
         explanation: 'If printed directly without storing, space complexity is O(1) (only loop variables needed).'
     },
     {
@@ -1159,7 +1158,7 @@ const mcqs = [
         explanation: 'Print ascending 1 to i, then descending i-1 to 1, effectively mirroring the row.'
     },
 
-    // Topic 2.3 â€“ Advanced Pattern Problems
+    // Topic 2.3 – Advanced Pattern Problems
     {
         moduleOrder: 2, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['butterfly', 'pattern'],
         question: 'A butterfly pattern is formed by:',
@@ -1168,7 +1167,7 @@ const mcqs = [
     },
     {
         moduleOrder: 2, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['hollow-square'],
-        question: 'In a hollow nÃ—n square, stars appear at:',
+        question: 'In a hollow n×n square, stars appear at:',
         options: ['All cells', 'Only corners', 'First row, last row, first col, last col', 'Diagonal only'], correctAnswer: 2,
         explanation: 'A hollow square prints stars only on the border: first/last row and first/last column.'
     },
@@ -1198,9 +1197,9 @@ const mcqs = [
     },
     {
         moduleOrder: 2, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['pattern-complexity'],
-        question: 'Time complexity of printing a full nÃ—n square pattern is:',
-        options: ['O(n)', 'O(nÂ²)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
-        explanation: 'An nÃ—n grid has nÂ² cells to print, giving O(nÂ²) time complexity.'
+        question: 'Time complexity of printing a full n×n square pattern is:',
+        options: ['O(n)', 'O(n²)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
+        explanation: 'An n×n grid has n² cells to print, giving O(n²) time complexity.'
     },
     {
         moduleOrder: 2, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['condition-per-cell'],
@@ -1221,11 +1220,9 @@ const mcqs = [
         explanation: 'System.out.print has overhead per call; building the row in StringBuilder and printing once is more efficient.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 3 â€“ ARRAYS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 3 – ARRAYS --------------------
 
-    // Topic 3.1 â€“ 1D Arrays & ArrayList
+    // Topic 3.1 – 1D Arrays & ArrayList
     {
         moduleOrder: 3, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['array', 'declaration'],
         question: 'How do you declare an integer array of size 5 in Java?',
@@ -1242,7 +1239,7 @@ const mcqs = [
         moduleOrder: 3, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['ArrayList', 'dynamic'],
         question: 'ArrayList differs from a plain array because:',
         options: ['ArrayList is faster', 'ArrayList can grow dynamically', 'ArrayList stores only Strings', 'ArrayList is primitive'], correctAnswer: 1,
-        explanation: 'ArrayList automatically resizes (doubles capacity) when full, unlike fixed-size arrays â€“ shown in Kunal\'s video.'
+        explanation: 'ArrayList automatically resizes (doubles capacity) when full, unlike fixed-size arrays – shown in Kunal\'s video.'
     },
     {
         moduleOrder: 3, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['array', 'memory'],
@@ -1278,7 +1275,7 @@ const mcqs = [
         moduleOrder: 3, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['multi-dim', 'memory'],
         question: 'A 2D array int[3][4] in Java stores how many ints?',
         options: ['7', '12', '34', '24'], correctAnswer: 1,
-        explanation: '3 rows Ã— 4 columns = 12 integers total.'
+        explanation: '3 rows × 4 columns = 12 integers total.'
     },
     {
         moduleOrder: 3, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['arrays', 'clone'],
@@ -1287,16 +1284,16 @@ const mcqs = [
         explanation: 'This copies the reference, not the array contents; both a and b point to the same heap array.'
     },
 
-    // Topic 3.2 â€“ 2D Arrays & Matrix
+    // Topic 3.2 – 2D Arrays & Matrix
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['2D-array', 'matrix'],
         question: 'How do you access element at row 2, column 3 of a 2D array `m`?',
         options: ['m[3][2]', 'm[2][3]', 'm(2,3)', 'm.get(2,3)'], correctAnswer: 1,
-        explanation: '2D array access: `m[row][col]` â†’ `m[2][3]` for row 2, column 3 (0-indexed).'
+        explanation: '2D array access: `m[row][col]` → `m[2][3]` for row 2, column 3 (0-indexed).'
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['matrix', 'traverse'],
-        question: 'To traverse all elements of a 2D mÃ—n matrix, you need:',
+        question: 'To traverse all elements of a 2D m×n matrix, you need:',
         options: ['1 loop', '2 nested loops', '3 loops', 'Recursion'], correctAnswer: 1,
         explanation: 'Two nested loops iterate over rows (m) and columns (n) to visit each element.'
     },
@@ -1304,7 +1301,7 @@ const mcqs = [
         moduleOrder: 3, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['transpose'],
         question: 'Transpose of a matrix swaps:',
         options: ['Rows and rows', 'Columns and columns', 'Rows and columns', 'Diagonal elements'], correctAnswer: 2,
-        explanation: 'Transposing a matrix means mat[i][j] becomes mat[j][i] â€“ rows and columns are exchanged.'
+        explanation: 'Transposing a matrix means mat[i][j] becomes mat[j][i] – rows and columns are exchanged.'
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['binary-search-2D'],
@@ -1320,15 +1317,15 @@ const mcqs = [
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['matrix-rotation'],
-        question: 'To rotate a matrix 90Â° clockwise in-place, the steps are:',
+        question: 'To rotate a matrix 90° clockwise in-place, the steps are:',
         options: ['Transpose then reverse each row', 'Reverse rows then transpose', 'Sort each row', 'Reverse columns'], correctAnswer: 0,
-        explanation: '90Â° clockwise rotation = Transpose + Reverse each row. This is a classic in-place matrix trick.'
+        explanation: '90° clockwise rotation = Transpose + Reverse each row. This is a classic in-place matrix trick.'
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['spiral-order'],
-        question: 'Spiral order traversal of an mÃ—n matrix has time complexity:',
-        options: ['O(m+n)', 'O(mÃ—n)', 'O(mÂ²)', 'O(log(mÃ—n))'], correctAnswer: 1,
-        explanation: 'Every element is visited exactly once, giving O(mÃ—n) time complexity.'
+        question: 'Spiral order traversal of an m×n matrix has time complexity:',
+        options: ['O(m+n)', 'O(m×n)', 'O(m²)', 'O(log(m×n))'], correctAnswer: 1,
+        explanation: 'Every element is visited exactly once, giving O(m×n) time complexity.'
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['jagged-array'],
@@ -1338,18 +1335,18 @@ const mcqs = [
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['matrix-search-complexity'],
-        question: 'Binary search on an mÃ—n sorted matrix has time complexity:',
-        options: ['O(m+n)', 'O(log(mÃ—n))', 'O(mÃ—n)', 'O(m log n)'], correctAnswer: 1,
-        explanation: 'Treating the matrix as a 1D array of size mÃ—n and binary-searching gives O(log(mÃ—n)).'
+        question: 'Binary search on an m×n sorted matrix has time complexity:',
+        options: ['O(m+n)', 'O(log(m×n))', 'O(m×n)', 'O(m log n)'], correctAnswer: 1,
+        explanation: 'Treating the matrix as a 1D array of size m×n and binary-searching gives O(log(m×n)).'
     },
     {
         moduleOrder: 3, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['set-zeroes'],
         question: 'Set Matrix Zeroes (if element is 0, set row and column to 0) optimal space complexity is:',
-        options: ['O(mÃ—n)', 'O(m+n)', 'O(1)', 'O(log(mÃ—n))'], correctAnswer: 2,
+        options: ['O(m×n)', 'O(m+n)', 'O(1)', 'O(log(m×n))'], correctAnswer: 2,
         explanation: 'Using the first row and column as markers gives O(1) extra space (classic trick).'
     },
 
-    // Topic 3.3 â€“ Array Algorithms (Kadane, Two-Pointer)
+    // Topic 3.3 – Array Algorithms (Kadane, Two-Pointer)
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ["Kadane's", 'max-subarray'],
         question: "Kadane's algorithm solves the:",
@@ -1371,7 +1368,7 @@ const mcqs = [
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['prefix-sum'],
         question: 'Prefix sum array allows range sum queries in:',
-        options: ['O(n) per query', 'O(1) per query after O(n) build', 'O(log n) per query', 'O(nÂ²) per query'], correctAnswer: 1,
+        options: ['O(n) per query', 'O(1) per query after O(n) build', 'O(log n) per query', 'O(n²) per query'], correctAnswer: 1,
         explanation: 'After O(n) build of prefix sum array, any range sum [l,r] = prefix[r] - prefix[l-1] in O(1).'
     },
     {
@@ -1389,14 +1386,14 @@ const mcqs = [
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['sliding-window', 'max-sum-k'],
         question: 'Max sum subarray of size k using sliding window has complexity:',
-        options: ['O(nÂ²)', 'O(n)', 'O(k)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Sliding window adds one element and removes one per step, giving O(n) instead of O(nÃ—k) brute force.'
+        options: ['O(n²)', 'O(n)', 'O(k)', 'O(n log n)'], correctAnswer: 1,
+        explanation: 'Sliding window adds one element and removes one per step, giving O(n) instead of O(n×k) brute force.'
     },
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['prefix-sum', '2D'],
         question: '2D prefix sum array enables submatrix sum queries in:',
-        options: ['O(mÃ—n)', 'O(1)', 'O(m+n)', 'O(mÃ—nÂ²)'], correctAnswer: 1,
-        explanation: '2D prefix sum allows O(1) submatrix sum queries after O(mÃ—n) build time.'
+        options: ['O(m×n)', 'O(1)', 'O(m+n)', 'O(m×n²)'], correctAnswer: 1,
+        explanation: '2D prefix sum allows O(1) submatrix sum queries after O(m×n) build time.'
     },
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ["Kadane's", 'circular'],
@@ -1407,15 +1404,13 @@ const mcqs = [
     {
         moduleOrder: 3, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['three-pointer', 'three-sum'],
         question: 'Three-sum problem complexity with sorting + two-pointer:',
-        options: ['O(n)', 'O(n log n)', 'O(nÂ²)', 'O(nÂ³)'], correctAnswer: 2,
-        explanation: 'Fix one element O(n), run two-pointer O(n) for each â†’ O(nÂ²) total. Much better than brute O(nÂ³).'
+        options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(n³)'], correctAnswer: 2,
+        explanation: 'Fix one element O(n), run two-pointer O(n) for each → O(n²) total. Much better than brute O(n³).'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 4 â€“ STRINGS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 4 – STRINGS --------------------
 
-    // Topic 4.1 â€“ String Basics & Immutability
+    // Topic 4.1 – String Basics & Immutability
     {
         moduleOrder: 4, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['String', 'immutable'],
         question: 'Why is String immutable in Java?',
@@ -1454,7 +1449,7 @@ const mcqs = [
         moduleOrder: 4, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['concatenation', 'performance'],
         question: 'Why is repeated String concatenation in a loop slow?',
         options: ['Strings are stored in stack', 'Each + creates a new String object due to immutability', 'Strings are encrypted', 'Java limits concatenation'], correctAnswer: 1,
-        explanation: 'Each `+` on Strings creates a new object; n concatenations â†’ O(nÂ²) total work due to copying.'
+        explanation: 'Each `+` on Strings creates a new object; n concatenations → O(n²) total work due to copying.'
     },
     {
         moduleOrder: 4, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['intern'],
@@ -1472,7 +1467,7 @@ const mcqs = [
         explanation: 'split() takes a regex; "\\\\." escapes the dot to match a literal period, splitting into ["a","b","c"].'
     },
 
-    // Topic 4.2 â€“ StringBuilder & StringBuffer
+    // Topic 4.2 – StringBuilder & StringBuffer
     {
         moduleOrder: 4, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['StringBuilder', 'mutable'],
         question: 'StringBuilder is mutable because:',
@@ -1512,7 +1507,7 @@ const mcqs = [
     {
         moduleOrder: 4, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['immutable-vs-mutable'],
         question: 'For building a long string in a loop, which is best?', options: ['String concatenation with +', 'StringBuilder', 'StringBuffer', 'String.format()'], correctAnswer: 1,
-        explanation: 'StringBuilder is O(n) for building a string; + operator is O(nÂ²) due to repeated object creation.'
+        explanation: 'StringBuilder is O(n) for building a string; + operator is O(n²) due to repeated object creation.'
     },
     {
         moduleOrder: 4, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['StringBuilder', 'toString'],
@@ -1521,11 +1516,11 @@ const mcqs = [
     },
     {
         moduleOrder: 4, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['StringBuilder', 'time-complexity'],
-        question: 'Time complexity of appending n characters one by one to StringBuilder:', options: ['O(nÂ²)', 'O(n)', 'O(1)', 'O(n log n)'], correctAnswer: 1,
+        question: 'Time complexity of appending n characters one by one to StringBuilder:', options: ['O(n²)', 'O(n)', 'O(1)', 'O(n log n)'], correctAnswer: 1,
         explanation: 'Each append is O(1) amortized (doubling strategy); n appends = O(n) total.'
     },
 
-    // Topic 4.3 â€“ String Pattern Matching
+    // Topic 4.3 – String Pattern Matching
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['anagram'],
         question: 'Two strings are anagrams if they:', options: ['Have same length', 'Contain same characters same number of times', 'Are equal', 'Have same prefix'], correctAnswer: 1,
@@ -1534,7 +1529,7 @@ const mcqs = [
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['palindrome'],
         question: 'A palindrome reads the same:', options: ['From left only', 'Forward and backward', 'When reversed partially', 'In any order'], correctAnswer: 1,
-        explanation: '"racecar" reversed is "racecar" â€“ reads the same forwards and backwards.'
+        explanation: '"racecar" reversed is "racecar" – reads the same forwards and backwards.'
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['KMP', 'failure-function'],
@@ -1543,8 +1538,8 @@ const mcqs = [
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['brute-force', 'pattern'],
-        question: 'Brute force string pattern matching has time complexity:', options: ['O(n)', 'O(nÃ—m)', 'O(n+m)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'For text length n and pattern length m, brute force checks every position: O(nÃ—m).'
+        question: 'Brute force string pattern matching has time complexity:', options: ['O(n)', 'O(n×m)', 'O(n+m)', 'O(n log n)'], correctAnswer: 1,
+        explanation: 'For text length n and pattern length m, brute force checks every position: O(n×m).'
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['anagram', 'frequency-array'],
@@ -1553,13 +1548,13 @@ const mcqs = [
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['KMP', 'complexity'],
-        question: 'KMP pattern matching time complexity is:', options: ['O(nÃ—m)', 'O(n+m)', 'O(n log n)', 'O(mÂ²)'], correctAnswer: 1,
+        question: 'KMP pattern matching time complexity is:', options: ['O(n×m)', 'O(n+m)', 'O(n log n)', 'O(m²)'], correctAnswer: 1,
         explanation: 'KMP preprocesses the pattern in O(m) and searches in O(n), total O(n+m).'
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['longest-palindrome', 'expand'],
-        question: "Expand around center approach for longest palindromic substring has complexity:", options: ['O(n)', 'O(nÂ²)', 'O(n log n)', 'O(nÂ³)'], correctAnswer: 1,
-        explanation: 'Expanding from each of the 2n-1 centers costs O(n) per center in the worst case â†’ O(nÂ²).'
+        question: "Expand around center approach for longest palindromic substring has complexity:", options: ['O(n)', 'O(n²)', 'O(n log n)', 'O(n³)'], correctAnswer: 1,
+        explanation: 'Expanding from each of the 2n-1 centers costs O(n) per center in the worst case → O(n²).'
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['subsequence'],
@@ -1573,15 +1568,13 @@ const mcqs = [
     },
     {
         moduleOrder: 4, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['Manacher', 'palindrome'],
-        question: "Manacher's algorithm finds all palindromic substrings in:", options: ['O(nÂ²)', 'O(n log n)', 'O(n)', 'O(nÂ³)'], correctAnswer: 2,
+        question: "Manacher's algorithm finds all palindromic substrings in:", options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(n³)'], correctAnswer: 2,
         explanation: "Manacher's algorithm uses previously computed palindrome lengths to achieve O(n) for all palindromic substrings."
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 5 â€“ SEARCHING
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 5 – SEARCHING --------------------
 
-    // Topic 5.1 â€“ Linear Search
+    // Topic 5.1 – Linear Search
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linear-search'],
         question: 'Linear search works on:', options: ['Only sorted arrays', 'Both sorted and unsorted arrays', 'Only linked lists', 'Only integers'], correctAnswer: 1,
@@ -1589,13 +1582,13 @@ const mcqs = [
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linear-search', 'complexity'],
-        question: 'Worst-case complexity of linear search on n elements:', options: ['O(log n)', 'O(n)', 'O(nÂ²)', 'O(1)'], correctAnswer: 1,
+        question: 'Worst-case complexity of linear search on n elements:', options: ['O(log n)', 'O(n)', 'O(n²)', 'O(1)'], correctAnswer: 1,
         explanation: 'In the worst case (element at end or not present), linear search checks all n elements: O(n).'
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linear-search', 'best-case'],
-        question: 'Best-case complexity of linear search:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(nÂ²)'], correctAnswer: 2,
-        explanation: 'If the target is the first element, it is found in O(1) â€“ best case.'
+        question: 'Best-case complexity of linear search:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'], correctAnswer: 2,
+        explanation: 'If the target is the first element, it is found in O(1) – best case.'
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['linear-search', 'not-found'],
@@ -1614,17 +1607,17 @@ const mcqs = [
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['linear-search', '2D'],
-        question: 'Linear search on a 2D mÃ—n array has complexity:', options: ['O(m+n)', 'O(mÃ—n)', 'O(m)', 'O(n)'], correctAnswer: 1,
-        explanation: 'Must visit all mÃ—n elements in the worst case.'
+        question: 'Linear search on a 2D m×n array has complexity:', options: ['O(m+n)', 'O(m×n)', 'O(m)', 'O(n)'], correctAnswer: 1,
+        explanation: 'Must visit all m×n elements in the worst case.'
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['linear-search', 'string'],
-        question: 'Linear search for a character in a String of length n:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
+        question: 'Linear search for a character in a String of length n:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'Scanning each character of the string is O(n).'
     },
     {
         moduleOrder: 5, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['linear-search', 'average-case'],
-        question: 'Average-case complexity of linear search (element present, uniform distribution):', options: ['O(1)', 'O(n/2) = O(n)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
+        question: 'Average-case complexity of linear search (element present, uniform distribution):', options: ['O(1)', 'O(n/2) = O(n)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'On average, the element is found after n/2 comparisons, which is still O(n).'
     },
     {
@@ -1633,7 +1626,7 @@ const mcqs = [
         explanation: 'In a sorted array, once current element exceeds target, target cannot be further right; terminate early.'
     },
 
-    // Topic 5.2 â€“ Binary Search
+    // Topic 5.2 – Binary Search
     {
         moduleOrder: 5, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['binary-search', 'requirement'],
         question: 'Binary search requires the array to be:', options: ['Unsorted', 'Sorted', 'Of even length', 'Non-empty'], correctAnswer: 1,
@@ -1651,8 +1644,8 @@ const mcqs = [
     },
     {
         moduleOrder: 5, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['binary-search', 'complexity'],
-        question: 'Time complexity of binary search:', options: ['O(n)', 'O(nÂ²)', 'O(log n)', 'O(1)'], correctAnswer: 2,
-        explanation: 'Each step halves the search space; after logâ‚‚(n) steps, one element remains.'
+        question: 'Time complexity of binary search:', options: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], correctAnswer: 2,
+        explanation: 'Each step halves the search space; after log₂(n) steps, one element remains.'
     },
     {
         moduleOrder: 5, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['order-agnostic'],
@@ -1676,16 +1669,16 @@ const mcqs = [
     },
     {
         moduleOrder: 5, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['sqrt', 'binary-search'],
-        question: 'Finding integer square root of n using binary search has complexity:', options: ['O(n)', 'O(log n)', 'O(âˆšn)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Binary search on [1, n] for floor(âˆšn) makes O(log n) iterations.'
+        question: 'Finding integer square root of n using binary search has complexity:', options: ['O(n)', 'O(log n)', 'O(√n)', 'O(n log n)'], correctAnswer: 1,
+        explanation: 'Binary search on [1, n] for floor(√n) makes O(log n) iterations.'
     },
     {
         moduleOrder: 5, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['rotated-sorted', 'binary-search'],
-        question: 'Binary search on a rotated sorted array requires:', options: ['O(n)', 'Identifying sorted half at each step â†’ O(log n)', 'Sorting first', 'Two passes'], correctAnswer: 1,
+        question: 'Binary search on a rotated sorted array requires:', options: ['O(n)', 'Identifying sorted half at each step → O(log n)', 'Sorting first', 'Two passes'], correctAnswer: 1,
         explanation: 'Check which half is sorted; target must be in the sorted half or the other half. Still O(log n).'
     },
 
-    // Topic 5.3 â€“ Binary Search Interview Questions
+    // Topic 5.3 – Binary Search Interview Questions
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['peak-element'],
         question: 'A peak element is one that is:', options: ['Maximum in array', 'Greater than its neighbours', 'Minimum in array', 'At index 0'], correctAnswer: 1,
@@ -1703,8 +1696,8 @@ const mcqs = [
     },
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['floor-ceil', 'binary-search'],
-        question: 'Floor of x in a sorted array is:', options: ['Smallest element > x', 'Largest element â‰¤ x', 'Exact match of x', 'Middle element'], correctAnswer: 1,
-        explanation: 'Floor(x) = largest element in array that is â‰¤ x. Ceiling(x) = smallest element â‰¥ x.'
+        question: 'Floor of x in a sorted array is:', options: ['Smallest element > x', 'Largest element ≤ x', 'Exact match of x', 'Middle element'], correctAnswer: 1,
+        explanation: 'Floor(x) = largest element in array that is ≤ x. Ceiling(x) = smallest element ≥ x.'
     },
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['minimum-rotated'],
@@ -1714,12 +1707,12 @@ const mcqs = [
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['kth-missing', 'binary-search'],
         question: 'Kth missing positive number can be solved with binary search on:', options: ['The array values', 'The answer space [1, arr[n-1]+k]', 'A hash set', 'Sorted pairs'], correctAnswer: 1,
-        explanation: 'Binary search on answer: check how many numbers â‰¤ mid are missing; narrow to find kth missing in O(log n).'
+        explanation: 'Binary search on answer: check how many numbers ≤ mid are missing; narrow to find kth missing in O(log n).'
     },
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['allocate-books', 'binary-search'],
         question: 'Allocate minimum pages (or painter\'s partition) uses binary search on:', options: ['Number of students', 'Answer space: max pages per student', 'Array of pages', 'Number of books'], correctAnswer: 1,
-        explanation: 'Binary search on [max_page, total_pages]; for each mid, check feasibility in O(n) â†’ O(n log n) total.'
+        explanation: 'Binary search on [max_page, total_pages]; for each mid, check feasibility in O(n) → O(n log n) total.'
     },
     {
         moduleOrder: 5, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['count-occurrences'],
@@ -1737,11 +1730,9 @@ const mcqs = [
         explanation: 'Binary search on the answer (minimum distance); for each candidate, greedily check placement feasibility.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 6 â€“ SORTING
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 6 – SORTING --------------------
 
-    // Topic 6.1 â€“ Basic Sorting
+    // Topic 6.1 – Basic Sorting
     {
         moduleOrder: 6, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['bubble-sort'],
         question: 'Bubble sort repeatedly:', options: ['Divides array in half', 'Swaps adjacent out-of-order elements', 'Inserts elements', 'Selects minimum'], correctAnswer: 1,
@@ -1754,12 +1745,12 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['insertion-sort'],
-        question: 'Insertion sort best-case complexity is:', options: ['O(nÂ²)', 'O(n log n)', 'O(n)', 'O(1)'], correctAnswer: 2,
-        explanation: 'Insertion sort on an already-sorted array makes no swaps, only n-1 comparisons â†’ O(n) best case.'
+        question: 'Insertion sort best-case complexity is:', options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(1)'], correctAnswer: 2,
+        explanation: 'Insertion sort on an already-sorted array makes no swaps, only n-1 comparisons → O(n) best case.'
     },
     {
         moduleOrder: 6, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['stable-sort'],
-        question: 'Which O(nÂ²) sort is stable?', options: ['Selection Sort', 'Bubble Sort and Insertion Sort', 'Bubble Sort only', 'None'], correctAnswer: 1,
+        question: 'Which O(n²) sort is stable?', options: ['Selection Sort', 'Bubble Sort and Insertion Sort', 'Bubble Sort only', 'None'], correctAnswer: 1,
         explanation: 'Both Bubble Sort and Insertion Sort are stable; equal elements maintain relative order. Selection Sort is not stable.'
     },
     {
@@ -1769,7 +1760,7 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['selection-sort', 'swaps'],
-        question: 'Selection sort makes at most ___ swaps for n elements:', options: ['nÂ²', 'n-1', 'n(n-1)/2', 'log n'], correctAnswer: 1,
+        question: 'Selection sort makes at most ___ swaps for n elements:', options: ['n²', 'n-1', 'n(n-1)/2', 'log n'], correctAnswer: 1,
         explanation: 'Selection sort swaps once per pass: at most n-1 swaps total, making it useful when writes are costly.'
     },
     {
@@ -1779,7 +1770,7 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['comparison', 'worst-case'],
-        question: 'Bubble Sort worst-case number of comparisons for n elements:', options: ['n', 'n-1', 'n(n-1)/2', 'nÂ²'], correctAnswer: 2,
+        question: 'Bubble Sort worst-case number of comparisons for n elements:', options: ['n', 'n-1', 'n(n-1)/2', 'n²'], correctAnswer: 2,
         explanation: 'n(n-1)/2 comparisons in the worst case (reverse sorted array) for Bubble Sort.'
     },
     {
@@ -1793,7 +1784,7 @@ const mcqs = [
         explanation: 'Each swap in bubble sort fixes one inversion; total swaps = total inversions = measure of sortedness.'
     },
 
-    // Topic 6.2 â€“ Advanced Sorting
+    // Topic 6.2 – Advanced Sorting
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['merge-sort', 'paradigm'],
         question: 'Merge Sort uses the paradigm:', options: ['Greedy', 'Divide and Conquer', 'Dynamic Programming', 'Backtracking'], correctAnswer: 1,
@@ -1806,13 +1797,13 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['merge-sort', 'stable'],
-        question: 'Merge Sort is:', options: ['Unstable, O(n log n)', 'Stable, O(n log n)', 'Stable, O(nÂ²)', 'Unstable, O(n)'], correctAnswer: 1,
+        question: 'Merge Sort is:', options: ['Unstable, O(n log n)', 'Stable, O(n log n)', 'Stable, O(n²)', 'Unstable, O(n)'], correctAnswer: 1,
         explanation: 'Merge Sort is stable (equal elements maintain order) with guaranteed O(n log n) time complexity.'
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['quick-sort', 'worst-case'],
-        question: 'Quick Sort worst-case time complexity:', options: ['O(n log n)', 'O(n)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 2,
-        explanation: 'When the pivot is always the smallest/largest element (sorted/reverse-sorted array), quick sort degrades to O(nÂ²).'
+        question: 'Quick Sort worst-case time complexity:', options: ['O(n log n)', 'O(n)', 'O(n²)', 'O(log n)'], correctAnswer: 2,
+        explanation: 'When the pivot is always the smallest/largest element (sorted/reverse-sorted array), quick sort degrades to O(n²).'
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['merge-sort', 'space'],
@@ -1831,13 +1822,13 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['merge-sort', 'inversion'],
-        question: 'Merge Sort can count inversions (out-of-order pairs) in:', options: ['O(nÂ²)', 'O(n log n)', 'O(n)', 'O(log n)'], correctAnswer: 1,
+        question: 'Merge Sort can count inversions (out-of-order pairs) in:', options: ['O(n²)', 'O(n log n)', 'O(n)', 'O(log n)'], correctAnswer: 1,
         explanation: 'During the merge step, when a right element is placed before left elements, add the count of remaining left elements as inversions.'
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['quick-sort', 'tail-recursion'],
         question: 'To reduce Quick Sort stack space to O(log n):', options: ['Use iterative approach only', 'Recurse on smaller partition first (tail-call optimisation)', 'Use merge instead', 'Add more pivots'], correctAnswer: 1,
-        explanation: 'Always recurse on the smaller subarray first; the larger part is handled iteratively â†’ O(log n) stack.'
+        explanation: 'Always recurse on the smaller subarray first; the larger part is handled iteratively → O(log n) stack.'
     },
     {
         moduleOrder: 6, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['three-way-partition'],
@@ -1845,7 +1836,7 @@ const mcqs = [
         explanation: 'Three-way partition groups equal elements, making Quick Sort O(n log n) even with many duplicates.'
     },
 
-    // Topic 6.3 â€“ Specialised Sorting
+    // Topic 6.3 – Specialised Sorting
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['counting-sort'],
         question: 'Counting Sort works by:', options: ['Comparing elements', 'Counting frequency of each distinct value', 'Dividing and merging', 'Finding pivot'], correctAnswer: 1,
@@ -1868,18 +1859,18 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['counting-sort', 'complexity'],
-        question: 'Counting Sort time complexity (n elements, range k):', options: ['O(n log n)', 'O(n + k)', 'O(n Ã— k)', 'O(k log k)'], correctAnswer: 1,
-        explanation: 'O(n) to count + O(k) to build output = O(n+k). When k=O(n), this is O(n) â€“ better than comparison sorts.'
+        question: 'Counting Sort time complexity (n elements, range k):', options: ['O(n log n)', 'O(n + k)', 'O(n × k)', 'O(k log k)'], correctAnswer: 1,
+        explanation: 'O(n) to count + O(k) to build output = O(n+k). When k=O(n), this is O(n) – better than comparison sorts.'
     },
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['radix-sort', 'complexity'],
-        question: 'Radix Sort time complexity for n numbers with d digits (base k):', options: ['O(n log n)', 'O(d Ã— (n + k))', 'O(n Ã— d)', 'O(nÂ²)'], correctAnswer: 1,
-        explanation: 'd passes, each O(n+k) counting sort â†’ O(d(n+k)). For fixed d and k, this is O(n).'
+        question: 'Radix Sort time complexity for n numbers with d digits (base k):', options: ['O(n log n)', 'O(d × (n + k))', 'O(n × d)', 'O(n²)'], correctAnswer: 1,
+        explanation: 'd passes, each O(n+k) counting sort → O(d(n+k)). For fixed d and k, this is O(n).'
     },
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['non-comparison', 'lower-bound'],
         question: 'Why can non-comparison sorts beat the O(n log n) lower bound?', options: ['They use more space', 'They exploit domain-specific structure of keys (not just comparisons)', 'They are incorrect', 'JVM optimisation'], correctAnswer: 1,
-        explanation: 'The Î©(n log n) lower bound applies only to comparison-based sorts. Non-comparison sorts use more information about the data.'
+        explanation: 'The Ω(n log n) lower bound applies only to comparison-based sorts. Non-comparison sorts use more information about the data.'
     },
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['bucket-sort'],
@@ -1893,15 +1884,13 @@ const mcqs = [
     },
     {
         moduleOrder: 6, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['cyclic-sort', 'duplicates'],
-        question: 'Finding all duplicates in [1,n] array using Cyclic Sort runs in:', options: ['O(nÂ²)', 'O(n)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
+        question: 'Finding all duplicates in [1,n] array using Cyclic Sort runs in:', options: ['O(n²)', 'O(n)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
         explanation: 'Cyclic Sort places each number at its correct index in O(n). A second scan identifies duplicates in O(n).'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 7 â€“ RECURSION
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 7 – RECURSION --------------------
 
-    // Topic 7.1 â€“ Recursion Fundamentals
+    // Topic 7.1 – Recursion Fundamentals
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['recursion', 'base-case'],
         question: 'What is the base case in recursion?', options: ['The recursive call', 'The condition that stops recursion', 'The return type', 'The first call'], correctAnswer: 1,
@@ -1915,12 +1904,12 @@ const mcqs = [
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['factorial', 'recursion'],
         question: 'Factorial of n recursively: factorial(n) = ?', options: ['n + factorial(n-1)', 'n * factorial(n-1)', 'factorial(n-1) / n', 'n - factorial(n-1)'], correctAnswer: 1,
-        explanation: 'factorial(n) = n Ã— factorial(n-1), with base case factorial(0) = 1.'
+        explanation: 'factorial(n) = n × factorial(n-1), with base case factorial(0) = 1.'
     },
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['fibonacci', 'recursion'],
-        question: 'Naive recursive Fibonacci has time complexity:', options: ['O(n)', 'O(n log n)', 'O(2â¿)', 'O(nÂ²)'], correctAnswer: 2,
-        explanation: 'Each call branches into two, leading to exponential O(2â¿) calls without memoization.'
+        question: 'Naive recursive Fibonacci has time complexity:', options: ['O(n)', 'O(n log n)', 'O(2ⁿ)', 'O(n²)'], correctAnswer: 2,
+        explanation: 'Each call branches into two, leading to exponential O(2ⁿ) calls without memoization.'
     },
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['tail-recursion'],
@@ -1939,8 +1928,8 @@ const mcqs = [
     },
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['power', 'recursion'],
-        question: 'Efficient power(x, n) using recursion has complexity:', options: ['O(n)', 'O(log n)', 'O(nÂ²)', 'O(1)'], correctAnswer: 1,
-        explanation: 'Fast exponentiation: power(x, n) = power(xÂ², n/2) if n even, x * power(x, n-1) if odd â†’ O(log n).'
+        question: 'Efficient power(x, n) using recursion has complexity:', options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'], correctAnswer: 1,
+        explanation: 'Fast exponentiation: power(x, n) = power(x², n/2) if n even, x * power(x, n-1) if odd → O(log n).'
     },
     {
         moduleOrder: 7, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['mutual-recursion'],
@@ -1953,21 +1942,21 @@ const mcqs = [
         explanation: 'Converting recursive DFS/traversals to iteration requires an explicit stack to replicate the call stack behaviour.'
     },
 
-    // Topic 7.2 â€“ Recursive Problem Solving
+    // Topic 7.2 – Recursive Problem Solving
     {
         moduleOrder: 7, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['subsets', 'power-set'],
-        question: 'Number of subsets of a set with n elements:', options: ['n', 'nÂ²', '2â¿', 'n!'], correctAnswer: 2,
-        explanation: 'Each element is either in or out of a subset â†’ 2 choices per element â†’ 2â¿ total subsets.'
+        question: 'Number of subsets of a set with n elements:', options: ['n', 'n²', '2ⁿ', 'n!'], correctAnswer: 2,
+        explanation: 'Each element is either in or out of a subset → 2 choices per element → 2ⁿ total subsets.'
     },
     {
         moduleOrder: 7, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['permutations'],
-        question: 'Number of permutations of n distinct elements:', options: ['n', '2â¿', 'nÂ²', 'n!'], correctAnswer: 3,
+        question: 'Number of permutations of n distinct elements:', options: ['n', '2ⁿ', 'n²', 'n!'], correctAnswer: 3,
         explanation: 'n! permutations exist for n distinct elements.'
     },
     {
         moduleOrder: 7, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['Tower-of-Hanoi'],
-        question: 'Tower of Hanoi with n discs requires ___ moves:', options: ['nÂ²', '2â¿', '2â¿ - 1', 'n log n'], correctAnswer: 2,
-        explanation: 'Minimum moves = 2â¿ - 1; each disc requires moving all above it, leading to exponential moves.'
+        question: 'Tower of Hanoi with n discs requires ___ moves:', options: ['n²', '2ⁿ', '2ⁿ - 1', 'n log n'], correctAnswer: 2,
+        explanation: 'Minimum moves = 2ⁿ - 1; each disc requires moving all above it, leading to exponential moves.'
     },
     {
         moduleOrder: 7, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['dice-throw'],
@@ -2001,11 +1990,11 @@ const mcqs = [
     },
     {
         moduleOrder: 7, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['Tower-of-Hanoi', 'recursion'],
-        question: 'Tower of Hanoi time complexity O(2â¿ - 1) arises because:', options: ['Linear growth', 'Each disc requires moving all discs above â†’ exponential calls', 'Random branching', 'Sorting occurs'], correctAnswer: 1,
-        explanation: 'T(n) = 2T(n-1) + 1 solves to O(2â¿), matching the minimum move count of 2â¿ - 1.'
+        question: 'Tower of Hanoi time complexity O(2ⁿ - 1) arises because:', options: ['Linear growth', 'Each disc requires moving all discs above → exponential calls', 'Random branching', 'Sorting occurs'], correctAnswer: 1,
+        explanation: 'T(n) = 2T(n-1) + 1 solves to O(2ⁿ), matching the minimum move count of 2ⁿ - 1.'
     },
 
-    // Topic 7.3 â€“ Backtracking
+    // Topic 7.3 – Backtracking
     {
         moduleOrder: 7, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['backtracking'],
         question: 'Backtracking prunes the search space by:', options: ['Sorting options', 'Abandoning a path when a constraint is violated', 'Using dynamic programming', 'Random sampling'], correctAnswer: 1,
@@ -2018,8 +2007,8 @@ const mcqs = [
     },
     {
         moduleOrder: 7, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['Sudoku', 'constraint'],
-        question: 'Sudoku constraints are:', options: ['Each row unique', 'Each row, column, and 3Ã—3 box unique', 'Each column unique only', 'Each row and column unique'], correctAnswer: 1,
-        explanation: 'Sudoku requires digits 1-9 to appear exactly once in each row, column, and each of the nine 3Ã—3 sub-grids.'
+        question: 'Sudoku constraints are:', options: ['Each row unique', 'Each row, column, and 3×3 box unique', 'Each column unique only', 'Each row and column unique'], correctAnswer: 1,
+        explanation: 'Sudoku requires digits 1-9 to appear exactly once in each row, column, and each of the nine 3×3 sub-grids.'
     },
     {
         moduleOrder: 7, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['backtracking', 'undo'],
@@ -2033,7 +2022,7 @@ const mcqs = [
     },
     {
         moduleOrder: 7, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['backtracking', 'complexity'],
-        question: 'N-Queens worst-case complexity is approximately:', options: ['O(n!)', 'O(nÂ²)', 'O(2â¿)', 'O(n log n)'], correctAnswer: 0,
+        question: 'N-Queens worst-case complexity is approximately:', options: ['O(n!)', 'O(n²)', 'O(2ⁿ)', 'O(n log n)'], correctAnswer: 0,
         explanation: 'N-Queens explores O(n!) possibilities in the worst case (one queen per row, n choices each) with pruning reducing practical time.'
     },
     {
@@ -2053,15 +2042,13 @@ const mcqs = [
     },
     {
         moduleOrder: 7, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['word-search', 'backtracking'],
-        question: 'Word Search on a grid using backtracking has complexity:', options: ['O(mÃ—n)', 'O(mÃ—n Ã— 4^L) where L is word length', 'O(L)', 'O(mÃ—n log(mÃ—n))'], correctAnswer: 1,
-        explanation: 'Start from each cell (mÃ—n), explore up to 4 directions at each of L steps: O(mÃ—n Ã— 4^L) worst case.'
+        question: 'Word Search on a grid using backtracking has complexity:', options: ['O(m×n)', 'O(m×n × 4^L) where L is word length', 'O(L)', 'O(m×n log(m×n))'], correctAnswer: 1,
+        explanation: 'Start from each cell (m×n), explore up to 4 directions at each of L steps: O(m×n × 4^L) worst case.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 8 â€“ LINKED LISTS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 8 – LINKED LISTS --------------------
 
-    // Topic 8.1 â€“ Singly Linked List
+    // Topic 8.1 – Singly Linked List
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linked-list', 'node'],
         question: 'Each node in a singly linked list contains:', options: ['Data only', 'Data and previous pointer', 'Data and next pointer', 'Data and two pointers'], correctAnswer: 2,
@@ -2074,23 +2061,23 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linked-list', 'insertion'],
-        question: 'Inserting at the beginning of a singly linked list is:', options: ['O(n)', 'O(1)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
-        explanation: 'Create new node, set its next = head, update head = new node. No traversal needed â†’ O(1).'
+        question: 'Inserting at the beginning of a singly linked list is:', options: ['O(n)', 'O(1)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
+        explanation: 'Create new node, set its next = head, update head = new node. No traversal needed → O(1).'
     },
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['linked-list', 'deletion'],
-        question: 'Deleting a node given its previous node pointer is:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(nÂ²)'], correctAnswer: 2,
+        question: 'Deleting a node given its previous node pointer is:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n²)'], correctAnswer: 2,
         explanation: 'prev.next = prev.next.next removes the target node in O(1) time.'
     },
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['linked-list', 'search'],
-        question: 'Searching for a value in a singly linked list:', options: ['O(1)', 'O(log n)', 'O(n)', 'O(nÂ²)'], correctAnswer: 2,
-        explanation: 'Must traverse potentially all nodes to find the value â†’ O(n) in worst case.'
+        question: 'Searching for a value in a singly linked list:', options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'], correctAnswer: 2,
+        explanation: 'Must traverse potentially all nodes to find the value → O(n) in worst case.'
     },
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['reverse-linked-list'],
         question: 'Reversing a singly linked list iteratively requires pointers:', options: ['Only head', 'prev, current, next', 'Two pointers', 'Four pointers'], correctAnswer: 1,
-        explanation: 'Three pointers: prev (initially null), current, next â€“ traverse and reverse each link in O(n), O(1) space.'
+        explanation: 'Three pointers: prev (initially null), current, next – traverse and reverse each link in O(n), O(1) space.'
     },
     {
         moduleOrder: 8, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['linked-list', 'advantages'],
@@ -2113,7 +2100,7 @@ const mcqs = [
         explanation: 'Compare head nodes, link the smaller, advance that pointer, repeat until both lists are exhausted.'
     },
 
-    // Topic 8.2 â€“ Doubly Linked List & Reversal
+    // Topic 8.2 – Doubly Linked List & Reversal
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['DLL', 'prev-pointer'],
         question: 'A doubly linked list node contains:', options: ['Data and next only', 'Data, next, and prev', 'Data and two next pointers', 'Data only'], correctAnswer: 1,
@@ -2126,8 +2113,8 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['DLL', 'delete'],
-        question: 'Deleting a known node in a DLL (with prev/next pointers):', options: ['O(n)', 'O(1)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
-        explanation: 'node.prev.next = node.next and node.next.prev = node.prev â€“ O(1) deletion with direct access.'
+        question: 'Deleting a known node in a DLL (with prev/next pointers):', options: ['O(n)', 'O(1)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
+        explanation: 'node.prev.next = node.next and node.next.prev = node.prev – O(1) deletion with direct access.'
     },
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['fast-slow-pointer'],
@@ -2146,8 +2133,8 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['LL-with-recursion'],
-        question: 'Recursion on linked lists uses O(_) stack space:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
-        explanation: 'Each recursive call adds one stack frame; for n nodes there are n frames â†’ O(n) space.'
+        question: 'Recursion on linked lists uses O(_) stack space:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
+        explanation: 'Each recursive call adds one stack frame; for n nodes there are n frames → O(n) space.'
     },
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['palindrome-LL'],
@@ -2161,11 +2148,11 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['k-reverse-LL'],
-        question: 'Reversing a linked list in groups of k has time complexity:', options: ['O(k)', 'O(n/k)', 'O(n)', 'O(nÃ—k)'], correctAnswer: 2,
-        explanation: 'Every node is visited and pointer reversed exactly once â†’ O(n) regardless of k.'
+        question: 'Reversing a linked list in groups of k has time complexity:', options: ['O(k)', 'O(n/k)', 'O(n)', 'O(n×k)'], correctAnswer: 2,
+        explanation: 'Every node is visited and pointer reversed exactly once → O(n) regardless of k.'
     },
 
-    // Topic 8.3 â€“ Circular Linked List & Cycle Detection
+    // Topic 8.3 – Circular Linked List & Cycle Detection
     {
         moduleOrder: 8, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['circular-LL'],
         question: 'In a circular linked list, the last node points to:', options: ['Null', 'A random node', 'The head (first node)', 'The middle node'], correctAnswer: 2,
@@ -2193,7 +2180,7 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['cycle-length'],
-        question: 'Finding cycle length after detection:', options: ['Count from head', 'Keep one pointer fixed, advance the other until it returns to meeting point â€“ count steps', 'Use slow pointer speed', 'Check node values'], correctAnswer: 1,
+        question: 'Finding cycle length after detection:', options: ['Count from head', 'Keep one pointer fixed, advance the other until it returns to meeting point – count steps', 'Use slow pointer speed', 'Check node values'], correctAnswer: 1,
         explanation: 'Hold one pointer at meeting point; advance the other until it loops back; count steps = cycle length.'
     },
     {
@@ -2208,29 +2195,27 @@ const mcqs = [
     },
     {
         moduleOrder: 8, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['Floyd', 'mathematical-proof'],
-        question: 'Why does Floyd\'s algorithm guarantee the two pointers meet in a cycle?', options: ['Random chance', 'Fast reduces distance to slow by 1 each step in the cycle â†’ guaranteed convergence', 'They are in the same memory location', 'Cycle is always even length'], correctAnswer: 1,
+        question: 'Why does Floyd\'s algorithm guarantee the two pointers meet in a cycle?', options: ['Random chance', 'Fast reduces distance to slow by 1 each step in the cycle → guaranteed convergence', 'They are in the same memory location', 'Cycle is always even length'], correctAnswer: 1,
         explanation: 'Inside a cycle, fast gains on slow by 1 step per cycle iteration; distance decreases to 0 in at most (cycle_length) steps.'
     },
     {
         moduleOrder: 8, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['Floyd', 'O(1)-space'],
         question: 'Floyd\'s cycle detection space complexity:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(cycle length)'], correctAnswer: 2,
-        explanation: 'Only two pointers (slow and fast) are used regardless of list size â†’ O(1) extra space.'
+        explanation: 'Only two pointers (slow and fast) are used regardless of list size → O(1) extra space.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 9 â€“ STACK & QUEUE
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 9 – STACK & QUEUE --------------------
 
-    // Topic 9.1 â€“ Stack Implementation
+    // Topic 9.1 – Stack Implementation
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['stack', 'LIFO'],
         question: 'Stack follows ___ order:', options: ['FIFO', 'LIFO', 'Random', 'Sorted'], correctAnswer: 1,
-        explanation: 'LIFO â€“ Last In, First Out. The last element pushed is the first popped.'
+        explanation: 'LIFO – Last In, First Out. The last element pushed is the first popped.'
     },
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['stack', 'operations'],
         question: 'Core stack operations are:', options: ['add, remove', 'push, pop, peek', 'enqueue, dequeue', 'insert, delete'], correctAnswer: 1,
-        explanation: 'Push adds to top, pop removes from top, peek views top without removing â€“ the fundamental stack operations.'
+        explanation: 'Push adds to top, pop removes from top, peek views top without removing – the fundamental stack operations.'
     },
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['stack', 'balanced-parens'],
@@ -2244,7 +2229,7 @@ const mcqs = [
     },
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['stack', 'push-efficient'],
-        question: 'Push-efficient stack using two queues: push is O(1), pop is:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
+        question: 'Push-efficient stack using two queues: push is O(1), pop is:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'Pop in a push-efficient two-queue stack requires moving all-but-one elements, making it O(n).'
     },
     {
@@ -2260,24 +2245,24 @@ const mcqs = [
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['stack', 'DFS'],
         question: 'DFS uses a stack (explicitly or via recursion) because:', options: ['FIFO is needed', 'LIFO matches exploring deep branches before backtracking', 'Stacks are faster', 'DFS is sorted'], correctAnswer: 1,
-        explanation: 'DFS explores as deep as possible before backtracking â€“ LIFO of a stack matches this depth-first behaviour.'
+        explanation: 'DFS explores as deep as possible before backtracking – LIFO of a stack matches this depth-first behaviour.'
     },
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['largest-histogram', 'stack'],
-        question: 'Largest rectangle in histogram optimal solution uses:', options: ['Sorting', 'A monotonic stack in O(n)', 'Two-pointer O(n)', 'DP O(nÂ²)'], correctAnswer: 1,
-        explanation: 'A monotonic (increasing) stack tracks bars; when a smaller bar is found, pop and calculate areas â†’ O(n).'
+        question: 'Largest rectangle in histogram optimal solution uses:', options: ['Sorting', 'A monotonic stack in O(n)', 'Two-pointer O(n)', 'DP O(n²)'], correctAnswer: 1,
+        explanation: 'A monotonic (increasing) stack tracks bars; when a smaller bar is found, pop and calculate areas → O(n).'
     },
     {
         moduleOrder: 9, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['stack', 'min-stack'],
         question: 'Min Stack (getMin in O(1)) uses:', options: ['Sorted array', 'Two stacks: main and auxiliary min-stack', 'Heap', 'Binary search'], correctAnswer: 1,
-        explanation: 'Auxiliary stack tracks minimum values; push current min alongside each element â†’ O(1) getMin.'
+        explanation: 'Auxiliary stack tracks minimum values; push current min alongside each element → O(1) getMin.'
     },
 
-    // Topic 9.2 â€“ Queue & Circular Queue
+    // Topic 9.2 – Queue & Circular Queue
     {
         moduleOrder: 9, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['queue', 'FIFO'],
         question: 'Queue follows ___ order:', options: ['LIFO', 'FIFO', 'Random', 'Priority'], correctAnswer: 1,
-        explanation: 'FIFO â€“ First In, First Out. The first element enqueued is the first dequeued.'
+        explanation: 'FIFO – First In, First Out. The first element enqueued is the first dequeued.'
     },
     {
         moduleOrder: 9, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['circular-queue'],
@@ -2291,7 +2276,7 @@ const mcqs = [
     },
     {
         moduleOrder: 9, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['queue-using-stack'],
-        question: 'Implementing queue using two stacks: enqueue is O(1), dequeue is:', options: ['O(1)', 'O(n) amortized', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
+        question: 'Implementing queue using two stacks: enqueue is O(1), dequeue is:', options: ['O(1)', 'O(n) amortized', 'O(log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'Amortized: each element is pushed/popped at most twice, making dequeue O(1) amortized despite O(n) occasional transfers.'
     },
     {
@@ -2306,8 +2291,8 @@ const mcqs = [
     },
     {
         moduleOrder: 9, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['queue', 'sliding-window-max'],
-        question: 'Sliding window maximum uses a deque (double-ended queue) to achieve:', options: ['O(nÂ²)', 'O(n) total', 'O(n log n)', 'O(k) per window'], correctAnswer: 1,
-        explanation: 'Deque stores indices of potential maximums; each element enters and exits the deque once â†’ O(n) total.'
+        question: 'Sliding window maximum uses a deque (double-ended queue) to achieve:', options: ['O(n²)', 'O(n) total', 'O(n log n)', 'O(k) per window'], correctAnswer: 1,
+        explanation: 'Deque stores indices of potential maximums; each element enters and exits the deque once → O(n) total.'
     },
     {
         moduleOrder: 9, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['LRU-cache', 'queue'],
@@ -2325,7 +2310,7 @@ const mcqs = [
         explanation: 'The one-slot-reserved convention: if advancing rear would equal front, the queue is considered full (n-1 capacity used).'
     },
 
-    // Topic 9.3 â€“ Deque & PriorityQueue
+    // Topic 9.3 – Deque & PriorityQueue
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['deque'],
         question: 'Deque stands for:', options: ['Delayed Queue', 'Double-Ended Queue', 'Dynamic Queue', 'Duplicate Queue'], correctAnswer: 1,
@@ -2344,7 +2329,7 @@ const mcqs = [
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['PriorityQueue', 'complexity'],
         question: 'PriorityQueue offer() and poll() complexity:', options: ['O(1)', 'O(n)', 'O(log n)', 'O(n log n)'], correctAnswer: 2,
-        explanation: 'Heap operations (insert/remove) maintain the heap property via sifting â†’ O(log n).'
+        explanation: 'Heap operations (insert/remove) maintain the heap property via sifting → O(log n).'
     },
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['PriorityQueue', 'max-heap'],
@@ -2354,12 +2339,12 @@ const mcqs = [
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['deque', 'sliding-window'],
         question: 'ArrayDeque is preferred over LinkedList for deque operations because:', options: ['Better worst-case', 'Better cache performance (array-based)', 'Supports generics', 'Has more methods'], correctAnswer: 1,
-        explanation: 'ArrayDeque uses a circular array; better cache locality than LinkedList\'s node-based structure â†’ faster in practice.'
+        explanation: 'ArrayDeque uses a circular array; better cache locality than LinkedList\'s node-based structure → faster in practice.'
     },
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['k-largest', 'PriorityQueue'],
         question: 'Finding k largest elements using PriorityQueue optimally:', options: ['Max-heap of all elements, poll k times', 'Min-heap of size k, add each element and evict if too large', 'Sort array', 'Linear scan k times'], correctAnswer: 1,
-        explanation: 'Min-heap of size k: if new element > heap top, replace top â†’ O(n log k) time, O(k) space.'
+        explanation: 'Min-heap of size k: if new element > heap top, replace top → O(n log k) time, O(k) space.'
     },
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['top-k-frequent'],
@@ -2368,8 +2353,8 @@ const mcqs = [
     },
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['k-way-merge'],
-        question: 'k-way merge of k sorted lists using PriorityQueue runs in:', options: ['O(nÃ—k)', 'O(n log k)', 'O(n)', 'O(k log n)'], correctAnswer: 1,
-        explanation: 'Each of the n total elements is pushed/popped from a heap of size k â†’ O(n log k) total.'
+        question: 'k-way merge of k sorted lists using PriorityQueue runs in:', options: ['O(n×k)', 'O(n log k)', 'O(n)', 'O(k log n)'], correctAnswer: 1,
+        explanation: 'Each of the n total elements is pushed/popped from a heap of size k → O(n log k) total.'
     },
     {
         moduleOrder: 9, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['median-data-stream'],
@@ -2377,15 +2362,13 @@ const mcqs = [
         explanation: 'Max-heap holds lower half, min-heap holds upper half; median is top of one or average of both tops. O(log n) insert, O(1) median.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 10 â€“ TREES
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 10 – TREES --------------------
 
-    // Topic 10.1 â€“ Binary Tree Fundamentals
+    // Topic 10.1 – Binary Tree Fundamentals
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['binary-tree', 'definition'],
         question: 'A binary tree node has at most ___ children:', options: ['1', '2', '3', 'Unlimited'], correctAnswer: 1,
-        explanation: 'Binary tree: each node has at most 2 children â€“ left and right.'
+        explanation: 'Binary tree: each node has at most 2 children – left and right.'
     },
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['height', 'depth'],
@@ -2400,13 +2383,13 @@ const mcqs = [
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['full-binary-tree'],
         question: 'A full binary tree has nodes with either ___ children:', options: ['0 only', '0 or 2', '1 or 2', '0,1, or 2'], correctAnswer: 1,
-        explanation: 'Full binary tree: every node has either 0 (leaf) or 2 children â€“ no nodes with exactly 1 child.'
+        explanation: 'Full binary tree: every node has either 0 (leaf) or 2 children – no nodes with exactly 1 child.'
     },
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['count-nodes'],
-        question: 'Number of nodes in a complete binary tree of height h:', options: ['h', '2^h', '2^(h+1) - 1', 'hÂ²'], correctAnswer: 2,
+        question: 'Number of nodes in a complete binary tree of height h:', options: ['h', '2^h', '2^(h+1) - 1', 'h²'], correctAnswer: 2,
         explanation: 'Complete binary tree with height h has 2^(h+1) - 1 nodes when perfectly filled.' 
-        },
+    },
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['diameter'],
         question: 'Diameter of a binary tree is:', options: ['Maximum depth', 'Longest path between any two nodes (may not pass through root)', 'Number of leaves', 'Root height'], correctAnswer: 1,
@@ -2414,7 +2397,7 @@ const mcqs = [
     },
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['balanced-tree'],
-        question: 'A balanced binary tree\'s height is:', options: ['O(n)', 'O(log n)', 'O(nÂ²)', 'O(1)'], correctAnswer: 1,
+        question: 'A balanced binary tree\'s height is:', options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'], correctAnswer: 1,
         explanation: 'A balanced tree has O(log n) height, ensuring efficient O(log n) search operations.'
     },
     {
@@ -2424,7 +2407,7 @@ const mcqs = [
     },
     {
         moduleOrder: 10, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['lowest-common-ancestor'],
-        question: 'Lowest Common Ancestor (LCA) of two nodes uses DFS with:', options: ['O(n) time', 'O(nÂ²) time', 'Binary search', 'Topological sort'], correctAnswer: 0,
+        question: 'Lowest Common Ancestor (LCA) of two nodes uses DFS with:', options: ['O(n) time', 'O(n²) time', 'Binary search', 'Topological sort'], correctAnswer: 0,
         explanation: 'DFS visits each node once to find LCA: O(n) time, O(h) space (recursion stack).'
     },
     {
@@ -2433,21 +2416,21 @@ const mcqs = [
         explanation: 'Preorder with null markers uniquely reconstructs the tree; null markers are essential to encode structure.'
     },
 
-    // Topic 10.2 â€“ Binary Search Tree
+    // Topic 10.2 – Binary Search Tree
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['BST', 'property'],
         question: 'BST property: for any node n:', options: ['Left subtree > n, right subtree < n', 'Left subtree < n, right subtree > n', 'All nodes equal', 'Random order'], correctAnswer: 1,
-        explanation: 'BST: left child < parent < right child â€“ this ordering enables O(log n) search in balanced BSTs.'
+        explanation: 'BST: left child < parent < right child – this ordering enables O(log n) search in balanced BSTs.'
     },
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['BST', 'search'],
         question: 'Search in a balanced BST has complexity:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Each comparison eliminates half the tree â†’ O(log n) for balanced BST, O(n) worst case (skewed).'
+        explanation: 'Each comparison eliminates half the tree → O(log n) for balanced BST, O(n) worst case (skewed).'
     },
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['BST', 'inorder'],
         question: 'Inorder traversal of a BST produces:', options: ['Random order', 'Sorted ascending order', 'Reverse sorted', 'Level order'], correctAnswer: 1,
-        explanation: 'BST inorder (left, root, right) visits nodes in ascending sorted order â€“ a key BST property.'
+        explanation: 'BST inorder (left, root, right) visits nodes in ascending sorted order – a key BST property.'
     },
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['BST', 'insert'],
@@ -2468,11 +2451,11 @@ const mcqs = [
         moduleOrder: 10, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['BST', 'kth-smallest'],
         question: 'Finding kth smallest element in BST uses:', options: ['Level order + sort', 'Inorder traversal (iterative or recursive)', 'BFS', 'Binary search on values'], correctAnswer: 1,
         explanation: 'Inorder traversal visits nodes in ascending order; stop at the kth node visited.' 
-        },
+    },
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['BST', 'floor-ceil'],
-        question: 'Floor in BST (largest node â‰¤ key) uses:', options: ['Inorder traversal', 'Modified BST search tracking best candidate', 'BFS', 'Sorting'], correctAnswer: 1,
-        explanation: 'Search BST: when node.val â‰¤ key, it\'s a candidate for floor; go right. When node.val > key, go left.'
+        question: 'Floor in BST (largest node ≤ key) uses:', options: ['Inorder traversal', 'Modified BST search tracking best candidate', 'BFS', 'Sorting'], correctAnswer: 1,
+        explanation: 'Search BST: when node.val ≤ key, it\'s a candidate for floor; go right. When node.val > key, go left.'
     },
     {
         moduleOrder: 10, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['BST', 'to-sorted-DLL'],
@@ -2485,11 +2468,11 @@ const mcqs = [
         explanation: 'Storing subtree size enables O(log n) kth-order statistics and rank queries.'
     },
 
-    // Topic 10.3 â€“ Tree Traversals & Views
+    // Topic 10.3 – Tree Traversals & Views
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['inorder'],
         question: 'Inorder traversal visits nodes in order:', options: ['Root, Left, Right', 'Left, Root, Right', 'Left, Right, Root', 'Right, Root, Left'], correctAnswer: 1,
-        explanation: 'Inorder: Left â†’ Root â†’ Right. For BST, this gives ascending sorted order.'
+        explanation: 'Inorder: Left → Root → Right. For BST, this gives ascending sorted order.'
     },
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['preorder'],
@@ -2499,12 +2482,12 @@ const mcqs = [
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['postorder'],
         question: 'Postorder traversal is used for:', options: ['Level order output', 'Deleting tree (children deleted before parent)', 'Sorted output', 'BFS'], correctAnswer: 1,
-        explanation: 'Postorder (Left, Right, Root) processes children before parent â€“ ideal for deletion and expression evaluation.'
+        explanation: 'Postorder (Left, Right, Root) processes children before parent – ideal for deletion and expression evaluation.'
     },
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['right-view'],
         question: 'Right view of a binary tree is:', options: ['Rightmost nodes at each level', 'All right children', 'Nodes visible from the right side (last node per level)', 'Right subtree only'], correctAnswer: 2,
-        explanation: 'Right view = the last node seen at each level when looking from the right â€“ BFS collecting last node per level.'
+        explanation: 'Right view = the last node seen at each level when looking from the right – BFS collecting last node per level.'
     },
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['top-view'],
@@ -2533,19 +2516,17 @@ const mcqs = [
     },
     {
         moduleOrder: 10, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['diagonal-traversal'],
-        question: 'Diagonal traversal groups nodes where diagonal index = row - col. Time complexity:', options: ['O(n log n)', 'O(n)', 'O(nÂ²)', 'O(h)'], correctAnswer: 1,
+        question: 'Diagonal traversal groups nodes where diagonal index = row - col. Time complexity:', options: ['O(n log n)', 'O(n)', 'O(n²)', 'O(h)'], correctAnswer: 1,
         explanation: 'Each node is visited once; BFS with diagonal index tracking gives O(n) time.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 11 â€“ HEAPS & HASHING
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 11 – HEAPS & HASHING --------------------
 
-    // Topic 11.1 â€“ Heap Data Structure
+    // Topic 11.1 – Heap Data Structure
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['heap', 'property'],
         question: 'Min-heap property: every node is ___ than its children:', options: ['Greater', 'Smaller or equal', 'Equal', 'Random'], correctAnswer: 1,
-        explanation: 'In a min-heap, the parent is always â‰¤ its children, ensuring the root is the minimum element.'
+        explanation: 'In a min-heap, the parent is always ≤ its children, ensuring the root is the minimum element.'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['heap', 'array-representation'],
@@ -2556,44 +2537,44 @@ const mcqs = [
         moduleOrder: 11, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['heap', 'insert'],
         question: 'Inserting in a heap then fixing heap property is called:', options: ['Heapify-down', 'Heapify-up (bubble up / sift up)', 'Merge', 'Sort'], correctAnswer: 1,
         explanation: 'After insertion at the end, sift-up (heapify-up) restores heap property by swapping up until correct.' 
-        },
+    },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['heapsort'],
-        question: 'Heap Sort time complexity:', options: ['O(n)', 'O(n log n)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 1,
-        explanation: 'Heapify is O(n); extracting n elements is O(n log n) â†’ O(n log n) total for Heap Sort.'
+        question: 'Heap Sort time complexity:', options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(log n)'], correctAnswer: 1,
+        explanation: 'Heapify is O(n); extracting n elements is O(n log n) → O(n log n) total for Heap Sort.'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['build-heap'],
-        question: 'Building a heap from an array of n elements is:', options: ['O(n log n)', 'O(n)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 1,
-        explanation: 'Applying heapify-down from the last internal node upwards is O(n) â€“ better than n insertions.'
+        question: 'Building a heap from an array of n elements is:', options: ['O(n log n)', 'O(n)', 'O(n²)', 'O(log n)'], correctAnswer: 1,
+        explanation: 'Applying heapify-down from the last internal node upwards is O(n) – better than n insertions.'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['kth-largest', 'heap'],
         question: 'Finding kth largest element using min-heap of size k takes:', options: ['O(n)', 'O(n log k)', 'O(k)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Process each of n elements; if larger than heap top, replace it â†’ O(log k) per element â†’ O(n log k).'
+        explanation: 'Process each of n elements; if larger than heap top, replace it → O(log k) per element → O(n log k).'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['heap', 'delete'],
         question: 'Deleting an arbitrary element from a heap (not root) requires:', options: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Replace with last element, remove last, then sift up or sift down to restore heap property â†’ O(log n).'
+        explanation: 'Replace with last element, remove last, then sift up or sift down to restore heap property → O(log n).'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['two-heap', 'median'],
-        question: 'Two-heap method for running median: max-heap for lower half, min-heap for upper half. Rebalancing is done to ensure:', options: ['Both heaps equal size always', 'Size difference â‰¤ 1', 'Max-heap always smaller', 'Heaps sorted internally'], correctAnswer: 1,
-        explanation: 'Size difference â‰¤ 1 ensures the median is the top of the larger heap or average of both tops.'
+        question: 'Two-heap method for running median: max-heap for lower half, min-heap for upper half. Rebalancing is done to ensure:', options: ['Both heaps equal size always', 'Size difference ≤ 1', 'Max-heap always smaller', 'Heaps sorted internally'], correctAnswer: 1,
+        explanation: 'Size difference ≤ 1 ensures the median is the top of the larger heap or average of both tops.'
     },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['d-ary-heap'],
         question: 'A d-ary heap has insert O(log_d n) and delete-min O(d log_d n). For large d:', options: ['Insert slower, delete faster', 'Insert faster, delete slower', 'Both faster', 'Both slower'], correctAnswer: 1,
-        explanation: 'Higher branching factor d reduces height (log_d n) â†’ faster insert, but delete-min must check d children at each level.' 
-        },
+        explanation: 'Higher branching factor d reduces height (log_d n) → faster insert, but delete-min must check d children at each level.' 
+    },
     {
         moduleOrder: 11, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['Fibonacci-heap'],
-        question: 'Fibonacci Heap achieves amortized O(1) decrease-key, making Dijkstra\'s run in:', options: ['O(VÂ² log V)', 'O((V+E) log V)', 'O(E + V log V)', 'O(VE)'], correctAnswer: 2,
+        question: 'Fibonacci Heap achieves amortized O(1) decrease-key, making Dijkstra\'s run in:', options: ['O(V² log V)', 'O((V+E) log V)', 'O(E + V log V)', 'O(VE)'], correctAnswer: 2,
         explanation: 'With Fibonacci heap: O(E + V log V) for Dijkstra, optimal for dense graphs.' 
-        },
+    },
 
-    // Topic 11.2 â€“ HashMap & HashSet Internals
+    // Topic 11.2 – HashMap & HashSet Internals
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['HashMap', 'hashing'],
         question: 'A HashMap stores key-value pairs using:', options: ['Sorted tree', 'Hash function mapping keys to bucket indices', 'Linear search', 'Binary search'], correctAnswer: 1,
@@ -2608,7 +2589,7 @@ const mcqs = [
         moduleOrder: 11, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['HashMap', 'complexity'],
         question: 'Average-case time for HashMap get() and put():', options: ['O(log n)', 'O(n)', 'O(1)', 'O(n log n)'], correctAnswer: 2,
         explanation: 'With a good hash function and low load factor, HashMap operations are O(1) average.' 
-        },
+    },
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['HashSet'],
         question: 'HashSet in Java is backed by:', options: ['LinkedList', 'TreeSet', 'HashMap (keys only)', 'Array'], correctAnswer: 2,
@@ -2617,7 +2598,7 @@ const mcqs = [
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['load-factor', 'rehash'],
         question: 'Default load factor of Java HashMap is:', options: ['0.5', '0.75', '1.0', '0.25'], correctAnswer: 1,
-        explanation: 'Java HashMap rehashes when size > capacity Ã— 0.75 (default load factor), balancing time/space.'
+        explanation: 'Java HashMap rehashes when size > capacity × 0.75 (default load factor), balancing time/space.'
     },
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['hash-function', 'distribution'],
@@ -2632,12 +2613,12 @@ const mcqs = [
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['TreeMap'],
         question: 'TreeMap in Java maintains keys in:', options: ['Insertion order', 'Sorted (natural or custom) order via Red-Black Tree', 'Hash order', 'Random order'], correctAnswer: 1,
-        explanation: 'TreeMap uses a Red-Black Tree; keys are sorted â†’ O(log n) operations but ordered iteration.'
+        explanation: 'TreeMap uses a Red-Black Tree; keys are sorted → O(log n) operations but ordered iteration.'
     },
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['HashMap', 'worst-case'],
-        question: 'HashMap worst-case get() before Java 8 tree conversion was:', options: ['O(1)', 'O(log n)', 'O(n)', 'O(nÂ²)'], correctAnswer: 2,
-        explanation: 'Before Java 8, chaining used only LinkedList; all keys hashing to same bucket â†’ O(n) lookup in worst case.'
+        question: 'HashMap worst-case get() before Java 8 tree conversion was:', options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'], correctAnswer: 2,
+        explanation: 'Before Java 8, chaining used only LinkedList; all keys hashing to same bucket → O(n) lookup in worst case.'
     },
     {
         moduleOrder: 11, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['concurrentHashMap'],
@@ -2645,7 +2626,7 @@ const mcqs = [
         explanation: 'ConcurrentHashMap uses finer-grained locks (segments, or CAS + bin-level locking in Java 8+) for concurrent access.'
     },
 
-    // Topic 11.3 â€“ Advanced Hashing (Rabin-Karp)
+    // Topic 11.3 – Advanced Hashing (Rabin-Karp)
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['Rabin-Karp', 'rolling-hash'],
         question: 'Rabin-Karp algorithm uses ___ to efficiently compute hash of sliding window:', options: ['Full rehash each step', 'Rolling hash (add new char, remove old char)', 'Binary search', 'Stack'], correctAnswer: 1,
@@ -2655,36 +2636,36 @@ const mcqs = [
         moduleOrder: 11, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['Rabin-Karp', 'false-positive'],
         question: 'A spurious hit in Rabin-Karp occurs when:', options: ['Pattern found', 'Hash matches but characters don\'t (collision)', 'Hash doesn\'t match', 'Pattern is empty'], correctAnswer: 1,
         explanation: 'False positive: same hash value but different strings. Verify character-by-character on hash match.' 
-        },
+    },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['Rabin-Karp', 'complexity'],
-        question: 'Rabin-Karp average complexity for pattern length m, text length n:', options: ['O(nÃ—m)', 'O(n+m)', 'O(n log m)', 'O(mÂ²)'], correctAnswer: 1,
-        explanation: 'O(n) for rolling hash scan + O(m) for verification of true matches â†’ O(n+m) average.' 
-        },
+        question: 'Rabin-Karp average complexity for pattern length m, text length n:', options: ['O(n×m)', 'O(n+m)', 'O(n log m)', 'O(m²)'], correctAnswer: 1,
+        explanation: 'O(n) for rolling hash scan + O(m) for verification of true matches → O(n+m) average.' 
+    },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['polynomial-hash'],
-        question: 'Polynomial rolling hash: hash = Î£ s[i] Ã— base^(m-1-i) mod p. Modulo is used to:', options: ['Speed up multiplication', 'Prevent overflow and keep hash in range', 'Sort the hash', 'Ensure uniqueness'], correctAnswer: 1,
+        question: 'Polynomial rolling hash: hash = Σ s[i] × base^(m-1-i) mod p. Modulo is used to:', options: ['Speed up multiplication', 'Prevent overflow and keep hash in range', 'Sort the hash', 'Ensure uniqueness'], correctAnswer: 1,
         explanation: 'Large polynomial values overflow; modulo keeps the hash within a manageable range.' 
-        },
+    },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['multiple-pattern', 'Rabin-Karp'],
         question: 'Rabin-Karp advantage over KMP when searching for ___ patterns simultaneously:', options: ['1', 'Many patterns using a set of hashes (multi-pattern search)', 'Sorted patterns', 'Short patterns only'], correctAnswer: 1,
-        explanation: 'With a HashSet of pattern hashes, Rabin-Karp checks all patterns in one pass â€“ O(n + m Ã— k) vs O(n Ã— k).'
+        explanation: 'With a HashSet of pattern hashes, Rabin-Karp checks all patterns in one pass – O(n + m × k) vs O(n × k).'
     },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['Rabin-Karp', 'worst-case'],
-        question: 'Rabin-Karp worst-case (many spurious hits) complexity is:', options: ['O(n)', 'O(nÃ—m)', 'O(n+m)', 'O(mÂ²)'], correctAnswer: 1,
-        explanation: 'If every window produces a hash collision requiring O(m) verification, worst case degrades to O(nÃ—m).' 
-        },
+        question: 'Rabin-Karp worst-case (many spurious hits) complexity is:', options: ['O(n)', 'O(n×m)', 'O(n+m)', 'O(m²)'], correctAnswer: 1,
+        explanation: 'If every window produces a hash collision requiring O(m) verification, worst case degrades to O(n×m).' 
+    },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['double-hashing'],
-        question: 'Using two independent hash functions in Rabin-Karp reduces:', options: ['Time complexity', 'Probability of false positives (collision probability â‰ˆ 1/pâ‚pâ‚‚)', 'Space usage', 'Code length'], correctAnswer: 1,
-        explanation: 'Two hashes must both collide for a false positive; probability drops to ~1/(p1Ã—p2).'
+        question: 'Using two independent hash functions in Rabin-Karp reduces:', options: ['Time complexity', 'Probability of false positives (collision probability ≈ 1/p₁p₂)', 'Space usage', 'Code length'], correctAnswer: 1,
+        explanation: 'Two hashes must both collide for a false positive; probability drops to ~1/(p1×p2).'
     },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['longest-duplicate-substring'],
-        question: 'Longest duplicate substring can be found with binary search + Rabin-Karp in:', options: ['O(nÂ²)', 'O(n logÂ² n)', 'O(n)', 'O(n log n)'], correctAnswer: 3,
-        explanation: 'Binary search on length (O(log n)) Ã— Rabin-Karp check per length (O(n)) = O(n log n) expected.'
+        question: 'Longest duplicate substring can be found with binary search + Rabin-Karp in:', options: ['O(n²)', 'O(n log² n)', 'O(n)', 'O(n log n)'], correctAnswer: 3,
+        explanation: 'Binary search on length (O(log n)) × Rabin-Karp check per length (O(n)) = O(n log n) expected.'
     },
     {
         moduleOrder: 11, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['hash-base-choice'],
@@ -2697,31 +2678,29 @@ const mcqs = [
         explanation: 'Hash each row\'s window, then hash the column of row-hashes; two-phase approach extends 1D to 2D.'
     },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 12 â€“ GRAPHS
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 12 – GRAPHS --------------------
 
-    // Topic 12.1 â€“ Graph Representation
+    // Topic 12.1 – Graph Representation
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['adjacency-list'],
-        question: 'Adjacency list representation space complexity for V vertices and E edges:', options: ['O(VÂ²)', 'O(V+E)', 'O(EÂ²)', 'O(VÃ—E)'], correctAnswer: 1,
+        question: 'Adjacency list representation space complexity for V vertices and E edges:', options: ['O(V²)', 'O(V+E)', 'O(E²)', 'O(V×E)'], correctAnswer: 1,
         explanation: 'Each vertex stores a list of its neighbours; total entries = V (vertex list) + E (edges) = O(V+E).'
     },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['adjacency-matrix'],
-        question: 'Adjacency matrix representation space complexity:', options: ['O(V+E)', 'O(VÂ²)', 'O(E)', 'O(V log V)'], correctAnswer: 1,
-        explanation: 'A VÃ—V matrix stores 0/1 for each pair of vertices â†’ O(VÂ²) space regardless of edge count.'
+        question: 'Adjacency matrix representation space complexity:', options: ['O(V+E)', 'O(V²)', 'O(E)', 'O(V log V)'], correctAnswer: 1,
+        explanation: 'A V×V matrix stores 0/1 for each pair of vertices → O(V²) space regardless of edge count.'
     },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['adjacency-matrix', 'edge-check'],
         question: 'Checking if edge (u, v) exists is O(1) using:', options: ['Adjacency list', 'Adjacency matrix [u][v]', 'Edge list', 'BFS'], correctAnswer: 1,
-        explanation: 'Matrix[u][v] = 1 if edge exists â†’ O(1) lookup. Adjacency list requires O(degree(u)) scan.' 
-        },
+        explanation: 'Matrix[u][v] = 1 if edge exists → O(1) lookup. Adjacency list requires O(degree(u)) scan.' 
+    },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['directed-undirected'],
-        question: 'Undirected graph edge (u,v) is stored in adjacency list as:', options: ['Only uâ†’v', 'Both uâ†’v and vâ†’u', 'Neither', 'Only in matrix'], correctAnswer: 1,
+        question: 'Undirected graph edge (u,v) is stored in adjacency list as:', options: ['Only u→v', 'Both u→v and v→u', 'Neither', 'Only in matrix'], correctAnswer: 1,
         explanation: 'Undirected edges appear in both u\'s and v\'s adjacency lists (bidirectional representation).' 
-        },
+    },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['weighted-graph'],
         question: 'Weighted graph adjacency list stores pairs of:', options: ['(vertex, vertex)', '(neighbour, weight)', '(edge, colour)', '(weight, depth)'], correctAnswer: 1,
@@ -2729,8 +2708,8 @@ const mcqs = [
     },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['sparse-dense'],
-        question: 'For sparse graphs (E << VÂ²), preferred representation is:', options: ['Adjacency matrix', 'Adjacency list', 'Edge matrix', 'Incidence matrix'], correctAnswer: 1,
-        explanation: 'Adjacency list uses O(V+E) space; for sparse graphs, E is small so this is much better than O(VÂ²) matrix.'
+        question: 'For sparse graphs (E << V²), preferred representation is:', options: ['Adjacency matrix', 'Adjacency list', 'Edge matrix', 'Incidence matrix'], correctAnswer: 1,
+        explanation: 'Adjacency list uses O(V+E) space; for sparse graphs, E is small so this is much better than O(V²) matrix.'
     },
     {
         moduleOrder: 12, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['degree'],
@@ -2753,7 +2732,7 @@ const mcqs = [
         explanation: 'Implicit graphs define neighbours procedurally; BFS/DFS generates edges as needed without storing all V+E upfront.'
     },
 
-    // Topic 12.2 â€“ BFS & DFS
+    // Topic 12.2 – BFS & DFS
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['BFS', 'level-order'],
         question: 'BFS explores nodes:', options: ['Deepest first', 'Level by level (nearest nodes first)', 'Randomly', 'Sorted order'], correctAnswer: 1,
@@ -2781,31 +2760,31 @@ const mcqs = [
     },
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['topological-sort', 'DFS'],
-        question: 'Topological sort using DFS: nodes are added to result:', options: ['When first visited', 'When fully processed (all neighbours visited) â€“ post-order', 'In BFS order', 'Alphabetically'], correctAnswer: 1,
-        explanation: 'DFS topological sort adds nodes to the stack (result) after all their descendants are processed â†’ post-order.'
+        question: 'Topological sort using DFS: nodes are added to result:', options: ['When first visited', 'When fully processed (all neighbours visited) – post-order', 'In BFS order', 'Alphabetically'], correctAnswer: 1,
+        explanation: 'DFS topological sort adds nodes to the stack (result) after all their descendants are processed → post-order.'
     },
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['connected-components'],
         question: 'Number of connected components found by running BFS/DFS until all nodes visited:', options: ['Count of nodes', 'Number of times we start a new BFS/DFS from an unvisited node', 'Number of edges', '1 always'], correctAnswer: 1,
         explanation: 'Each unvisited node starting a new BFS/DFS represents a new component; count those starts.' 
-        },
+    },
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['bipartite', 'BFS'],
-        question: 'Checking bipartiteness using BFS:', options: ['Sort nodes', 'Colour nodes with 2 colours; edge connects same colour â†’ not bipartite', 'DFS required', 'Count edges'], correctAnswer: 1,
+        question: 'Checking bipartiteness using BFS:', options: ['Sort nodes', 'Colour nodes with 2 colours; edge connects same colour → not bipartite', 'DFS required', 'Count edges'], correctAnswer: 1,
         explanation: '2-colour BFS: assign alternating colours; if two adjacent nodes share a colour, the graph is not bipartite.'
     },
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['BFS', '0-1-BFS'],
         question: '0-1 BFS (edges with weight 0 or 1) uses a ___ instead of a regular queue:', options: ['Stack', 'Priority queue', 'Deque (front for 0-weight, back for 1-weight)', 'Two queues'], correctAnswer: 2,
-        explanation: '0-1 BFS uses a deque: 0-weight edges push to front (higher priority), 1-weight to back â†’ O(V+E) like BFS.'
+        explanation: '0-1 BFS uses a deque: 0-weight edges push to front (higher priority), 1-weight to back → O(V+E) like BFS.'
     },
     {
         moduleOrder: 12, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['SCC', 'Kosaraju'],
-        question: 'Kosaraju\'s algorithm finds SCCs in:', options: ['O(V log V)', 'O(V+E) with two DFS passes', 'O(E log V)', 'O(VÂ²)'], correctAnswer: 1,
-        explanation: 'Pass 1: DFS on original graph, push to stack. Pass 2: DFS on transposed graph in stack order â†’ SCCs in O(V+E).'
+        question: 'Kosaraju\'s algorithm finds SCCs in:', options: ['O(V log V)', 'O(V+E) with two DFS passes', 'O(E log V)', 'O(V²)'], correctAnswer: 1,
+        explanation: 'Pass 1: DFS on original graph, push to stack. Pass 2: DFS on transposed graph in stack order → SCCs in O(V+E).'
     },
 
-    // Topic 12.3 â€“ Shortest Path (Dijkstra)
+    // Topic 12.3 – Shortest Path (Dijkstra)
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ["Dijkstra", 'requirement'],
         question: "Dijkstra's algorithm requires:", options: ['Unweighted graph', 'Non-negative edge weights', 'Directed graph only', 'Sorted edges'], correctAnswer: 1,
@@ -2814,17 +2793,17 @@ const mcqs = [
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ["Dijkstra", 'data-structure'],
         question: "Dijkstra's uses ___ for efficient minimum distance extraction:", options: ['Stack', 'Queue', 'Priority queue (min-heap)', 'Array'], correctAnswer: 2,
-        explanation: "Min-heap extracts the unvisited node with minimum distance in O(log V) â†’ efficient for sparse graphs."
+        explanation: "Min-heap extracts the unvisited node with minimum distance in O(log V) → efficient for sparse graphs."
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ["Dijkstra", 'relaxation'],
         question: 'Edge relaxation in Dijkstra: if dist[u] + weight(u,v) < dist[v], then:', options: ['Ignore', 'Update dist[v] and re-add to priority queue', 'Delete v', 'Add new edge'], correctAnswer: 1,
         explanation: 'Relaxation: update dist[v] to the shorter path via u, then push (dist[v], v) into the priority queue.' 
-        },
+    },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ["Dijkstra", 'complexity'],
-        question: "Dijkstra's with binary heap complexity:", options: ['O(VÂ²)', 'O((V+E) log V)', 'O(E log E)', 'O(V log V)'], correctAnswer: 1,
-        explanation: 'Each vertex and edge is processed once; heap operations cost O(log V) â†’ O((V+E) log V) total.'
+        question: "Dijkstra's with binary heap complexity:", options: ['O(V²)', 'O((V+E) log V)', 'O(E log E)', 'O(V log V)'], correctAnswer: 1,
+        explanation: 'Each vertex and edge is processed once; heap operations cost O(log V) → O((V+E) log V) total.'
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['Bellman-Ford', 'negative'],
@@ -2833,8 +2812,8 @@ const mcqs = [
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['Floyd-Warshall'],
-        question: 'Floyd-Warshall finds all-pairs shortest paths in:', options: ['O(V+E)', 'O(VÂ²)', 'O(VÂ³)', 'O(V log V)'], correctAnswer: 2,
-        explanation: 'Three nested loops over all vertices â†’ O(VÂ³). Works with negative weights (no negative cycles).'
+        question: 'Floyd-Warshall finds all-pairs shortest paths in:', options: ['O(V+E)', 'O(V²)', 'O(V³)', 'O(V log V)'], correctAnswer: 2,
+        explanation: 'Three nested loops over all vertices → O(V³). Works with negative weights (no negative cycles).'
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ["Dijkstra", 'greedy'],
@@ -2843,25 +2822,23 @@ const mcqs = [
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['SSSP', 'DAG'],
-        question: 'Single-source shortest path on DAG (no cycles) can be done in:', options: ['O(VÂ²)', 'O(V+E) using topological sort + relaxation', 'O(E log V)', 'O(VE)'], correctAnswer: 1,
-        explanation: 'Process vertices in topological order; relax each edge once â†’ O(V+E). Works with negative edges.'
+        question: 'Single-source shortest path on DAG (no cycles) can be done in:', options: ['O(V²)', 'O(V+E) using topological sort + relaxation', 'O(E log V)', 'O(VE)'], correctAnswer: 1,
+        explanation: 'Process vertices in topological order; relax each edge once → O(V+E). Works with negative edges.'
     },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ["Dijkstra", 'bidirectional'],
-        question: 'Bidirectional Dijkstra reduces practical search space by approximately:', options: ['2Ã—', 'Half', 'Square root of original', 'Log factor'], correctAnswer: 1,
+        question: 'Bidirectional Dijkstra reduces practical search space by approximately:', options: ['2×', 'Half', 'Square root of original', 'Log factor'], correctAnswer: 1,
         explanation: 'Running Dijkstra from both source and target and meeting in the middle halves the explored nodes roughly.' 
-        },
+    },
     {
         moduleOrder: 12, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['Johnson-algorithm'],
-        question: 'Johnson\'s algorithm solves all-pairs shortest paths on sparse graphs in:', options: ['O(VÂ³)', 'O(VÂ² log V + VE)', 'O(VE)', 'O(E log V)'], correctAnswer: 1,
-        explanation: 'Johnson\'s: Bellman-Ford for reweighting O(VE) + Dijkstra from each vertex O(VÃ—(V+E)log V) â†’ efficient for sparse graphs.' 
-        },
+        question: 'Johnson\'s algorithm solves all-pairs shortest paths on sparse graphs in:', options: ['O(V³)', 'O(V² log V + VE)', 'O(VE)', 'O(E log V)'], correctAnswer: 1,
+        explanation: 'Johnson\'s: Bellman-Ford for reweighting O(VE) + Dijkstra from each vertex O(V×(V+E)log V) → efficient for sparse graphs.' 
+    },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 13 â€“ DYNAMIC PROGRAMMING
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 13 – DYNAMIC PROGRAMMING --------------------
 
-    // Topic 13.1 â€“ DP Fundamentals
+    // Topic 13.1 – DP Fundamentals
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['DP', 'overlapping-subproblems'],
         question: 'DP is applicable when a problem has:', options: ['Greedy structure only', 'Overlapping subproblems and optimal substructure', 'No recursion', 'Sorted input'], correctAnswer: 1,
@@ -2879,13 +2856,13 @@ const mcqs = [
     },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['fibonacci', 'DP'],
-        question: 'Fibonacci DP (tabulation) space complexity:', options: ['O(n)', 'O(1) (optimised with two variables)', 'O(nÂ²)', 'O(log n)'], correctAnswer: 1,
-        explanation: 'Only the last two Fibonacci values are needed at any point â†’ O(1) space optimisation.'
+        question: 'Fibonacci DP (tabulation) space complexity:', options: ['O(n)', 'O(1) (optimised with two variables)', 'O(n²)', 'O(log n)'], correctAnswer: 1,
+        explanation: 'Only the last two Fibonacci values are needed at any point → O(1) space optimisation.'
     },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['coin-change', 'DP'],
-        question: 'Coin Change (minimum coins) DP has time complexity (n coins, amount A):', options: ['O(n)', 'O(nÃ—A)', 'O(AÂ²)', 'O(nÂ²)'], correctAnswer: 1,
-        explanation: 'dp[a] = min(dp[a-coin]+1) for each coin and each amount 0..A â†’ O(nÃ—A) time.'
+        question: 'Coin Change (minimum coins) DP has time complexity (n coins, amount A):', options: ['O(n)', 'O(n×A)', 'O(A²)', 'O(n²)'], correctAnswer: 1,
+        explanation: 'dp[a] = min(dp[a-coin]+1) for each coin and each amount 0..A → O(n×A) time.'
     },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['optimal-substructure'],
@@ -2895,39 +2872,39 @@ const mcqs = [
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['state-definition'],
         question: 'Most important step in DP problem solving:', options: ['Choosing base case first', 'Defining the state clearly (what dp[i] represents)', 'Selecting the algorithm', 'Sorting data'], correctAnswer: 1,
-        explanation: 'Clear state definition â€“ what dp[i] or dp[i][j] means â€“ determines the transition relation and solution correctness.'
+        explanation: 'Clear state definition – what dp[i] or dp[i][j] means – determines the transition relation and solution correctness.'
     },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['longest-increasing-subsequence'],
-        question: 'Longest Increasing Subsequence basic DP is:', options: ['O(n)', 'O(n log n)', 'O(nÂ²)', 'O(2â¿)'], correctAnswer: 2,
-        explanation: 'dp[i] = max(dp[j]+1) for all j < i with arr[j] < arr[i] â†’ O(nÂ²). Patience sort achieves O(n log n).' 
-        },
+        question: 'Longest Increasing Subsequence basic DP is:', options: ['O(n)', 'O(n log n)', 'O(n²)', 'O(2ⁿ)'], correctAnswer: 2,
+        explanation: 'dp[i] = max(dp[j]+1) for all j < i with arr[j] < arr[i] → O(n²). Patience sort achieves O(n log n).' 
+    },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['DP', 'state-compression'],
-        question: 'Bitmask DP is used when:', options: ['Array is large', 'Number of items is small (â‰¤20) and states can be encoded as bitmasks', 'Problem has no overlapping subproblems', 'Input is sorted'], correctAnswer: 1,
-        explanation: 'Bitmask DP encodes subsets as bits; feasible for nâ‰¤20 since 2Â²â° â‰ˆ 1M states.' 
-        },
+        question: 'Bitmask DP is used when:', options: ['Array is large', 'Number of items is small (≤20) and states can be encoded as bitmasks', 'Problem has no overlapping subproblems', 'Input is sorted'], correctAnswer: 1,
+        explanation: 'Bitmask DP encodes subsets as bits; feasible for n≤20 since 2²⁰ ≈ 1M states.' 
+    },
     {
         moduleOrder: 13, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['DP', 'convex-hull-trick'],
-        question: 'Convex Hull Trick optimises DP transitions of the form dp[i] = min over j of (f(j) + g(i)Ã—h(j)) to:', options: ['O(nÂ²)', 'O(n)', 'O(n log n)', 'O(nÂ²/2)'], correctAnswer: 1,
-        explanation: 'Convex Hull Trick (monotone hull) reduces O(nÂ²) linear DP to O(n) by maintaining a convex hull of lines.' 
-        },
+        question: 'Convex Hull Trick optimises DP transitions of the form dp[i] = min over j of (f(j) + g(i)×h(j)) to:', options: ['O(n²)', 'O(n)', 'O(n log n)', 'O(n²/2)'], correctAnswer: 1,
+        explanation: 'Convex Hull Trick (monotone hull) reduces O(n²) linear DP to O(n) by maintaining a convex hull of lines.' 
+    },
 
-    // Topic 13.2 â€“ Knapsack & Subset DP
+    // Topic 13.2 – Knapsack & Subset DP
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['0-1-knapsack'],
         question: '0/1 Knapsack differs from fractional knapsack because:', options: ['You can take fractions', 'You take or skip items (no fractions)', 'It uses greedy', 'Items are sorted'], correctAnswer: 1,
-        explanation: '0/1 Knapsack: each item is taken wholly or not at all â†’ requires DP, not greedy.'
+        explanation: '0/1 Knapsack: each item is taken wholly or not at all → requires DP, not greedy.'
     },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['0-1-knapsack', 'complexity'],
-        question: '0/1 Knapsack time complexity (n items, capacity W):', options: ['O(n)', 'O(nÃ—W)', 'O(2â¿)', 'O(WÂ²)'], correctAnswer: 1,
-        explanation: 'dp[i][w] = max(dp[i-1][w], dp[i-1][w-wi]+vi) â†’ nÃ—W states each O(1) â†’ O(nÃ—W).'
+        question: '0/1 Knapsack time complexity (n items, capacity W):', options: ['O(n)', 'O(n×W)', 'O(2ⁿ)', 'O(W²)'], correctAnswer: 1,
+        explanation: 'dp[i][w] = max(dp[i-1][w], dp[i-1][w-wi]+vi) → n×W states each O(1) → O(n×W).'
     },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['subset-sum'],
-        question: 'Subset Sum problem (can we reach target T from array elements?):', options: ['O(n)', 'O(nÃ—T)', 'O(n log n)', 'O(TÂ²)'], correctAnswer: 1,
-        explanation: 'dp[i][s] = can we form sum s using first i elements â†’ O(nÃ—T) DP table.'
+        question: 'Subset Sum problem (can we reach target T from array elements?):', options: ['O(n)', 'O(n×T)', 'O(n log n)', 'O(T²)'], correctAnswer: 1,
+        explanation: 'dp[i][s] = can we form sum s using first i elements → O(n×T) DP table.'
     },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['unbounded-knapsack'],
@@ -2938,26 +2915,26 @@ const mcqs = [
         moduleOrder: 13, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['partition-equal-subset'],
         question: 'Partition Equal Subset Sum reduces to:', options: ['Sorting problem', 'Subset Sum with target = totalSum/2', 'Knapsack variant', 'Longest Increasing Subsequence'], correctAnswer: 1,
         explanation: 'If total sum is even, check if subset summing to total/2 exists using 0/1 Knapsack approach.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['space-optimized-knapsack'],
         question: 'Space-optimised 0/1 Knapsack uses a ___ array with iteration:', options: ['2D array forward', '1D array iterated backwards (to avoid using item twice)', 'Random direction', 'Stack'], correctAnswer: 1,
         explanation: 'Iterating capacity backwards ensures each item is counted at most once in the 1D DP array.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['count-subsets'],
         question: 'Count subsets with given sum uses:', options: ['Boolean DP', 'Count DP (add counts instead of boolean)', 'Greedy', 'Sorting'], correctAnswer: 1,
         explanation: 'Instead of dp[s] = boolean, use dp[s] = count of ways to reach sum s; transition: dp[s] += dp[s - num].' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['target-sum', 'DP'],
         question: 'Target Sum (assign + or - to array elements) reduces to:', options: ['Simple sum', 'Subset Sum variant: find subset with sum = (total+target)/2', 'Sorting then binary search', 'Two-pointer'], correctAnswer: 1,
-        explanation: '+ subset sum - remaining = target â†’ sum of + subset = (total + target) / 2; count subsets with that sum.' 
-        },
+        explanation: '+ subset sum - remaining = target → sum of + subset = (total + target) / 2; count subsets with that sum.' 
+    },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['rod-cutting'],
         question: 'Rod Cutting problem (cut rod for max price) is identical to:', options: ['0/1 Knapsack', 'Unbounded Knapsack (pieces reusable)', 'Coin Change', 'Matrix Chain Multiplication'], correctAnswer: 1,
-        explanation: 'Rod pieces can be reused (different lengths from same rod) â†’ Unbounded Knapsack formulation.'
+        explanation: 'Rod pieces can be reused (different lengths from same rod) → Unbounded Knapsack formulation.'
     },
     {
         moduleOrder: 13, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['min-cost-partition'],
@@ -2965,63 +2942,61 @@ const mcqs = [
         explanation: 'Interval DP: dp[i][j] = optimal cost for subrange [i,j]; merge optimal subranges with a split point k.'
     },
 
-    // Topic 13.3 â€“ DP on Strings & Grid
+    // Topic 13.3 – DP on Strings & Grid
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['LCS'],
         question: 'LCS (Longest Common Subsequence) of "ABCBDAB" and "BDCABA" length is:', options: ['3', '4', '5', '6'], correctAnswer: 1,
-        explanation: 'LCS = "BCBA" or "BDAB" with length 4 â€“ computed by the classic 2D DP table.' 
-        },
+        explanation: 'LCS = "BCBA" or "BDAB" with length 4 – computed by the classic 2D DP table.' 
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['LCS', 'complexity'],
-        question: 'LCS time and space complexity for strings of length m and n:', options: ['O(m+n)', 'O(mÃ—n)', 'O(mÂ²Ã—nÂ²)', 'O(2^(m+n))'], correctAnswer: 1,
-        explanation: 'dp[i][j] for all iâˆˆ[0,m], jâˆˆ[0,n] â†’ O(mÃ—n) time and space.'
+        question: 'LCS time and space complexity for strings of length m and n:', options: ['O(m+n)', 'O(m×n)', 'O(m²×n²)', 'O(2^(m+n))'], correctAnswer: 1,
+        explanation: 'dp[i][j] for all i∈[0,m], j∈[0,n] → O(m×n) time and space.'
     },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['edit-distance'],
         question: 'Edit Distance (Levenshtein) allows operations:', options: ['Insert only', 'Insert, delete, and substitute', 'Substitute only', 'Insert and delete'], correctAnswer: 1,
         explanation: 'Edit distance = minimum inserts, deletes, or substitutions to transform one string to another.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['grid-DP', 'unique-paths'],
-        question: 'Unique Paths in mÃ—n grid (move right or down only) = :', options: ['m+n', 'mÃ—n', 'C(m+n-2, m-1)', 'm^n'], correctAnswer: 2,
+        question: 'Unique Paths in m×n grid (move right or down only) = :', options: ['m+n', 'm×n', 'C(m+n-2, m-1)', 'm^n'], correctAnswer: 2,
         explanation: 'Choose m-1 down moves among m+n-2 total moves: C(m+n-2, m-1) distinct paths.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['LPS'],
         question: 'Longest Palindromic Subsequence = ?', options: ['Length of string', 'LCS(s, reverse(s))', 'Brute force 2^n', 'Length/2'], correctAnswer: 1,
         explanation: 'LPS = LCS of the string and its reverse; a classic string DP reduction.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['edit-distance', 'DP'],
         question: 'Edit Distance base cases: dp[i][0] = i and dp[0][j] = j represent:', options: ['Diagonal values', 'Transforming i characters to/from empty string (all inserts/deletes)', 'Maximum lengths', 'Zero costs'], correctAnswer: 1,
         explanation: 'dp[i][0] = i deletions to empty string; dp[0][j] = j insertions from empty string.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['min-path-sum', 'grid'],
         question: 'Minimum path sum in grid (move right/down) DP transition:', options: ['dp[i][j] = grid[i][j] + max(dp[i-1][j], dp[i][j-1])', 'dp[i][j] = grid[i][j] + min(dp[i-1][j], dp[i][j-1])', 'dp[i][j] = dp[i-1][j-1]', 'dp[i][j] = 0'], correctAnswer: 1,
         explanation: 'Minimum path = current cell cost + minimum of coming from top or left.' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['palindrome-partition'],
-        question: 'Palindrome Partitioning II (min cuts) DP runs in:', options: ['O(nÂ³)', 'O(nÂ²)', 'O(n)', 'O(2^n)'], correctAnswer: 1,
-        explanation: 'Precompute palindrome[i][j] in O(nÂ²), then dp[i] = min cuts for s[0..i] in O(nÂ²) total.'
+        question: 'Palindrome Partitioning II (min cuts) DP runs in:', options: ['O(n³)', 'O(n²)', 'O(n)', 'O(2^n)'], correctAnswer: 1,
+        explanation: 'Precompute palindrome[i][j] in O(n²), then dp[i] = min cuts for s[0..i] in O(n²) total.'
     },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['interleaving-strings'],
         question: 'Interleaving Strings (is C an interleaving of A and B?): dp[i][j] means:', options: ['i+j characters matched', 'First i chars of A and j chars of B form interleaving of C[0..i+j-1]', 'Cost of merging', 'LCS length'], correctAnswer: 1,
         explanation: 'dp[i][j] = can we form C[0..i+j-1] as an interleaving of A[0..i-1] and B[0..j-1].' 
-        },
+    },
     {
         moduleOrder: 13, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['distinct-subsequences'],
-        question: 'Count Distinct Subsequences of string S in T uses:', options: ['O(n)', 'O(|S|Ã—|T|) DP', 'O(2^n)', 'O(n log n)'], correctAnswer: 1,
+        question: 'Count Distinct Subsequences of string S in T uses:', options: ['O(n)', 'O(|S|×|T|) DP', 'O(2^n)', 'O(n log n)'], correctAnswer: 1,
         explanation: 'dp[i][j] = number of ways to form T[0..j-1] in S[0..i-1]; transitions on character match/mismatch.' 
-        },
+    },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  MODULE 14 â€“ ADVANCED DSA
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- MODULE 14 – ADVANCED DSA --------------------
 
-    // Topic 14.1 â€“ Tries (Prefix Trees)
+    // Topic 14.1 – Tries (Prefix Trees)
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Basic', questionType: 'conceptual', tags: ['trie', 'structure'],
         question: 'A Trie (prefix tree) node contains:', options: ['Value and parent', 'Array/Map of children (one per character) and isEndOfWord flag', 'Only character', 'Height and depth'], correctAnswer: 1,
@@ -3030,18 +3005,18 @@ const mcqs = [
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['trie', 'insert'],
         question: 'Inserting a word of length L into a Trie:', options: ['O(1)', 'O(L)', 'O(n)', 'O(L log n)'], correctAnswer: 1,
-        explanation: 'Traverse L characters, creating nodes as needed â†’ O(L) time and space.' 
-        },
+        explanation: 'Traverse L characters, creating nodes as needed → O(L) time and space.' 
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['trie', 'search'],
         question: 'Searching for a word of length L in a Trie:', options: ['O(n)', 'O(L)', 'O(log n)', 'O(1)'], correctAnswer: 1,
-        explanation: 'Follow characters of the word down the Trie â†’ O(L) time, independent of total words stored.' 
-        },
+        explanation: 'Follow characters of the word down the Trie → O(L) time, independent of total words stored.' 
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Basic', questionType: 'application', tags: ['trie', 'prefix-match'],
         question: 'startsWith(prefix) in Trie checks:', options: ['Word exists exactly', 'All words starting with prefix by traversing prefix path', 'Sorted words', 'Character frequency'], correctAnswer: 1,
-        explanation: 'Traverse the prefix characters; if all nodes exist, the prefix is present â†’ O(|prefix|) time.' 
-        },
+        explanation: 'Traverse the prefix characters; if all nodes exist, the prefix is present → O(|prefix|) time.' 
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['trie', 'autocomplete'],
         question: 'Autocomplete using Trie: after finding prefix node, do ___ to list all completions:', options: ['BFS from prefix node', 'DFS from prefix node collecting all leaf paths', 'Sort children', 'Binary search'], correctAnswer: 1,
@@ -3051,34 +3026,34 @@ const mcqs = [
         moduleOrder: 14, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['trie', 'vs-HashMap'],
         question: 'Trie advantage over HashMap for prefix operations:', options: ['Faster single lookup', 'O(L) prefix queries and prefix enumeration; HashMap cannot enumerate prefix matches easily', 'Less memory', 'Random access'], correctAnswer: 1,
         explanation: 'Trie natively supports prefix queries and enumeration; HashMap can only check exact keys.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Medium', questionType: 'reasoning', tags: ['compressed-trie', 'Patricia'],
         question: 'Compressed Trie (Patricia Trie) reduces space by:', options: ['Using arrays', 'Merging nodes with single children into one edge with a string label', 'Sorting words', 'Using bit arrays'], correctAnswer: 1,
         explanation: 'Compressed Trie merges chains of single-child nodes into single edges with multi-character labels, reducing node count.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Medium', questionType: 'application', tags: ['XOR-trie', 'maximum-XOR'],
         question: 'Maximum XOR of two numbers in an array uses a ___ bit-level Trie:', options: ['Suffix Trie', 'Bit Trie (binary Trie over bit representations)', 'Compressed Trie', 'Hash Trie'], correctAnswer: 1,
         explanation: 'Binary Trie stores numbers bit by bit (MSB first); for each number, greedily pick the opposite bit to maximise XOR.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['trie', 'space-complexity'],
-        question: 'Space complexity of Trie with n words of average length L:', options: ['O(n)', 'O(nÃ—L)', 'O(L)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Worst case: no shared prefixes â†’ nÃ—L nodes. Best case with shared prefixes: much less.' 
-        },
+        question: 'Space complexity of Trie with n words of average length L:', options: ['O(n)', 'O(n×L)', 'O(L)', 'O(n log n)'], correctAnswer: 1,
+        explanation: 'Worst case: no shared prefixes → n×L nodes. Best case with shared prefixes: much less.' 
+    },
     {
         moduleOrder: 14, topicOrder: 1, difficulty: 'Hard', questionType: 'reasoning', tags: ['suffix-trie'],
-        question: 'Suffix Trie of string length n has ___ suffixes (leaves):', options: ['n/2', 'n', '2n', 'nÂ²'], correctAnswer: 1,
+        question: 'Suffix Trie of string length n has ___ suffixes (leaves):', options: ['n/2', 'n', '2n', 'n²'], correctAnswer: 1,
         explanation: 'A string of length n has exactly n suffixes (from index 0, 1, ..., n-1), each a leaf in the suffix trie.'
     },
 
-    // Topic 14.2 â€“ Greedy Algorithms
+    // Topic 14.2 – Greedy Algorithms
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['greedy', 'principle'],
         question: 'Greedy algorithm makes the ___ choice at each step:', options: ['Random', 'Locally optimal (best immediate option)', 'Globally optimal', 'Smallest value'], correctAnswer: 1,
         explanation: 'Greedy: at each step, pick the option that seems best locally, hoping it leads to a globally optimal solution.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['activity-selection'],
         question: 'Activity Selection Problem greedy strategy: always pick:', options: ['Activity with earliest start', 'Activity with longest duration', 'Activity with earliest finish time', 'Activity with most conflicts'], correctAnswer: 2,
@@ -3087,13 +3062,13 @@ const mcqs = [
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Basic', questionType: 'application', tags: ['fractional-knapsack'],
         question: 'Fractional Knapsack greedy strategy: sort by:', options: ['Weight ascending', 'Value ascending', 'Value/Weight ratio descending', 'Weight descending'], correctAnswer: 2,
-        explanation: 'Take items with highest value-to-weight ratio first; fractions allowed â†’ greedy is optimal.' 
-        },
+        explanation: 'Take items with highest value-to-weight ratio first; fractions allowed → greedy is optimal.' 
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Basic', questionType: 'conceptual', tags: ['greedy', 'when-works'],
         question: 'Greedy approach is provably correct when the problem has:', options: ['Overlapping subproblems', 'Greedy choice property and optimal substructure', 'Only two choices', 'Sorted input'], correctAnswer: 1,
         explanation: 'Greedy works when a locally optimal choice is safe (greedy choice property) and optimal substructure holds.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['interval-scheduling'],
         question: 'Minimum platforms required for trains (interval scheduling) uses:', options: ['Greedy with sorting start/end times + two-pointer or max overlap count', 'DP', 'BFS', 'Divide and conquer'], correctAnswer: 0,
@@ -3102,65 +3077,65 @@ const mcqs = [
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['Huffman-coding'],
         question: 'Huffman Coding uses greedy by always merging the ___ frequency symbols:', options: ['Highest', 'Two lowest frequency symbols', 'Random', 'Equal'], correctAnswer: 1,
-        explanation: 'Merging the two lowest-frequency nodes minimises the total weighted path length â†’ optimal prefix code.' 
-        },
+        explanation: 'Merging the two lowest-frequency nodes minimises the total weighted path length → optimal prefix code.' 
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Medium', questionType: 'application', tags: ['jump-game'],
         question: 'Jump Game II (minimum jumps to reach end) greedy tracks:', options: ['Exact jump positions', 'Farthest reachable position at each step', 'Random jumps', 'BFS levels'], correctAnswer: 1,
         explanation: 'Track current range end and farthest reachable; when current range ends, increment jumps and extend range.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Medium', questionType: 'reasoning', tags: ['greedy', 'proof'],
         question: 'Exchange argument in greedy proofs shows:', options: ['Brute force correctness', 'Swapping any non-greedy choice with the greedy choice does not worsen the solution', 'Greedy is always wrong', 'DP is equivalent'], correctAnswer: 1,
-        explanation: 'Exchange argument: assume an optimal solution differs from greedy; show swapping to match greedy doesn\'t hurt â†’ greedy is also optimal.' 
-        },
+        explanation: 'Exchange argument: assume an optimal solution differs from greedy; show swapping to match greedy doesn\'t hurt → greedy is also optimal.' 
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['task-scheduling', 'greedy'],
-        question: 'Task Scheduler (CPU with cooldown n) greedy: arrange most frequent tasks first. Time complexity:', options: ['O(n)', 'O(n log k) where k is unique tasks', 'O(nÂ²)', 'O(1)'], correctAnswer: 1,
-        explanation: 'Use max-heap of task frequencies; each cycle processes top tasks and cools down â†’ O(n log k).' 
-        },
+        question: 'Task Scheduler (CPU with cooldown n) greedy: arrange most frequent tasks first. Time complexity:', options: ['O(n)', 'O(n log k) where k is unique tasks', 'O(n²)', 'O(1)'], correctAnswer: 1,
+        explanation: 'Use max-heap of task frequencies; each cycle processes top tasks and cools down → O(n log k).' 
+    },
     {
         moduleOrder: 14, topicOrder: 2, difficulty: 'Hard', questionType: 'reasoning', tags: ['Prim-Kruskal'],
         question: 'Kruskal\'s MST algorithm is greedy because it:', options: ['Uses BFS', 'Always adds the minimum weight edge that doesn\'t form a cycle', 'Processes vertices greedily', 'Uses DFS'], correctAnswer: 1,
         explanation: 'Kruskal\'s sorts edges by weight; greedily adds minimum edge if it doesn\'t create a cycle (checked by Union-Find).' 
-        },
+    },
 
-    // Topic 14.3 â€“ Segment Trees
+    // Topic 14.3 – Segment Trees
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['segment-tree', 'range-query'],
         question: 'Segment Tree enables range queries in:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n log n)'], correctAnswer: 1,
         explanation: 'Segment tree stores precomputed range values; query traverses O(log n) nodes.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Basic', questionType: 'conceptual', tags: ['segment-tree', 'build'],
-        question: 'Building a segment tree on n elements takes:', options: ['O(n log n)', 'O(n)', 'O(log n)', 'O(nÂ²)'], correctAnswer: 1,
+        question: 'Building a segment tree on n elements takes:', options: ['O(n log n)', 'O(n)', 'O(log n)', 'O(n²)'], correctAnswer: 1,
         explanation: 'Build is O(n): visit each internal node once. The tree has 2n-1 nodes.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['segment-tree', 'point-update'],
         question: 'Point update in segment tree takes:', options: ['O(n)', 'O(log n)', 'O(1)', 'O(n log n)'], correctAnswer: 1,
         explanation: 'Update a leaf and propagate changes up: O(height) = O(log n) node updates.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Basic', questionType: 'application', tags: ['segment-tree', 'array-size'],
         question: 'Segment tree for n elements requires array of size approximately:', options: ['n', '2n', '4n', 'n log n'], correctAnswer: 2,
-        explanation: 'A segment tree array is allocated as 4Ã—n to accommodate all nodes, including the last level padding.' 
-        },
+        explanation: 'A segment tree array is allocated as 4×n to accommodate all nodes, including the last level padding.' 
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['lazy-propagation'],
         question: 'Lazy propagation in segment trees defers:', options: ['Build time', 'Range updates to query time, reducing range update from O(n) to O(log n)', 'Point queries', 'Memory allocation'], correctAnswer: 1,
-        explanation: 'Lazy tags mark subtrees for pending updates; applied on-demand during query/update traversal â†’ O(log n) per operation.' 
-        },
+        explanation: 'Lazy tags mark subtrees for pending updates; applied on-demand during query/update traversal → O(log n) per operation.' 
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['segment-tree', 'range-update'],
         question: 'Without lazy propagation, range update on segment tree is:', options: ['O(log n)', 'O(n)', 'O(n log n)', 'O(1)'], correctAnswer: 1,
         explanation: 'Updating all n elements in the range one by one is O(n) without laziness.' 
-        },
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Medium', questionType: 'application', tags: ['merge-sort-tree'],
-        question: 'Merge Sort Tree (segment tree with sorted lists at nodes) enables count queries in range in:', options: ['O(log n)', 'O(logÂ² n)', 'O(n)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Query each of O(log n) nodes using binary search (O(log n) each) â†’ O(logÂ² n) per query.' 
-        },
+        question: 'Merge Sort Tree (segment tree with sorted lists at nodes) enables count queries in range in:', options: ['O(log n)', 'O(log² n)', 'O(n)', 'O(n log n)'], correctAnswer: 1,
+        explanation: 'Query each of O(log n) nodes using binary search (O(log n) each) → O(log² n) per query.' 
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Medium', questionType: 'reasoning', tags: ['segment-tree', 'vs-BIT'],
         question: 'Segment Tree vs Binary Indexed Tree (Fenwick): Segment Tree supports:', options: ['Only prefix sums', 'Any associative range query (min, max, GCD, etc.)', 'Only point updates', 'Only sorted arrays'], correctAnswer: 1,
@@ -3169,56 +3144,43 @@ const mcqs = [
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['persistent-segment-tree'],
         question: 'Persistent Segment Tree creates a new version per update in:', options: ['O(n)', 'O(log n) time and space per update', 'O(1)', 'O(n log n)'], correctAnswer: 1,
-        explanation: 'Only O(log n) nodes differ per version; copy only the path from root to modified leaf â†’ O(log n) per update.' 
-        },
+        explanation: 'Only O(log n) nodes differ per version; copy only the path from root to modified leaf → O(log n) per update.' 
+    },
     {
         moduleOrder: 14, topicOrder: 3, difficulty: 'Hard', questionType: 'reasoning', tags: ['2D-segment-tree'],
-        question: '2D Segment Tree for mÃ—n grid range queries has build complexity:', options: ['O(mÃ—n)', 'O(mÃ—n log(mÃ—n))', 'O(mÃ—nÃ—log mÃ—log n)', 'O(mÂ²Ã—nÂ²)'], correctAnswer: 2,
-        explanation: 'Outer segment tree has O(m log m) nodes; each has an inner tree of O(n log n) â†’ O(mn log m log n).' 
-        },
+        question: '2D Segment Tree for m×n grid range queries has build complexity:', options: ['O(m×n)', 'O(m×n log(m×n))', 'O(m×n×log m×log n)', 'O(m²×n²)'], correctAnswer: 2,
+        explanation: 'Outer segment tree has O(m log m) nodes; each has an inner tree of O(n log n) → O(mn log m log n).' 
+    },
 
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    //  CONTINUATION: paste this file directly after the last line of your existing
-    //  seed/index.js (which ends mid-sentence at Mo's MCQ #5).
-    //
-    //  The last COMPLETE line in your existing file is:
-    //    question("Mo's algorithm is a generalisation of:"),
-    //  DELETE that incomplete entry and paste everything below.
-    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-    // Topic 14.4 â€“ Mo's Algorithm  (MCQs 5 â€“ 10)
+    // Topic 14.4 – Mo's Algorithm
     {
         moduleOrder: 14, topicOrder: 4, difficulty: 'Medium', questionType: 'reasoning', tags: ["Mo's", 'vs-sqrt-decomp'],
         question: "Mo's algorithm is a generalisation of which technique?",
         options: ['Merge sort', 'Square root decomposition for offline range queries', 'Binary indexed tree', 'Segment tree'],
         correctAnswer: 1,
-        explanation: "Mo's organises queries into âˆšn-sized blocks â€” a direct application of sqrt decomposition to offline query processing."
+        explanation: "Mo's organises queries into √n-sized blocks — a direct application of sqrt decomposition to offline query processing."
     },
-
     {
         moduleOrder: 14, topicOrder: 4, difficulty: 'Medium', questionType: 'application', tags: ["Mo's", 'add-remove'],
         question: "In Mo's algorithm, the 'add' and 'remove' operations update the current window. Their combined time per query is:",
-        options: ['O(n)', 'O(1) per pointer move (O(âˆšn) total moves per query on average)', 'O(log n)', 'O(nÂ²)'],
+        options: ['O(n)', 'O(1) per pointer move (O(√n) total moves per query on average)', 'O(log n)', 'O(n²)'],
         correctAnswer: 1,
-        explanation: "Each add/remove is O(1) (e.g., increment frequency array). The block ordering ensures O(âˆšn) total pointer moves per query on average."
+        explanation: "Each add/remove is O(1) (e.g., increment frequency array). The block ordering ensures O(√n) total pointer moves per query on average."
     },
-
     {
         moduleOrder: 14, topicOrder: 4, difficulty: 'Medium', questionType: 'reasoning', tags: ["Mo's", 'Hilbert-curve'],
         question: "Mo's algorithm with Hilbert curve ordering improves practical performance by:",
         options: ['Reducing asymptotic complexity to O(n)', 'Reducing cache misses via better spatial locality of pointer movement', 'Sorting queries by answer', 'Using less memory'],
         correctAnswer: 1,
-        explanation: "Hilbert curve ordering keeps pointer movement spatially local, reducing cache misses in practice though the asymptotic bound stays O((n+q)âˆšn)."
+        explanation: "Hilbert curve ordering keeps pointer movement spatially local, reducing cache misses in practice though the asymptotic bound stays O((n+q)√n)."
     },
-
     {
         moduleOrder: 14, topicOrder: 4, difficulty: 'Hard', questionType: 'reasoning', tags: ["Mo's", 'with-updates'],
         question: "Mo's algorithm with updates (point updates between queries) has complexity:",
-        options: ['O((n+q)âˆšn)', 'O(n^(5/3)) using block size n^(2/3)', 'O(n log n)', 'O(qâˆšn)'],
+        options: ['O((n+q)√n)', 'O(n^(5/3)) using block size n^(2/3)', 'O(n log n)', 'O(q√n)'],
         correctAnswer: 1,
-        explanation: "With updates, block size n^(2/3) balances query and update costs, giving O(n^(5/3)) total â€” a classic extension of Mo's."
+        explanation: "With updates, block size n^(2/3) balances query and update costs, giving O(n^(5/3)) total — a classic extension of Mo's."
     },
-
     {
         moduleOrder: 14, topicOrder: 4, difficulty: 'Hard', questionType: 'reasoning', tags: ["Mo's", 'suitable-problems'],
         question: "Mo's algorithm is NOT suitable for problems where:",
@@ -3226,20 +3188,19 @@ const mcqs = [
         correctAnswer: 1,
         explanation: "Mo's requires efficient add AND remove operations. When removing an element from the window is hard (e.g., max of range without segment tree), Mo's is impractical."
     },
+]; // ← closes the mcqs array
 
-]; // â† closes the mcqs array
 
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+// ============================================================================
 //  CODING PROBLEMS  (1 per topic = 47 total)
-//  hasCoding: false  â†’ purely conceptual topic (no coding exercise)
-//  hasCoding: true   â†’ has javaStarterCode, testCases, hints
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+//  hasCoding: false  → purely conceptual topic (no coding exercise)
+//  hasCoding: true   → has javaStarterCode, testCases, hints
+// ============================================================================
 const codingProblems = [
 
-    // â”€â”€ Module 1 â€“ Fundamentals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 1 – Fundamentals --------------------
 
-    // 1.1 Flowcharts & Pseudocode  (conceptual â€“ no coding)
+    // 1.1 Flowcharts & Pseudocode  (conceptual – no coding)
     {
         moduleOrder: 1, topicOrder: 1,
         hasCoding: false,
@@ -3248,7 +3209,7 @@ const codingProblems = [
         difficulty: 'Basic', tags: ['flowchart', 'pseudocode'],
     },
 
-    // 1.2 Java Architecture & Setup  (conceptual â€“ no coding)
+    // 1.2 Java Architecture & Setup  (conceptual – no coding)
     {
         moduleOrder: 1, topicOrder: 2,
         hasCoding: false,
@@ -3399,7 +3360,7 @@ public class Calculator {
         ],
     },
 
-    // 1.6 OOP  (conceptual-heavy â€“ placeholder with basic exercise)
+    // 1.6 OOP  (conceptual-heavy – placeholder with basic exercise)
     {
         moduleOrder: 1, topicOrder: 6,
         hasCoding: true,
@@ -3429,7 +3390,7 @@ class BankAccount {
     void deposit(long amount) {
     }
 
-    // TODO: withdraw method â€“ print "Insufficient funds" if amount > balance
+    // TODO: withdraw method – print "Insufficient funds" if amount > balance
     void withdraw(long amount) {
     }
 
@@ -3462,7 +3423,7 @@ public class Main {
         ],
     },
 
-    // 1.7 Time & Space Complexity  (conceptual â€“ no coding)
+    // 1.7 Time & Space Complexity  (conceptual – no coding)
     {
         moduleOrder: 1, topicOrder: 7,
         hasCoding: false,
@@ -3471,7 +3432,7 @@ public class Main {
         difficulty: 'Medium', tags: ['Big-O', 'complexity'],
     },
 
-    // â”€â”€ Module 2 â€“ Patterns â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 2 – Patterns --------------------
 
     // 2.1 Star Patterns
     {
@@ -3486,7 +3447,7 @@ public class Main {
         sampleInput: '4',
         sampleOutput: '*\n**\n***\n****',
         solutionApproach: 'Outer loop i from 1 to N; inner loop j from 1 to i, print star. Println after inner loop.',
-        timeComplexity: 'O(NÂ²)',
+        timeComplexity: 'O(N²)',
         spaceComplexity: 'O(1)',
         difficulty: 'Basic',
         tags: ['nested-loops', 'pattern', 'star'],
@@ -3525,7 +3486,7 @@ public class StarTriangle {
         sampleInput: '4',
         sampleOutput: 'A\nAB\nABC\nABCD',
         solutionApproach: 'Outer loop i from 1 to N; inner loop j from 0 to i-1, print (char)(\'A\'+j).',
-        timeComplexity: 'O(NÂ²)',
+        timeComplexity: 'O(N²)',
         spaceComplexity: 'O(1)',
         difficulty: 'Basic',
         tags: ['nested-loops', 'char-arithmetic', 'ASCII'],
@@ -3563,7 +3524,7 @@ public class AlphabetTriangle {
         sampleInput: '4',
         sampleOutput: '   *\n  ***\n *****\n*******\n *****\n  ***\n   *',
         solutionApproach: 'Top half: row i has (2i-1) stars and (N-i) leading spaces. Bottom half: mirror in reverse.',
-        timeComplexity: 'O(NÂ²)',
+        timeComplexity: 'O(N²)',
         spaceComplexity: 'O(1)',
         difficulty: 'Medium',
         tags: ['diamond', 'spaces', 'nested-loops', 'pattern'],
@@ -3577,8 +3538,8 @@ public class DiamondPattern {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         int n = sc.nextInt();
-        // TODO: Top half â€“ row i (1..n): spaces = n-i, stars = 2i-1
-        // TODO: Bottom half â€“ row i (n-1..1): spaces = n-i, stars = 2i-1
+        // TODO: Top half – row i (1..n): spaces = n-i, stars = 2i-1
+        // TODO: Bottom half – row i (n-1..1): spaces = n-i, stars = 2i-1
     }
 }`,
         testCases: [
@@ -3592,14 +3553,14 @@ public class DiamondPattern {
         ],
     },
 
-    // â”€â”€ Module 3 â€“ Arrays â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 3 – Arrays --------------------
 
     // 3.1 1D Arrays & ArrayList
     {
         moduleOrder: 3, topicOrder: 1,
         hasCoding: true,
         title: 'Reverse an Array',
-        description: 'Reverse an array in-place â€” a core array manipulation from Kunal\'s arrays video.',
+        description: 'Reverse an array in-place — a core array manipulation from Kunal\'s arrays video.',
         problemStatement: 'Given an array of N integers, reverse it in-place and print the result.',
         inputFormat: 'First line: N. Second line: N space-separated integers.',
         outputFormat: 'N space-separated integers in reversed order.',
@@ -3646,15 +3607,15 @@ public class ReverseArray {
         moduleOrder: 3, topicOrder: 2,
         hasCoding: true,
         title: 'Transpose a Matrix',
-        description: 'Transpose an NÃ—N matrix in-place as shown in Kunal\'s 2D arrays video.',
-        problemStatement: 'Given an NÃ—N matrix, print its transpose.',
+        description: 'Transpose an N×N matrix in-place as shown in Kunal\'s 2D arrays video.',
+        problemStatement: 'Given an N×N matrix, print its transpose.',
         inputFormat: 'First line: N. Next N lines: N space-separated integers each.',
         outputFormat: 'N lines representing the transposed matrix.',
         constraints: ['1 <= N <= 100', '-10^4 <= matrix[i][j] <= 10^4'],
         sampleInput: '3\n1 2 3\n4 5 6\n7 8 9',
         sampleOutput: '1 4 7\n2 5 8\n3 6 9',
         solutionApproach: 'For i<j, swap matrix[i][j] with matrix[j][i].',
-        timeComplexity: 'O(NÂ²)',
+        timeComplexity: 'O(N²)',
         spaceComplexity: 'O(1)',
         difficulty: 'Medium',
         tags: ['2D-array', 'matrix', 'transpose'],
@@ -3699,7 +3660,7 @@ public class MatrixTranspose {
         description: 'Implement Kadane\'s algorithm as taught in Kunal\'s array algorithms video.',
         problemStatement: 'Given an array of N integers (may include negatives), find the maximum sum of any contiguous subarray.',
         inputFormat: 'First line: N. Second line: N space-separated integers.',
-        outputFormat: 'A single integer â€” the maximum subarray sum.',
+        outputFormat: 'A single integer — the maximum subarray sum.',
         constraints: ['1 <= N <= 10^5', '-10^4 <= arr[i] <= 10^4'],
         sampleInput: '8\n-2 1 -3 4 -1 2 1 -5',
         sampleOutput: '6',
@@ -3741,7 +3702,7 @@ public class MaxSubarray {
         ],
     },
 
-    // â”€â”€ Module 4 â€“ Strings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 4 – Strings --------------------
 
     // 4.1 String Basics & Immutability
     {
@@ -3766,7 +3727,7 @@ public class ReverseWords {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         String line = sc.nextLine().trim();
-        // TODO: Split line into words (split by one or more spaces: "\\s+")
+        // TODO: Split line into words (split by one or more spaces: "\\\\s+")
         // TODO: Reverse the words array
         // TODO: Join with single space and print
     }
@@ -3826,7 +3787,7 @@ public class PalindromeCheck {
         moduleOrder: 4, topicOrder: 3,
         hasCoding: true,
         title: 'Check Anagram',
-        description: 'Determine if two strings are anagrams using frequency counting â€” from Kunal\'s string recursion video.',
+        description: 'Determine if two strings are anagrams using frequency counting — from Kunal\'s string recursion video.',
         problemStatement: 'Given two strings A and B of lowercase letters, print "YES" if they are anagrams, else "NO".',
         inputFormat: 'Two lines, each containing a string.',
         outputFormat: '"YES" or "NO".',
@@ -3868,13 +3829,13 @@ public class AnagramCheck {
         ],
     },
 
-    // â”€â”€ Module 5 â€“ Searching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 5 – Searching --------------------
 
     // 5.1 Linear Search
     {
         moduleOrder: 5, topicOrder: 1,
         hasCoding: true,
-        title: 'Linear Search â€“ Find All Occurrences',
+        title: 'Linear Search – Find All Occurrences',
         description: 'Implement linear search returning all indices where target appears.',
         problemStatement: 'Given an array of N integers and a target X, print all 0-based indices where X appears. If not found, print -1.',
         inputFormat: 'First line: N. Second line: N integers. Third line: X.',
@@ -3916,7 +3877,7 @@ public class LinearSearchAll {
     {
         moduleOrder: 5, topicOrder: 2,
         hasCoding: true,
-        title: 'Binary Search â€“ First and Last Occurrence',
+        title: 'Binary Search – First and Last Occurrence',
         description: 'Find first and last occurrence of a target in a sorted array using binary search.',
         problemStatement: 'Given a sorted array of N integers and target X, print the first and last index of X. Print "-1 -1" if not found.',
         inputFormat: 'First line: N. Second line: N sorted integers. Third line: X.',
@@ -3983,8 +3944,8 @@ public class FirstLastOccurrence {
         description: 'Binary search application: find any peak element in an array.',
         problemStatement: 'A peak element is one that is greater than its neighbours. Given array of N distinct integers, find and print the index of any peak element.',
         inputFormat: 'First line: N. Second line: N integers.',
-        outputFormat: 'A single integer â€” index of any peak element.',
-        constraints: ['1 <= N <= 10^5', 'arr[-1] = arr[N] = -âˆž (treat boundaries as negative infinity)'],
+        outputFormat: 'A single integer — index of any peak element.',
+        constraints: ['1 <= N <= 10^5', 'arr[-1] = arr[N] = -∞ (treat boundaries as negative infinity)'],
         sampleInput: '5\n1 3 5 2 4',
         sampleOutput: '2',
         solutionApproach: 'Binary search: if arr[mid] < arr[mid+1], peak is right; else left or mid.',
@@ -4004,8 +3965,8 @@ public class PeakElement {
         int low = 0, high = n - 1;
         while (low < high) {
             int mid = low + (high - low) / 2;
-            // TODO: if arr[mid] < arr[mid+1], peak is in right half â†’ low = mid+1
-            // TODO: else peak is in left half or at mid â†’ high = mid
+            // TODO: if arr[mid] < arr[mid+1], peak is in right half → low = mid+1
+            // TODO: else peak is in left half or at mid → high = mid
         }
         System.out.println(low); // low == high at peak
     }
@@ -4016,12 +3977,12 @@ public class PeakElement {
             { input: '1\n7', expectedOutput: '0', isHidden: true },
         ],
         hints: [
-            'Any peak is acceptable â€” multiple correct answers exist.',
+            'Any peak is acceptable — multiple correct answers exist.',
             'When arr[mid] < arr[mid+1], the right side must have a peak.',
         ],
     },
 
-    // â”€â”€ Module 6 â€“ Sorting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 6 – Sorting --------------------
 
     // 6.1 Basic Sorting
     {
@@ -4036,7 +3997,7 @@ public class PeakElement {
         sampleInput: '5\n5 3 1 4 2',
         sampleOutput: '1 2 3 4 5',
         solutionApproach: 'For each element, find its correct position in the sorted prefix by shifting larger elements right.',
-        timeComplexity: 'O(NÂ²)',
+        timeComplexity: 'O(N²)',
         spaceComplexity: 'O(1)',
         difficulty: 'Basic',
         tags: ['insertion-sort', 'sorting'],
@@ -4182,7 +4143,7 @@ public class MissingNumber {
         ],
     },
 
-    // â”€â”€ Module 7 â€“ Recursion â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 7 – Recursion --------------------
 
     // 7.1 Recursion Fundamentals
     {
@@ -4196,7 +4157,7 @@ public class MissingNumber {
         constraints: ['0 <= B <= 10^9', '0 <= N <= 10^9'],
         sampleInput: '2 10',
         sampleOutput: '1024',
-        solutionApproach: 'If N==0 return 1. If N is even: power(BÂ²,N/2). If odd: B * power(B,N-1).',
+        solutionApproach: 'If N==0 return 1. If N is even: power(B²,N/2). If odd: B * power(B,N-1).',
         timeComplexity: 'O(log N)',
         spaceComplexity: 'O(log N)',
         difficulty: 'Medium',
@@ -4208,8 +4169,8 @@ public class FastPower {
 
     static long power(long base, long exp) {
         if (exp == 0) return 1;
-        // TODO: if exp is even â†’ power(base*base % MOD, exp/2)
-        // TODO: if exp is odd  â†’ base * power(base, exp-1) % MOD
+        // TODO: if exp is even → power(base*base % MOD, exp/2)
+        // TODO: if exp is odd  → base * power(base, exp-1) % MOD
         return 0; // replace
     }
 
@@ -4244,7 +4205,7 @@ public class FastPower {
         sampleInput: '3\n1 2 3',
         sampleOutput: '\n3\n2\n2 3\n1\n1 3\n1 2\n1 2 3',
         solutionApproach: 'Recursive: at each index, include or exclude the element. Base case: index==N, print current subset.',
-        timeComplexity: 'O(2^N Ã— N)',
+        timeComplexity: 'O(2^N × N)',
         spaceComplexity: 'O(N)',
         difficulty: 'Medium',
         tags: ['recursion', 'subsets', 'power-set'],
@@ -4287,9 +4248,9 @@ public class AllSubsets {
         hasCoding: true,
         title: 'N-Queens Problem',
         description: 'Solve the N-Queens problem using backtracking as taught in Kunal\'s backtracking video.',
-        problemStatement: 'Given N, find the total number of ways to place N queens on an NÃ—N chessboard such that no two queens attack each other.',
+        problemStatement: 'Given N, find the total number of ways to place N queens on an N×N chessboard such that no two queens attack each other.',
         inputFormat: 'A single integer N.',
-        outputFormat: 'A single integer â€” total number of valid configurations.',
+        outputFormat: 'A single integer — total number of valid configurations.',
         constraints: ['1 <= N <= 12'],
         sampleInput: '4',
         sampleOutput: '2',
@@ -4338,7 +4299,7 @@ public class NQueens {
         ],
     },
 
-    // â”€â”€ Module 8 â€“ Linked Lists â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 8 – Linked Lists --------------------
 
     // 8.1 Singly Linked List
     {
@@ -4458,7 +4419,7 @@ public class MiddleLinkedList {
             { input: '1\n7', expectedOutput: '7', isHidden: true },
         ],
         hints: [
-            'Condition: fast != null && fast.next != null â€” otherwise fast.next.next throws NullPointerException.',
+            'Condition: fast != null && fast.next != null — otherwise fast.next.next throws NullPointerException.',
         ],
     },
 
@@ -4474,7 +4435,7 @@ public class MiddleLinkedList {
         constraints: ['1 <= N <= 10^4', '-1 <= P < N'],
         sampleInput: '5\n3 2 0 4 5\n1',
         sampleOutput: 'CYCLE',
-        solutionApproach: 'Slow and fast pointer. If they ever meet â†’ CYCLE. If fast reaches null â†’ NO CYCLE.',
+        solutionApproach: 'Slow and fast pointer. If they ever meet → CYCLE. If fast reaches null → NO CYCLE.',
         timeComplexity: 'O(N)',
         spaceComplexity: 'O(1)',
         difficulty: 'Hard',
@@ -4519,7 +4480,7 @@ public class DetectCycle {
         ],
     },
 
-    // â”€â”€ Module 9 â€“ Stack & Queue â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 9 – Stack & Queue --------------------
 
     // 9.1 Stack Implementation
     {
@@ -4551,7 +4512,7 @@ public class ValidParentheses {
             if (c == '(' || c == '{' || c == '[') {
                 // TODO: push c onto stack
             } else {
-                // TODO: if stack is empty â†’ invalid
+                // TODO: if stack is empty → invalid
                 // TODO: pop top and check if it matches c's opening pair
                 // '(' matches ')', '{' matches '}', '[' matches ']'
             }
@@ -4683,12 +4644,12 @@ public class KLargest {
             { input: '4 4\n1 2 3 4', expectedOutput: '1 2 3 4', isHidden: true },
         ],
         hints: [
-            'After processing all elements, the heap has exactly K elements â€” the K largest.',
+            'After processing all elements, the heap has exactly K elements — the K largest.',
             'Extract in reverse order (poll into array from back) to get ascending order.',
         ],
     },
 
-    // â”€â”€ Module 10 â€“ Trees â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 10 – Trees --------------------
 
     // 10.1 Binary Tree Fundamentals
     {
@@ -4791,7 +4752,7 @@ public class ValidateBST {
 
     static boolean validate(Node node, long min, long max) {
         if (node == null) return true;
-        // TODO: if node.val <= min || node.val >= max â†’ return false
+        // TODO: if node.val <= min || node.val >= max → return false
         // TODO: recursively validate left subtree with max = node.val
         // TODO: recursively validate right subtree with min = node.val
         return true; // replace
@@ -4813,7 +4774,7 @@ public class ValidateBST {
         ],
         hints: [
             'Use Long.MIN_VALUE and Long.MAX_VALUE as initial bounds to handle int edge cases.',
-            'Every node must satisfy min < node.val < max â€” not just relative to its direct parent.',
+            'Every node must satisfy min < node.val < max — not just relative to its direct parent.',
         ],
     },
 
@@ -4881,7 +4842,7 @@ public class RightView {
         ],
     },
 
-    // â”€â”€ Module 11 â€“ Heaps & Hashing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 11 – Heaps & Hashing --------------------
 
     // 11.1 Heap Data Structure
     {
@@ -4940,7 +4901,7 @@ public class KthLargest {
         sampleOutput: 'v',
         solutionApproach: 'Count frequencies with HashMap. Second pass: return first character with frequency 1.',
         timeComplexity: 'O(N)',
-        spaceComplexity: 'O(1) â€” at most 26 entries',
+        spaceComplexity: 'O(1) — at most 26 entries',
         difficulty: 'Basic',
         tags: ['HashMap', 'frequency', 'string'],
         javaStarterCode: `import java.util.*;
@@ -5004,7 +4965,7 @@ public class RabinKarp {
         long patHash = 0, winHash = 0, power = 1;
         List<Integer> result = new ArrayList<>();
 
-        // Placeholder â€“ implement rolling hash
+        // Placeholder – implement rolling hash
         System.out.println(result.isEmpty() ? -1 :
             result.stream().map(String::valueOf).reduce((a,b)->a+" "+b).get());
     }
@@ -5020,7 +4981,7 @@ public class RabinKarp {
         ],
     },
 
-    // â”€â”€ Module 12 â€“ Graphs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 12 – Graphs --------------------
 
     // 12.1 Graph Representation
     {
@@ -5077,7 +5038,7 @@ public class AdjacencyList {
         description: 'Count connected components in an undirected graph using BFS as taught in Kunal\'s BFS/DFS video.',
         problemStatement: 'Given V vertices and E undirected edges, print the number of connected components.',
         inputFormat: 'First line: V and E. Next E lines: u v.',
-        outputFormat: 'A single integer â€” number of connected components.',
+        outputFormat: 'A single integer — number of connected components.',
         constraints: ['1 <= V <= 10^4', '0 <= E <= 10^5'],
         sampleInput: '5 3\n0 1\n1 2\n3 4',
         sampleOutput: '2',
@@ -5139,7 +5100,7 @@ public class ConnectedComponents {
         problemStatement: 'Given a weighted undirected graph with V vertices, E edges, and source S, print shortest distance from S to all vertices. Print -1 if unreachable.',
         inputFormat: 'First line: V, E, S. Next E lines: u v w (edge with weight w).',
         outputFormat: 'V space-separated shortest distances.',
-        constraints: ['1 <= V <= 10^4', '0 <= E <= 2Ã—10^5', '0 <= w <= 10^6'],
+        constraints: ['1 <= V <= 10^4', '0 <= E <= 2×10^5', '0 <= w <= 10^6'],
         sampleInput: '5 6 0\n0 1 4\n0 2 1\n2 1 2\n1 3 1\n2 3 5\n3 4 3',
         sampleOutput: '0 3 1 4 7',
         solutionApproach: 'dist[] = INF, dist[S]=0. PriorityQueue by distance. Relax neighbours when shorter path found.',
@@ -5196,7 +5157,7 @@ public class Dijkstra {
         ],
     },
 
-    // â”€â”€ Module 13 â€“ Dynamic Programming â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 13 – Dynamic Programming --------------------
 
     // 13.1 DP Fundamentals
     {
@@ -5252,7 +5213,7 @@ public class ClimbingStairs {
         sampleInput: '4 5\n1 3 4 5\n1 4 5 7',
         sampleOutput: '9',
         solutionApproach: 'dp[w] = max value using capacity w. For each item, iterate capacity backwards.',
-        timeComplexity: 'O(N Ã— W)',
+        timeComplexity: 'O(N × W)',
         spaceComplexity: 'O(W)',
         difficulty: 'Hard',
         tags: ['0-1-knapsack', 'DP', 'tabulation'],
@@ -5292,14 +5253,14 @@ public class Knapsack01 {
         title: 'Longest Common Subsequence',
         description: 'Implement LCS using 2D DP as taught in Kunal\'s DP on strings video.',
         problemStatement: 'Given two strings A and B, print the length of their Longest Common Subsequence.',
-        inputFormat: 'Two lines â€” strings A and B.',
-        outputFormat: 'A single integer â€” LCS length.',
+        inputFormat: 'Two lines — strings A and B.',
+        outputFormat: 'A single integer — LCS length.',
         constraints: ['1 <= |A|, |B| <= 1000'],
         sampleInput: 'ABCBDAB\nBDCABA',
         sampleOutput: '4',
         solutionApproach: 'dp[i][j] = LCS of A[0..i-1] and B[0..j-1]. If match: dp[i-1][j-1]+1, else max(dp[i-1][j], dp[i][j-1]).',
-        timeComplexity: 'O(M Ã— N)',
-        spaceComplexity: 'O(M Ã— N)',
+        timeComplexity: 'O(M × N)',
+        spaceComplexity: 'O(M × N)',
         difficulty: 'Hard',
         tags: ['LCS', 'DP', 'strings'],
         javaStarterCode: `import java.util.Scanner;
@@ -5334,13 +5295,13 @@ public class LCS {
         ],
     },
 
-    // â”€â”€ Module 14 â€“ Advanced DSA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -------------------- Module 14 – Advanced DSA --------------------
 
     // 14.1 Tries
     {
         moduleOrder: 14, topicOrder: 1,
         hasCoding: true,
-        title: 'Implement Trie â€“ Insert and Search',
+        title: 'Implement Trie – Insert and Search',
         description: 'Build a Trie supporting insert, search, and startsWith as shown in Kunal\'s Trie video.',
         problemStatement: 'Process Q operations on a Trie: INSERT word, SEARCH word (print YES/NO), PREFIX word (print YES/NO if any word starts with prefix).',
         inputFormat: 'First line: Q. Next Q lines: operation and string.',
@@ -5554,12 +5515,12 @@ public class SegmentTree {
         description: 'Count distinct elements in multiple ranges using Mo\'s algorithm as taught in Kunal\'s Mo\'s algorithm video.',
         problemStatement: 'Given an array of N integers and Q queries [l, r], print the count of distinct elements in each range.',
         inputFormat: 'First line: N. Second line: N integers. Third line: Q. Next Q lines: l r.',
-        outputFormat: 'Q lines â€” distinct count for each query.',
-        constraints: ['1 <= N, Q <= 5Ã—10^4', '0 <= arr[i] <= 10^6', '0-indexed queries'],
+        outputFormat: 'Q lines — distinct count for each query.',
+        constraints: ['1 <= N, Q <= 5×10^4', '0 <= arr[i] <= 10^6', '0-indexed queries'],
         sampleInput: '6\n1 2 3 2 1 3\n3\n0 5\n1 3\n2 4',
         sampleOutput: '3\n3\n3',
         solutionApproach: 'Sort queries by (block, R). Expand/shrink window maintaining freq[] and distinctCount. Answer queries in sorted order, output in original order.',
-        timeComplexity: 'O((N+Q)âˆšN)',
+        timeComplexity: 'O((N+Q)√N)',
         spaceComplexity: 'O(N + Q)',
         difficulty: 'Hard',
         tags: ["Mo's", 'offline', 'distinct-count', 'sqrt-decomposition'],
@@ -5631,22 +5592,36 @@ public class MosAlgorithm {
         ],
     },
 
-]; // â† closes the codingProblems array
+]; // ← closes the codingProblems array
+
+const normalizedModules = normalizeSeedValue(modules);
+const normalizedTopics = normalizeSeedValue(topics);
+const normalizedMcqs = normalizeSeedValue(mcqs);
+const normalizedCodingProblems = normalizeSeedValue(codingProblems);
+const normalizedModuleLevelByOrder = Object.fromEntries(
+    normalizedModules.map((module) => [module.order, module.courseLevel || 'Beginner'])
+);
 
 const validateSeedCoverage = () => {
-    const topicKeys = new Set(topics.map((topic) => `${topic.moduleOrder}_${topic.order}`));
-    const mcqKeys = new Set(mcqs.map((mcq) => `${mcq.moduleOrder}_${mcq.topicOrder}`));
+    const topicKeys = new Set(normalizedTopics.map((topic) => `${topic.moduleOrder}_${topic.order}`));
+    const mcqKeys = new Set(normalizedMcqs.map((mcq) => `${mcq.moduleOrder}_${mcq.topicOrder}`));
     const codingKeys = new Set(
-        codingProblems.map((problem) => `${problem.moduleOrder}_${problem.topicOrder}`)
+        normalizedCodingProblems.map((problem) => `${problem.moduleOrder}_${problem.topicOrder}`)
     );
-    const levelMismatches = topics.filter(
-        (topic) => (moduleLevelByOrder[topic.moduleOrder] || 'Beginner') !== topic.courseLevel
+    const mcqCountsByTopic = normalizedMcqs.reduce((acc, mcq) => {
+        const key = `${mcq.moduleOrder}_${mcq.topicOrder}`;
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+    const levelMismatches = normalizedTopics.filter(
+        (topic) => (normalizedModuleLevelByOrder[topic.moduleOrder] || 'Beginner') !== topic.courseLevel
     );
 
     const missingMcqs = [...topicKeys].filter((key) => !mcqKeys.has(key));
     const missingCoding = [...topicKeys].filter((key) => !codingKeys.has(key));
+    const insufficientMcqs = [...topicKeys].filter((key) => (mcqCountsByTopic[key] || 0) < 5);
 
-    if (missingMcqs.length > 0 || missingCoding.length > 0 || levelMismatches.length > 0) {
+    if (missingMcqs.length > 0 || missingCoding.length > 0 || insufficientMcqs.length > 0 || levelMismatches.length > 0) {
         throw new Error(
             [
                 'Seed coverage validation failed.',
@@ -5655,6 +5630,9 @@ const validateSeedCoverage = () => {
                     : null,
                 missingCoding.length > 0
                     ? `Missing coding problems for: ${missingCoding.join(', ')}`
+                    : null,
+                insufficientMcqs.length > 0
+                    ? `Topics with fewer than 5 MCQs: ${insufficientMcqs.join(', ')}`
                     : null,
                 levelMismatches.length > 0
                     ? `Topic level mismatches: ${levelMismatches.map((topic) => `${topic.moduleOrder}_${topic.order}`).join(', ')}`
@@ -5665,11 +5643,6 @@ const validateSeedCoverage = () => {
         );
     }
 };
-
-
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-//  SEED FUNCTION
-// â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 async function seed() {
     section('Connecting to MongoDB');
     await mongoose.connect(process.env.MONGO_URI, {
@@ -5678,7 +5651,7 @@ async function seed() {
     });
     log('Connected');
     validateSeedCoverage();
-    log(`Seed coverage verified for ${topics.length} topics`);
+    log(`Seed coverage verified for ${normalizedTopics.length} topics`);
 
     const fresh = process.argv.includes('--fresh');
 
@@ -5710,68 +5683,84 @@ async function seed() {
         log('User curriculum-bound fields reset');
     }
 
-    // â”€â”€ Insert Modules â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    section('Inserting Modules');
-    const insertedModules = await Module.insertMany(
-        modules.map(m => ({
-            order: m.order,
-            title: m.title,
-            description: m.description,
-            // Module schema requires estimatedDays and difficulty.
-            difficulty: m.courseLevel || 'Beginner',
-            estimatedDays:
-                typeof m.estimatedDays === 'number'
-                    ? m.estimatedDays
-                    : (m.courseLevel === 'Advanced' ? 7 : (m.courseLevel === 'Intermediate' ? 5 : 4)),
-            totalTopics: 0,
-            topics: [],
-        }))
-    );
-    log(`${insertedModules.length} modules inserted`);
+   
+    section('Inserting/Updating Modules');
+    const moduleOps = normalizedModules.map(m => ({
+        updateOne: {
+            filter: { order: m.order },
+            update: {
+                $set: {
+                    order: m.order,
+                    title: m.title,
+                    description: m.description,
+                    difficulty: m.courseLevel || 'Beginner',
+                    estimatedDays:
+                        typeof m.estimatedDays === 'number'
+                            ? m.estimatedDays
+                            : (m.courseLevel === 'Advanced' ? 7 : (m.courseLevel === 'Intermediate' ? 5 : 4)),
+                }
+            },
+            upsert: true,
+        }
+    }));
+    await Module.bulkWrite(moduleOps);
+    log(`${normalizedModules.length} modules upserted`);
+    
+    // Fetch all modules for mapping
+    const insertedModules = await Module.find({}).sort({ order: 1 });
 
-    // Build order â†’ ObjectId map for modules
+    // Build order → ObjectId map for modules
     const moduleMap = {};
     insertedModules.forEach(m => { moduleMap[m.order] = m._id; });
     const codingTopicMap = new Map(
-        codingProblems.map((problem) => [
+        normalizedCodingProblems.map((problem) => [
             `${problem.moduleOrder}_${problem.topicOrder}`,
             problem.hasCoding !== false,
         ])
     );
 
-    // â”€â”€ Insert Topics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    section('Inserting Topics');
-    const insertedTopics = await Topic.insertMany(
-        topics.map(t => {
-            const topicKey = `${t.moduleOrder}_${t.order}`;
-            const resolvedCourseLevel = moduleLevelByOrder[t.moduleOrder] || 'Beginner';
-            const durationMinutes = Number(t.videoDuration) || 0;
-            const hasCoding = codingTopicMap.get(topicKey) !== false;
+    // -------------------- Insert/Update Topics --------------------
+    section('Inserting/Updating Topics');
+    const topicOps = normalizedTopics.map(t => {
+        const topicKey = `${t.moduleOrder}_${t.order}`;
+        const resolvedCourseLevel = normalizedModuleLevelByOrder[t.moduleOrder] || 'Beginner';
+        const durationMinutes = Number(t.videoDuration) || 0;
+        const hasCoding = codingTopicMap.get(topicKey) !== false;
+        const moduleId = moduleMap[t.moduleOrder];
 
-            return {
-                moduleId: moduleMap[t.moduleOrder],
-                moduleOrder: t.moduleOrder,
-                order: t.order,
-                title: t.title,
-                description: t.description || t.title,
-                videoUrl: t.videoUrl,
-                videoTitle: t.videoTitle,
-                videoDuration: durationMinutes,
-                estimatedMinutes: durationMinutes,
-                difficultyLevel: t.difficultyLevel,
-                courseLevel: resolvedCourseLevel,
-                javaConceptTags: t.javaConceptTags || [],
-                learningAssets: buildLearningAssets(t, hasCoding),
-                status: 'Locked',
-            };
-        })
-    );
-    log(`${insertedTopics.length} topics inserted`);
+        return {
+            updateOne: {
+                filter: { moduleId, order: t.order },
+                update: {
+                    $set: {
+                        moduleId,
+                        order: t.order,
+                        title: t.title,
+                        description: t.description || t.title,
+                        videoUrl: t.videoUrl,
+                        videoTitle: t.videoTitle,
+                        videoDuration: durationMinutes,
+                        estimatedMinutes: durationMinutes,
+                        difficultyLevel: t.difficultyLevel,
+                        courseLevel: resolvedCourseLevel,
+                        javaConceptTags: t.javaConceptTags || [],
+                        learningAssets: buildLearningAssets(t, hasCoding),
+                    }
+                },
+                upsert: true,
+            }
+        };
+    });
+    await Topic.bulkWrite(topicOps);
+    log(`${normalizedTopics.length} topics upserted`);
 
-    // Build (moduleOrder, topicOrder) â†’ ObjectId map for topics
+    // Fetch all topics for mapping
+    const insertedTopics = await Topic.find({}).sort({ moduleId: 1, order: 1 });
+
+    // Build (moduleOrder, topicOrder) → ObjectId map for topics
     const topicMap = {};
     insertedTopics.forEach((t, index) => {
-        const sourceTopic = topics[index];
+        const sourceTopic = normalizedTopics[index];
         if (sourceTopic) {
             topicMap[`${sourceTopic.moduleOrder}_${sourceTopic.order}`] = t._id;
         }
@@ -5791,13 +5780,11 @@ async function seed() {
     log('Module topic references updated');
 
     
-    section('Inserting MCQs');
-    const mcqDocs = mcqs.map((q, index) => ({
+    section('Inserting/Updating MCQs');
+    const mcqDocs = normalizedMcqs.map((q, index) => ({
         seedIndex: index,
         topicId: topicMap[`${q.moduleOrder}_${q.topicOrder}`],
         moduleId: moduleMap[q.moduleOrder],
-        moduleOrder: q.moduleOrder,
-        topicOrder: q.topicOrder,
         difficulty: q.difficulty,
         question: q.question,
         options: q.options,
@@ -5811,27 +5798,38 @@ async function seed() {
         console.warn(`  ! Skipping ${invalidMCQs.length} MCQ(s) with invalid module/topic mapping`);
         invalidMCQs.slice(0, 5).forEach(doc => {
             console.warn(
-                `    - MCQ #${doc.seedIndex} (moduleOrder=${doc.moduleOrder}, topicOrder=${doc.topicOrder})`
+                `    - MCQ #${doc.seedIndex}`
             );
         });
     }
     const validMCQDocs = mcqDocs
         .filter(doc => doc.topicId && doc.moduleId)
         .map(({ seedIndex, ...doc }) => doc);
-    const insertedMCQs = await MCQ.insertMany(validMCQDocs);
-    log(`${insertedMCQs.length} MCQs inserted`);
+    
+    const mcqOps = validMCQDocs.map(doc => ({
+        updateOne: {
+            filter: {
+                topicId: doc.topicId,
+                question: doc.question,
+            },
+            update: { $set: doc },
+            upsert: true,
+        }
+    }));
+    if (mcqOps.length > 0) {
+        await MCQ.bulkWrite(mcqOps);
+    }
+    log(`${validMCQDocs.length} MCQs upserted`);
 
     
-    section('Inserting Coding Problems');
-    const cpDocs = codingProblems.map(cp => {
+    section('Inserting/Updating Coding Problems');
+    const cpDocs = normalizedCodingProblems.map(cp => {
         const topicId = topicMap[`${cp.moduleOrder}_${cp.topicOrder}`];
         const moduleId = moduleMap[cp.moduleOrder];
         if (cp.hasCoding === false) {
             return {
                 topicId,
                 moduleId,
-                moduleOrder: cp.moduleOrder,
-                topicOrder: cp.topicOrder,
                 hasCoding: false,
                 title: cp.title,
                 description: cp.description,
@@ -5842,8 +5840,6 @@ async function seed() {
         return {
             topicId,
             moduleId,
-            moduleOrder: cp.moduleOrder,
-            topicOrder: cp.topicOrder,
             hasCoding: true,
             title: cp.title,
             description: cp.description,
@@ -5863,11 +5859,24 @@ async function seed() {
             tags: cp.tags || [],
         };
     });
-    const insertedCPs = await CodingProblem.insertMany(cpDocs);
-    log(`${insertedCPs.length} coding problems inserted`);
+    
+    const cpOps = cpDocs.map(doc => ({
+        updateOne: {
+            filter: {
+                topicId: doc.topicId,
+                title: doc.title,
+            },
+            update: { $set: doc },
+            upsert: true,
+        }
+    }));
+    if (cpOps.length > 0) {
+        await CodingProblem.bulkWrite(cpOps);
+    }
+    log(`${cpDocs.length} coding problems upserted`);
 
     
-    section('Seed Complete â€“ Final Counts');
+    section('Seed Complete – Final Counts');
     log(`Modules:         ${await Module.countDocuments()}`);
     log(`Topics:          ${await Topic.countDocuments()}`);
     log(`MCQs:            ${await MCQ.countDocuments()}`);

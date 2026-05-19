@@ -164,6 +164,25 @@ const userSchema = new mongoose.Schema(
       ref: 'Roadmap',
       default: null,
     },
+
+    assessmentLock: {
+      isLocked: {
+        type: Boolean,
+        default: false,
+      },
+      lockedUntil: {
+        type: Date,
+        default: null,
+      },
+      lockReason: {
+        type: String,
+        default: '',
+      },
+      lockCount: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   {
     timestamps: true,

@@ -1,4 +1,3 @@
-// server/controllers/mcq.controller.js
 const MCQ = require('../models/MCQ');
 const Module = require('../models/Module');
 const {
@@ -6,19 +5,73 @@ const {
   getTopicProgressionState,
 } = require('../services/progressionService');
 
-// Helper: shuffle array in place and return mapping of newIndex -> originalIndex
 function shuffleOptions(options) {
   const indices = [0, 1, 2, 3];
-  for (let i = indices.length - 1; i > 0; i--) {
+  for (let i = indices.length - 1; i > 0; i -= 1) {
     const j = Math.floor(Math.random() * (i + 1));
     [indices[i], indices[j]] = [indices[j], indices[i]];
   }
   const shuffled = indices.map((originalIdx) => options[originalIdx]);
-  const originalOrder = indices; // originalOrder[newIdx] = originalIdx
+  const originalOrder = indices;
   return { shuffled, originalOrder };
 }
 
-// @desc    Get 5 MCQs for a topic and difficulty (student view: no answers)
+const shuffleItems = (items = []) => {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+const difficultyFallbackOrder = {
+  Basic: ['Basic', 'Medium', 'Hard'],
+  Medium: ['Medium', 'Hard', 'Basic'],
+  Hard: ['Hard', 'Medium', 'Basic'],
+};
+
+const selectTopicQuestions = (pool = [], level, targetCount = 5) => {
+  const orderedLevels = difficultyFallbackOrder[level] || [level];
+  const selected = [];
+  const seenIds = new Set();
+
+  orderedLevels.forEach((difficulty) => {
+    if (selected.length >= targetCount) {
+      return;
+    }
+
+    const matching = shuffleItems(
+      pool.filter((mcq) => mcq.difficulty === difficulty)
+    );
+
+    matching.forEach((mcq) => {
+      const id = String(mcq._id);
+      if (selected.length >= targetCount || seenIds.has(id)) {
+        return;
+      }
+      seenIds.add(id);
+      selected.push(mcq);
+    });
+  });
+
+  return selected;
+};
+
+const serializeQuestion = (mcq) => {
+  const { shuffled, originalOrder } = shuffleOptions(mcq.options);
+  return {
+    _id: mcq._id,
+    question: mcq.question,
+    options: shuffled,
+    originalOrder,
+    timeLimit: mcq.timeLimit,
+    points: mcq.points,
+    difficulty: mcq.difficulty,
+  };
+};
+
+// @desc    Get up to 5 MCQs for a topic and preferred difficulty (student view: no answers)
 // @route   GET /api/mcq/topic/:topicId/:level
 // @access  Private
 const getMCQsByTopic = async (req, res, next) => {
@@ -47,30 +100,28 @@ const getMCQsByTopic = async (req, res, next) => {
       });
     }
 
-    const mcqs = await MCQ.find({
+    const questionPool = await MCQ.find({
       topicId,
-      difficulty: level,
       isActive: true,
-    }).limit(5);
+    }).lean();
 
-    if (mcqs.length === 0) {
+    if (questionPool.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No MCQs found for this topic',
+      });
+    }
+
+    const selectedMcqs = selectTopicQuestions(questionPool, level, 5);
+    if (selectedMcqs.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'No MCQs found for this topic and level',
       });
     }
 
-    const questions = mcqs.map((mcq) => {
-      const { shuffled, originalOrder } = shuffleOptions(mcq.options);
-      return {
-        _id: mcq._id,
-        question: mcq.question,
-        options: shuffled,
-        originalOrder, // allows server-side answer verification later
-        timeLimit: mcq.timeLimit,
-        points: mcq.points,
-      };
-    });
+    const questions = selectedMcqs.map(serializeQuestion);
+    const fallbackUsed = selectedMcqs.some((mcq) => mcq.difficulty !== level);
 
     res.status(200).json({
       success: true,
@@ -78,7 +129,10 @@ const getMCQsByTopic = async (req, res, next) => {
         questions,
         topicId,
         level,
-        timeLimit: mcqs[0].timeLimit, // assume all same timeLimit
+        requestedCount: 5,
+        actualCount: questions.length,
+        fallbackUsed,
+        timeLimit: selectedMcqs[0]?.timeLimit || 60,
       },
     });
   } catch (err) {
@@ -119,11 +173,11 @@ const getDiagnosticMCQs = async (req, res, next) => {
 
     const diagnosticQuestions = [];
 
-    for (const mod of modules) {
+    for (const moduleDoc of modules) {
       const mcqs = await MCQ.aggregate([
         {
           $match: {
-            moduleId: mod._id,
+            moduleId: moduleDoc._id,
             difficulty: { $in: ['Basic', 'Medium'] },
             isActive: true,
           },
@@ -134,20 +188,12 @@ const getDiagnosticMCQs = async (req, res, next) => {
       if (mcqs.length === 0) {
         return res.status(500).json({
           success: false,
-          message: `Not enough MCQs in module ${mod.order} for diagnostic`,
+          message: `Not enough MCQs in module ${moduleDoc.order} for diagnostic`,
         });
       }
 
       mcqs.forEach((mcq) => {
-        const { shuffled, originalOrder } = shuffleOptions(mcq.options);
-        diagnosticQuestions.push({
-          _id: mcq._id,
-          question: mcq.question,
-          options: shuffled,
-          originalOrder,
-          timeLimit: mcq.timeLimit,
-          points: mcq.points,
-        });
+        diagnosticQuestions.push(serializeQuestion(mcq));
       });
     }
 

@@ -4,6 +4,7 @@ const {
   addEvent,
   addWarning,
   applyRisk,
+  captureMonitoringEvidence,
   closeActiveSessionsForUser,
   finalizeSession,
   getBrowserAnalysis,
@@ -191,6 +192,15 @@ const analyzeMonitoringFrame = async (req, res, next) => {
       ...(result?.signals || []),
       ...alerts.map((alert) => alert.code),
     ]);
+    const evidenceResult = await captureMonitoringEvidence({
+      session,
+      alerts,
+      imageData,
+      metadata,
+      riskLevel: result?.riskLevel || 'LOW',
+      confidence: result?.confidence || 0,
+      modelSource: result?.metadata?.modelSource || (result?.fallback ? 'heuristic' : 'onnx'),
+    });
 
     summarizeVisionFindings(session, detections, result?.confidence || 0);
     applyRisk(session, {
@@ -231,6 +241,9 @@ const analyzeMonitoringFrame = async (req, res, next) => {
       data: buildSessionResponse(session, {
         alerts,
         detections,
+        evidenceCaptured: !!evidenceResult?.evidenceCaptured,
+        evidenceTrigger: evidenceResult?.evidenceTrigger || null,
+        evidenceCount: Number(evidenceResult?.evidenceCount || 0),
       }),
     });
   } catch (err) {

@@ -25,6 +25,7 @@ api.interceptors.response.use(
       const userType = localStorage.getItem("dsa_user_type");
       localStorage.removeItem("dsa_token");
       localStorage.removeItem("dsa_user_type");
+      localStorage.removeItem("dsa_diag_completed");
       const target =
         userType === "institution" ? "/institution/login" : "/login";
       if (window.location.pathname !== target) {

@@ -11,6 +11,18 @@ const initialMetrics = {
   copyAttempts: 0,
   windowBlurCount: 0,
 };
+const FRAME_ANALYSIS_INTERVAL_MS = 6000;
+const FRAME_KICKOFF_DELAY_MS = 1200;
+const initialVisionState = {
+  alerts: [],
+  detections: null,
+  confidence: 0,
+  riskLevel: 'NONE',
+  evidenceCaptured: false,
+  evidenceTrigger: null,
+  evidenceCount: 0,
+  updatedAt: null,
+};
 
 const isBrowserMobile = () => {
   if (typeof window === 'undefined') return false;
@@ -42,6 +54,7 @@ export default function usePracticeMonitoring({
   const captureVideoRef = useRef(null);
   const canvasRef = useRef(null);
   const frameTimerRef = useRef(null);
+  const frameKickoffTimerRef = useRef(null);
   const eventFlushTimerRef = useRef(null);
   const pendingStartResolveRef = useRef(null);
   const startedAutoRef = useRef(false);
@@ -55,12 +68,13 @@ export default function usePracticeMonitoring({
   const [error, setError] = useState('');
   const [stream, setStream] = useState(null);
   const [browserMetrics, setBrowserMetrics] = useState(initialMetrics);
+  const [visionState, setVisionState] = useState(initialVisionState);
   const [sessionState, setSessionState] = useState(
     isBrowserOnly
       ? {
           monitoringSessionId: null,
           warningCount: 0,
-          warningLimit: institutionLinked ? 2 : 3,
+          warningLimit: 3,
           finalFlagged: false,
           riskLevel: 'NONE',
           riskScore: 0,
@@ -73,7 +87,7 @@ export default function usePracticeMonitoring({
   const [browserOnlyStarted, setBrowserOnlyStarted] = useState(isBrowserOnly ? autoStart : false);
   const [isMobile, setIsMobile] = useState(isBrowserMobile);
 
-  const warningLimit = sessionState?.warningLimit || (institutionLinked ? 2 : 3);
+  const warningLimit = sessionState?.warningLimit || 3;
   const sessionId = sessionState?.monitoringSessionId || null;
   const isMonitoring = isBrowserOnly ? browserOnlyStarted : (!!sessionId && !!stream);
 
@@ -81,6 +95,11 @@ export default function usePracticeMonitoring({
     if (frameTimerRef.current) {
       window.clearInterval(frameTimerRef.current);
       frameTimerRef.current = null;
+    }
+
+    if (frameKickoffTimerRef.current) {
+      window.clearTimeout(frameKickoffTimerRef.current);
+      frameKickoffTimerRef.current = null;
     }
 
     if (eventFlushTimerRef.current) {
@@ -128,11 +147,7 @@ export default function usePracticeMonitoring({
       canvasRef.current = document.createElement('canvas');
     }
 
-    if (frameTimerRef.current) {
-      window.clearInterval(frameTimerRef.current);
-    }
-
-    frameTimerRef.current = window.setInterval(async () => {
+    const sampleFrame = async () => {
       if (!captureVideoRef.current || !sessionId || document.hidden) return;
       if (captureVideoRef.current.readyState < 2) return;
 
@@ -148,23 +163,49 @@ export default function usePracticeMonitoring({
             deviceType: isMobile ? 'mobile' : 'desktop',
           },
         });
+
+        setVisionState({
+          alerts: Array.isArray(nextState?.alerts) ? nextState.alerts : [],
+          detections: nextState?.detections || null,
+          confidence: Number(nextState?.confidence || 0),
+          riskLevel: nextState?.riskLevel || 'NONE',
+          evidenceCaptured: !!nextState?.evidenceCaptured,
+          evidenceTrigger: nextState?.evidenceTrigger || null,
+          evidenceCount: Number(nextState?.evidenceCount || 0),
+          updatedAt: Date.now(),
+        });
         updateSessionState(nextState);
       } catch (frameError) {
         // Keep the session alive even if an individual frame analysis fails.
       }
-    }, 12000);
+    };
+
+    if (frameTimerRef.current) {
+      window.clearInterval(frameTimerRef.current);
+    }
+
+    if (frameKickoffTimerRef.current) {
+      window.clearTimeout(frameKickoffTimerRef.current);
+    }
+
+    frameKickoffTimerRef.current = window.setTimeout(() => {
+      sampleFrame();
+    }, FRAME_KICKOFF_DELAY_MS);
+
+    frameTimerRef.current = window.setInterval(sampleFrame, FRAME_ANALYSIS_INTERVAL_MS);
   }, [isMobile, sessionId, updateSessionState]);
 
   const beginSession = useCallback(async () => {
     if (isBrowserOnly) {
       latestBrowserMetricsRef.current = initialMetrics;
       setBrowserMetrics(initialMetrics);
+      setVisionState(initialVisionState);
       browserOnlyWarningRef.current = 0;
       setPermissionState('granted');
       setSessionState({
         monitoringSessionId: null,
         warningCount: 0,
-        warningLimit: institutionLinked ? 2 : 3,
+        warningLimit: 3,
         finalFlagged: false,
         riskLevel: 'NONE',
         riskScore: 0,
@@ -205,6 +246,7 @@ export default function usePracticeMonitoring({
 
       latestBrowserMetricsRef.current = initialMetrics;
       setBrowserMetrics(initialMetrics);
+      setVisionState(initialVisionState);
       setPermissionState('granted');
       setStream(mediaStream);
       updateSessionState(nextSession);
@@ -337,6 +379,10 @@ export default function usePracticeMonitoring({
     if (isBrowserOnly || !isMonitoring) return undefined;
     startSampling();
     return () => {
+      if (frameKickoffTimerRef.current) {
+        window.clearTimeout(frameKickoffTimerRef.current);
+        frameKickoffTimerRef.current = null;
+      }
       if (frameTimerRef.current) {
         window.clearInterval(frameTimerRef.current);
         frameTimerRef.current = null;
@@ -387,5 +433,6 @@ export default function usePracticeMonitoring({
     startMonitoring,
     stream,
     trackBrowserEvent,
+    visionState,
   };
 }
