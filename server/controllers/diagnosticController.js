@@ -25,9 +25,10 @@ const {
   runDiagnosticProblem,
   runDiagnosticProblemLocally,
 } = require('../services/judge0Service');
+const { ML_SERVICE_URL } = require('../config/env');
 
 const ALLOWED_LEVELS = ['Beginner', 'Intermediate', 'Placement-Ready'];
-const ML_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+const ML_URL = ML_SERVICE_URL;
 const TOTAL_CODING_WEIGHT = 23;
 const MCQ_COMBINED_WEIGHT = 0.3;
 const CODING_COMBINED_WEIGHT = 0.7;

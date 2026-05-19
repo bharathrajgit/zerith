@@ -2,9 +2,9 @@
 // Connects Node.js backend to Python Flask ML service
 
 const axios = require('axios');
+const { ML_SERVICE_URL } = require('../config/env');
 
-const ML_URL = process.env.ML_SERVICE_URL 
-  || 'http://localhost:8000';
+const ML_URL = ML_SERVICE_URL;
 
 // ── Timeout config ─────────────────────────────────────
 const mlAxios = axios.create({

@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config({ path: require('path').join(__dirname, '.env') });
+const { PORT, MONGO_URI } = require('./config/env');
 
 // Import route files
 const authRoutes = require('./routes/auth.routes');

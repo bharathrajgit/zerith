@@ -8,5 +8,5 @@ scikit-learn==1.8.0
 joblib==1.5.2
 python-dotenv==1.1.1
 requests==2.32.5
-Pillow==10.0.1
+Pillow==11.2.1
 onnxruntime==1.15.1
